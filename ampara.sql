@@ -16,6 +16,7 @@ CREATE TABLE Recebedor (
     Telefone VARCHAR(11),
     Nome_representante VARCHAR(40),
     CPF VARCHAR(14),
+    Senha VARCHAR(30),
     UNIQUE (CNPJ, Email, Telefone, CPF)
 );
 
