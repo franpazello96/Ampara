@@ -29,6 +29,12 @@ const signupSchema = z.object({
   
   CPF: z.string()
     .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido. Use o formato 000.000.000-00."),
+
+  Senha: z.string()
+    .min(6, "A senha deve ter pelo menos 6 caracteres.")
+    .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
+    .regex(/[0-9]/, "A senha deve ter pelo menos um número.")
+    .regex(/[\W_]/, "A senha deve ter pelo menos um caractere especial."),
 });
 
 type SignupFormData = z.infer<typeof signupSchema>;
@@ -87,6 +93,10 @@ export default function SignupRecebedor() {
         <div>
           <Input type="text" placeholder="CPF do Representante (000.000.000-00)" {...register("CPF")} />
           {errors.CPF && <p className="text-red-500 text-sm">{errors.CPF.message}</p>}
+        </div>
+        <div>
+          <Input type="password" placeholder="Senha" {...register("Senha")} />
+          {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
         </div>
 
         <Button type="submit">Cadastrar</Button>
