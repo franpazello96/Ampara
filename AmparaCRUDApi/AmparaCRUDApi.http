@@ -1,0 +1,6 @@
+@AmparaCRUDApi_HostAddress = http://localhost:5003
+
+GET {{AmparaCRUDApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
