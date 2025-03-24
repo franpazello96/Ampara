@@ -1,10 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AmparaCRUDApi.Models.Entities
+﻿namespace AmparaCRUDApi.Models
 {
-    public class Donator
+    public class AddDonatorDTO
     {
-        [Key]
         public required string CPF { get; set; }
 
         public required string Name { get; set; }
