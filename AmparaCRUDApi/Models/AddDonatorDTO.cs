@@ -1,12 +1,22 @@
-﻿namespace AmparaCRUDApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AmparaCRUDApi.Models
 {
     public class AddDonatorDTO
     {
-        public required string CPF { get; set; }
+        [Required]
+        public string CPF { get; set; }
 
-        public required string Name { get; set; }
-        public required string Email { get; set; }
-        public required string PhoneNumber { get; set; }
-        public required string Password { get; set; }
+        [Required]
+        public string Name { get; set; }
+
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        public string Password { get; set; }
     }
 }

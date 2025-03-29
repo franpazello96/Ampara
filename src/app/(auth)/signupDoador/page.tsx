@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import axios from "axios";
+import { toast } from "react-toastify";
 
     const signupSchema = z.object({
         Nome: z.string()
@@ -39,11 +40,11 @@ export default function Signup() {
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
-  const { reset } = useForm();
   async function onSubmit(data: SignupFormData) {
     try{
       const addForm = {
@@ -61,11 +62,25 @@ export default function Signup() {
 
       console.log("Dados enviados:", data);
 
-      if (response){
+      if (response.status === 200 || response.status === 201){
+        toast.success("Cadastro realizado com sucesso!")
         reset();
       }
     } catch (error: any){
-      console.error("Erro ao cadastrar usuário:", error);
+      let errorMessage = "Erro desconhecido";
+
+      if (error.response?.data){
+        if (typeof error.response.data === "string"){
+          errorMessage = error.response.data
+        } else if (typeof error.response.data === "object" && error.response.data.message){
+          errorMessage = error.response.data.message;
+        } else {
+          errorMessage = JSON.stringify(error.response.data);
+        }
+      }
+
+      toast.error("Falha ao cadastrar o usuario:" + errorMessage);
+      console.log("Erro ao cadastrar o usuario: ", errorMessage);
     }
   }
 

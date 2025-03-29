@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import { Toaster } from "./Toaster";
 
 export const metadata: Metadata = {
   title: "Ampara",
@@ -16,6 +19,7 @@ export default function RootLayout({
         text-zinc-900 min-h-screen flex">
         <main className="max-w-[1240px] mx-auto px-5 py-8">
           {children}
+          <Toaster />
         </main>
       </body>
     </html>
