@@ -8,6 +8,7 @@ import { Button } from "@/components/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
+import axios from "axios";
 
     const signupSchema = z.object({
         Nome: z.string()

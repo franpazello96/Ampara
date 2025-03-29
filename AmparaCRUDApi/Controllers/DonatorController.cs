@@ -61,5 +61,40 @@ namespace AmparaCRUDApi.Controllers
             //Return the POST operation
             return Ok(donatorEntity);
         }
+
+        [HttpPut]
+        [Route("cpf/{cpf}")]
+        public IActionResult UpdateDonator(string cpf, UpdateDonatorDTO updateDonatorDTO)
+        {
+            var donator = dbContext.Donators.Find(cpf);
+            if (donator == null)
+            {
+                return NotFound();
+            }
+
+            donator.Name = updateDonatorDTO.Name;
+            donator.PhoneNumber = updateDonatorDTO.PhoneNumber;
+            donator.Email = updateDonatorDTO.Email;
+            donator.Password = updateDonatorDTO.Password;
+
+            dbContext.SaveChanges();
+            return Ok(donator);
+        }
+
+        [HttpDelete]
+        [Route("cpf/{cpf}")]
+        public IActionResult DeleteDonator(string cpf)
+        {
+            var donator = dbContext.Donators.Find(cpf);
+
+            if (donator == null)
+            {
+                return NotFound();
+            }
+
+            dbContext.Donators.Remove(donator);
+            dbContext.SaveChanges();
+            return Ok(donator);
+        }
     }
 }
