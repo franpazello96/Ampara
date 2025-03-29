@@ -39,7 +39,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donatorCpf);
         }
 
-        [HttpPost]
+        [HttpPost("signupdonator")]
         public IActionResult AddDonator(AddDonatorDTO addDonatorDTO)
         {
             //DTO (Data Transfer Object) is getting the object from the Class Donator, configuring it, and now we create the variables in the "constructor".

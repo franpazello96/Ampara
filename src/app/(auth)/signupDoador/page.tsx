@@ -21,10 +21,10 @@ import axios from "axios";
         Email: z.string()
           .email("Insira um e-mail válido."),
         
-        Telefone: z.string()
+        PhoneNumber: z.string()
           .regex(/^\d{11}$/, "O telefone deve ter 11 números e não pode conter espaços ou caracteres especiais."),
         
-        Senha: z.string()
+        Password: z.string()
           .min(6, "A senha deve ter pelo menos 6 caracteres.")
           .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
           .regex(/[0-9]/, "A senha deve ter pelo menos um número.")
@@ -43,8 +43,30 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
   });
 
-  function onSubmit(data: SignupFormData) {
-    console.log("Dados enviados:", data);
+  const { reset } = useForm();
+  async function onSubmit(data: SignupFormData) {
+    try{
+      const addForm = {
+        CPF: data.CPF,
+        Name: data.Nome,
+        Email: data.Email,
+        PhoneNumber: data.PhoneNumber,
+        Password: data.Password
+      }
+      const response = await axios.post("https://localhost:5001/api/donator/signupdonator", addForm, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log("Dados enviados:", data);
+
+      if (response){
+        reset();
+      }
+    } catch (error: any){
+      console.error("Erro ao cadastrar usuário:", error);
+    }
   }
 
   return (
@@ -76,13 +98,13 @@ export default function Signup() {
         </div>
 
         <div>
-          <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("Telefone")} />
-          {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
+          <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("PhoneNumber")} />
+          {errors.PhoneNumber && <p className="text-red-500 text-sm">{errors.PhoneNumber.message}</p>}
         </div>
 
         <div>
-          <Input type="password" placeholder="Senha" {...register("Senha")} />
-          {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
+          <Input type="password" placeholder="Senha" {...register("Password")} />
+          {errors.Password && <p className="text-red-500 text-sm">{errors.Password.message}</p>}
         </div>
 
         <Button type="submit">Cadastrar</Button>
