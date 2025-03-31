@@ -1,5 +1,9 @@
 # Ampara - Plataforma de Arrecadação e Gestão de Doações
 
+# Nome dos integrantes: Eduardo Nicolosi de Oliveira - Felipe Cesar Poulos Kureski - Francielly Fileto Pazello - Joao Pedro Brum Lisboa
+
+# Descrição do projeto
+
 ## 1. Visão Geral
 
 O sistema **Ampara** tem como objetivo facilitar a arrecadação e gestão de doações financeiras e de alimentos não perecíveis para comunidades em situação de miséria e moradores de rua. A plataforma conectará doadores, ONGs e instituições beneficentes, garantindo transparência e eficiência na distribuição dos recursos.
@@ -64,3 +68,18 @@ O sistema **Ampara** tem como objetivo facilitar a arrecadação e gestão de do
 ## 7. Conclusão
 
 O **Ampara** proporcionará um meio confiável, transparente e eficiente para conectar doadores e instituições beneficentes, garantindo que as doações cheguem a quem mais precisa. Através da tecnologia e metodologias ágeis, a plataforma será um facilitador essencial para o terceiro setor, promovendo impacto social significativo.
+
+## Instruções de instalação 
+npm i 
+npm run dev
+Requisitos de instalação: 
+
+## SQL Server via site
+Microsoft SQL Server Manager
+Microsoft SQL Server Configuration Manager
+
+##Nuget Microsoft Visual Studio
+Microsoft ASP.NET MVC Core
+Entity Framework Core
+Entity Framework Tools
+Entity Framework SqlServer
