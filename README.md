@@ -70,16 +70,16 @@ O sistema **Ampara** tem como objetivo facilitar a arrecadação e gestão de do
 O **Ampara** proporcionará um meio confiável, transparente e eficiente para conectar doadores e instituições beneficentes, garantindo que as doações cheguem a quem mais precisa. Através da tecnologia e metodologias ágeis, a plataforma será um facilitador essencial para o terceiro setor, promovendo impacto social significativo.
 
 ## Instruções de instalação 
-npm i 
-npm run dev
-Requisitos de instalação: 
+- npm i 
+- npm run dev
+
 
 ## SQL Server via site
-Microsoft SQL Server Manager
-Microsoft SQL Server Configuration Manager
+- Microsoft SQL Server Manager
+- Microsoft SQL Server Configuration Manager
 
 ##Nuget Microsoft Visual Studio
-Microsoft ASP.NET MVC Core
-Entity Framework Core
-Entity Framework Tools
-Entity Framework SqlServer
+- Microsoft ASP.NET MVC Core
+- Entity Framework Core
+- Entity Framework Tools
+- Entity Framework SqlServer
