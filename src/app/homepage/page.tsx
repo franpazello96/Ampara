@@ -12,12 +12,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-      <header className="flex justify-between items-center px-14 py-6 shadow-md bg-white dark:bg-zinc-800">
+      <header className="flex justify-between items-center px-30 py-6 shadow-md bg-white dark:bg-zinc-800">
         <div className="flex items-center space-x-4">
           <Image src={logo} alt="Logo" width={140} height={45} />
         </div>
 
-        <nav className="flex items-center space-x-8 text-base font-medium">
+        <nav className="flex items-center space-x-20 text-xl">
           <Link href="#quem-somos" className="hover:underline">Quem Somos</Link>
           <Link href="#objetivo" className="hover:underline">Nosso Objetivo</Link>
           <Link href="#ongs" className="hover:underline">ONG’s Parceiras</Link>
