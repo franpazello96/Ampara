@@ -5,13 +5,14 @@ import logo from "@/assets/logo.png";
 import { Button } from "@/components/button";
 import Link from "next/link";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle"; 
 
 export default function HomePage() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-      <header className="flex justify-between items-center px-8 py-6 shadow-md bg-white dark:bg-zinc-800">
+    <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+      <header className="flex justify-between items-center px-14 py-6 shadow-md bg-white dark:bg-zinc-800">
         <div className="flex items-center space-x-4">
           <Image src={logo} alt="Logo" width={140} height={45} />
         </div>
@@ -40,39 +41,40 @@ export default function HomePage() {
             <Button>Login</Button>
           </Link>
         </nav>
+        <ThemeToggle />
       </header>
 
-      <main className="flex flex-col items-center justify-center px-6 md:px-20 py-20 text-center">
+      <main className="flex flex-col items-center justify-center w-full px-4 py-20 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">
           Bem-vindo ao Nosso Projeto
         </h1>
-        <p className="text-lg md:text-xl max-w-3xl mb-10">
+        <p className="text-lg md:text-xl w-full mb-10">
           Conectamos doadores com instituições e pessoas que precisam. Junte-se a nós nessa corrente do bem!
         </p>
         <Link href="/signupDoador">
           <Button className="px-8 py-3 text-lg bg-violet-600 hover:bg-violet-700 text-white rounded-lg">
-          Quero Ajudar
+            Quero Ajudar
           </Button>
         </Link>
       </main>
 
-      <section id="quem-somos" className="w-full px-6 md:px-20 py-16 bg-zinc-100 dark:bg-zinc-800">
+      <section id="quem-somos" className="w-full px-4 py-16 bg-zinc-100 dark:bg-zinc-800">
         <h2 className="text-2xl md:text-3xl font-semibold mb-4">Quem Somos</h2>
-        <p className="text-base md:text-lg max-w-4xl">
+        <p className="text-base md:text-lg w-full">
           Somos uma iniciativa que visa facilitar o encontro entre quem quer ajudar e quem precisa de ajuda.
         </p>
       </section>
 
-      <section id="objetivo" className="w-full px-6 md:px-20 py-16">
+      <section id="objetivo" className="w-full px-4 py-16">
         <h2 className="text-2xl md:text-3xl font-semibold mb-4">Nosso Objetivo</h2>
-        <p className="text-base md:text-lg max-w-4xl">
+        <p className="text-base md:text-lg w-full">
           Promover solidariedade e facilitar o processo de doação com segurança, agilidade e transparência.
         </p>
       </section>
 
-      <section id="ongs" className="w-full px-6 md:px-20 py-16 bg-zinc-100 dark:bg-zinc-800">
+      <section id="ongs" className="w-full px-4 py-16 bg-zinc-100 dark:bg-zinc-800">
         <h2 className="text-2xl md:text-3xl font-semibold mb-4">ONG's Parceiras</h2>
-        <p className="text-base md:text-lg max-w-4xl">
+        <p className="text-base md:text-lg w-full">
           Conheça algumas das instituições com as quais trabalhamos lado a lado para fazer a diferença.
         </p>
       </section>
