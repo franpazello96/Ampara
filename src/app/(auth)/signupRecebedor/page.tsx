@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -19,20 +20,20 @@ const signupSchema = z.object({
   Tipo_instituicao: z.string()
     .min(3, "O tipo de instituição deve ter pelo menos 3 caracteres.")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O tipo de instituição deve conter apenas letras."),
-    
+
   CNPJ: z.string()
     .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido. Use o formato 00.000.000/0000-00."),
-  
+
   Email: z.string()
     .email("Insira um e-mail válido."),
-  
+
   Telefone: z.string()
     .regex(/^\d{11}$/, "O telefone deve ter 11 números e não pode conter espaços ou caracteres especiais."),
-  
+
   Nome_representante: z.string()
     .min(3, "O nome do representante deve ter pelo menos 3 caracteres.")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome do representante deve conter apenas letras."),
-  
+
   CPF: z.string()
     .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido. Use o formato 000.000.000-00."),
 
@@ -55,52 +56,55 @@ export default function SignupRecebedor() {
     resolver: zodResolver(signupSchema),
   });
 
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedOption(event.target.value);
+  };
+
   async function onSubmit(data: SignupFormData) {
     try {
       const addForm = {
         CNPJ: data.CNPJ,
         InstitutionName: data.Nome_instituicao,
-        InstitutionType: data.Tipo_instituicao,
+        InstitutionType: selectedOption || data.Tipo_instituicao,
         Email: data.Email,
         PhoneNumber: data.Telefone,
         RepresentativeName: data.Nome_representante,
         Password: data.Senha
-      }
+      };
 
       const response = await axios.post("https://localhost:5001/api/donee/signupdonee", addForm, {
         headers: {
-          "Contente-Type": "application/json"
+          "Content-Type": "application/json"
         }
       });
 
       console.log("Dados enviados:", data);
 
-      if (response.status === 200 || response.status === 201){
-        toast.success("Cadastro realizado com sucesso!")
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Cadastro realizado com sucesso!");
         reset();
+        setSelectedOption("");
       }
     } catch (error: any) {
       let errorMessage = "Erro desconhecido";
 
-      if (error.response?.data){
-        if (typeof error.response.data === "string"){
-          errorMessage = error.response.data
-        } else if (typeof error.response.data === "object" && error.response.data.message){
+      if (error.response?.data) {
+        if (typeof error.response.data === "string") {
+          errorMessage = error.response.data;
+        } else if (typeof error.response.data === "object" && error.response.data.message) {
           errorMessage = error.response.data.message;
         } else {
           errorMessage = JSON.stringify(error.response.data);
         }
       }
 
-      toast.error("Falha ao cadastrar o usuario:" + errorMessage);
-      console.log("Erro ao cadastrar o usuario:", errorMessage)
-    };
+      toast.error("Falha ao cadastrar o usuário: " + errorMessage);
+      console.log("Erro ao cadastrar o usuário:", errorMessage);
+    }
   }
-}
 
-function DropdownSelect (){
-  const [selectedOption, setSelectedOption]
-}
   return (
     <div className="min-h-screen">
       <div className="flex flex-col justify-center items-center">
@@ -118,11 +122,27 @@ function DropdownSelect (){
           <Input type="text" placeholder="Nome da Instituição" {...register("Nome_instituicao")} />
           {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
         </div>
-        <div>
-          <label htmlFor="dropdown"> Tipo de instituição:</label>
-          <select id="dropdown" value={selectedOption} onChange={handleChange}>
 
+        <div>
+          <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
+            Tipo de instituição:
+          </label>
+          <select
+            id="dropdown"
+            value={selectedOption}
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md mt-1"
+          >
+            <option value="">-- Selecione --</option>
+            <option value="ONG">ONG</option>
+            <option value="Associação">Associação</option>
+            <option value="Fundação">Fundação</option>
           </select>
+          {!selectedOption && errors.Tipo_instituicao && (
+            <p className="text-red-500 text-sm">{errors.Tipo_instituicao.message}</p>
+          )}
+        </div>
+
         <div>
           <Input type="text" placeholder="CNPJ (00.000.000/0000-00)" {...register("CNPJ")} />
           {errors.CNPJ && <p className="text-red-500 text-sm">{errors.CNPJ.message}</p>}
@@ -147,6 +167,7 @@ function DropdownSelect (){
           <Input type="text" placeholder="CPF do Representante (000.000.000-00)" {...register("CPF")} />
           {errors.CPF && <p className="text-red-500 text-sm">{errors.CPF.message}</p>}
         </div>
+
         <div>
           <Input type="password" placeholder="Senha" {...register("Senha")} />
           {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
