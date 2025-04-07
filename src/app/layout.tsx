@@ -15,9 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className=" bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-200
+      <body className="bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-200
         text-zinc-900 min-h-screen flex">
-        <main className="max-w-[1240px] mx-auto px-5 py-8">
+        <main className="w-full mx-auto px-5 py-8">
           {children}
           <Toaster />
         </main>
