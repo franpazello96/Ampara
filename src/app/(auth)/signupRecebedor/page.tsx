@@ -96,7 +96,11 @@ export default function SignupRecebedor() {
       console.log("Erro ao cadastrar o usuario:", errorMessage)
     };
   }
+}
 
+function DropdownSelect (){
+  const [selectedOption, setSelectedOption]
+}
   return (
     <div className="min-h-screen">
       <div className="flex flex-col justify-center items-center">
@@ -115,10 +119,10 @@ export default function SignupRecebedor() {
           {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
         </div>
         <div>
-          <Input type="text" placeholder="Religiosa, ONG, escola" {...register("Tipo_instituicao")} />
-          {errors.Tipo_instituicao && <p className="text-red-500 text-sm">{errors.Tipo_instituicao.message}</p>}
-        </div>
+          <label htmlFor="dropdown"> Tipo de instituição:</label>
+          <select id="dropdown" value={selectedOption} onChange={handleChange}>
 
+          </select>
         <div>
           <Input type="text" placeholder="CNPJ (00.000.000/0000-00)" {...register("CNPJ")} />
           {errors.CNPJ && <p className="text-red-500 text-sm">{errors.CNPJ.message}</p>}
