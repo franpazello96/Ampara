@@ -8,12 +8,18 @@ import { Button } from "@/components/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const signupSchema = z.object({
   Nome_instituicao: z.string()
     .min(3, "O nome da instituição deve ter pelo menos 3 caracteres.")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome da instituição deve conter apenas letras."),
-  
+
+  Tipo_instituicao: z.string()
+    .min(3, "O tipo de instituição deve ter pelo menos 3 caracteres.")
+    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O tipo de instituição deve conter apenas letras."),
+    
   CNPJ: z.string()
     .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido. Use o formato 00.000.000/0000-00."),
   
@@ -43,13 +49,52 @@ export default function SignupRecebedor() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
-  function onSubmit(data: SignupFormData) {
-    console.log("Dados enviados:", data);
+  async function onSubmit(data: SignupFormData) {
+    try {
+      const addForm = {
+        CNPJ: data.CNPJ,
+        InstitutionName: data.Nome_instituicao,
+        InstitutionType: data.Tipo_instituicao,
+        Email: data.Email,
+        PhoneNumber: data.Telefone,
+        RepresentativeName: data.Nome_representante,
+        Password: data.Senha
+      }
+
+      const response = await axios.post("https://localhost:5001/api/donee/signupdonee", addForm, {
+        headers: {
+          "Contente-Type": "application/json"
+        }
+      });
+
+      console.log("Dados enviados:", data);
+
+      if (response.status === 200 || response.status === 201){
+        toast.success("Cadastro realizado com sucesso!")
+        reset();
+      }
+    } catch (error: any) {
+      let errorMessage = "Erro desconhecido";
+
+      if (error.response?.data){
+        if (typeof error.response.data === "string"){
+          errorMessage = error.response.data
+        } else if (typeof error.response.data === "object" && error.response.data.message){
+          errorMessage = error.response.data.message;
+        } else {
+          errorMessage = JSON.stringify(error.response.data);
+        }
+      }
+
+      toast.error("Falha ao cadastrar o usuario:" + errorMessage);
+      console.log("Erro ao cadastrar o usuario:", errorMessage)
+    };
   }
 
   return (
@@ -68,6 +113,10 @@ export default function SignupRecebedor() {
         <div>
           <Input type="text" placeholder="Nome da Instituição" {...register("Nome_instituicao")} />
           {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
+        </div>
+        <div>
+          <Input type="text" placeholder="Religiosa, ONG, escola" {...register("Tipo_instituicao")} />
+          {errors.Tipo_instituicao && <p className="text-red-500 text-sm">{errors.Tipo_instituicao.message}</p>}
         </div>
 
         <div>
