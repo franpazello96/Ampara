@@ -56,18 +56,12 @@ export default function SignupRecebedor() {
     resolver: zodResolver(signupSchema),
   });
 
-  const [selectedOption, setSelectedOption] = useState("");
-
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(event.target.value);
-  };
-
   async function onSubmit(data: SignupFormData) {
     try {
       const addForm = {
         CNPJ: data.CNPJ,
         InstitutionName: data.Nome_instituicao,
-        InstitutionType: selectedOption || data.Tipo_instituicao,
+        InstitutionType: data.Tipo_instituicao,
         Email: data.Email,
         PhoneNumber: data.Telefone,
         RepresentativeName: data.Nome_representante,
@@ -85,7 +79,6 @@ export default function SignupRecebedor() {
       if (response.status === 200 || response.status === 201) {
         toast.success("Cadastro realizado com sucesso!");
         reset();
-        setSelectedOption("");
       }
     } catch (error: any) {
       let errorMessage = "Erro desconhecido";
@@ -122,25 +115,17 @@ export default function SignupRecebedor() {
           <Input type="text" placeholder="Nome da Instituição" {...register("Nome_instituicao")} />
           {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
         </div>
-
+        
         <div>
           <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
             Tipo de instituição:
           </label>
-          <select
-            id="dropdown"
-            value={selectedOption}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md mt-1"
-          >
+          <select id="dropdown" {...register("Tipo_instituicao")} className="w-full p-2 border rounded-md mt-1">
             <option value="">-- Selecione --</option>
             <option value="ONG">ONG</option>
             <option value="Associação">Associação</option>
             <option value="Fundação">Fundação</option>
           </select>
-          {!selectedOption && errors.Tipo_instituicao && (
-            <p className="text-red-500 text-sm">{errors.Tipo_instituicao.message}</p>
-          )}
         </div>
 
         <div>
