@@ -8,7 +8,7 @@ namespace AmparaCRUDApi.Models.Entities
         public required string CNPJ { get; set; }
 
         public required string InstitutionName { get; set; }
-        public string InstitutionType { get; set; }
+        public required string InstitutionType { get; set; }
         public required string Email { get; set; }
         public required string PhoneNumber { get; set; }
         public required string RepresentativeName { get; set; } 
