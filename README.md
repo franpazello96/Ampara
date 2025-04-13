@@ -83,3 +83,5 @@ O **Ampara** proporcionará um meio confiável, transparente e eficiente para co
 - Entity Framework Core
 - Entity Framework Tools
 - Entity Framework SqlServer
+- Microsoft ASP.NET Core Authentication JwtBearer (8.0.4)
+- System IdentityModel Tokens Jwt
