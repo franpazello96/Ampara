@@ -25,22 +25,26 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
-        var user = _context.Donators
+        var donator = _context.Donators
             .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
 
-        if (user == null)
+        var donee = _context.Donees.FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
+
+        if (donator == null || donee == null)
             return Unauthorized(new { message = "Credenciais inválidas." });
 
-        var token = GenerateJwtToken(user);
+        var token = GenerateJwtToken(donator, donee);
         return Ok(new { token });
     }
 
-    private string GenerateJwtToken(Donator user)
+    private string GenerateJwtToken(Donator donator, Donee donee)
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim("cpf", user.CPF),
+            new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
+            new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
+            new Claim("cpf", donator.CPF),
+            new Claim("cnpj", donee.CNPJ),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
