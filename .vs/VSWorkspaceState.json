@@ -2,9 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\AmparaCRUDApi",
-    "\\AmparaCRUDApi\\Controllers",
-    "\\AmparaCRUDApi\\Models"
+    "\\AmparaCRUDApi\\Models",
+    "\\AmparaCRUDApi\\Models\\Entities"
   ],
-  "SelectedNode": "\\AmparaCRUDApi\\Models\\AddDonatorDTO.cs",
+  "SelectedNode": "\\AmparaCRUDApi\\Models\\Entities\\Donator.cs",
   "PreviewInSolutionExplorer": false
 }
