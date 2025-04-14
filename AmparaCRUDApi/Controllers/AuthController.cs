@@ -28,26 +28,51 @@ public class AuthController : ControllerBase
         var donator = _context.Donators
             .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
 
-        var donee = _context.Donees.FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
+        if (donator != null)
+        {
+            var token = GenerateJwtTokenForDonator(donator);
+            return Ok(new { token, userType = "donator" });
+        }
 
-        if (donator == null || donee == null)
-            return Unauthorized(new { message = "Credenciais inválidas." });
+        var donee = _context.Donees
+            .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
 
-        var token = GenerateJwtToken(donator, donee);
-        return Ok(new { token });
+        if (donee != null)
+        {
+            var token = GenerateJwtTokenForDonee(donee);
+            return Ok(new { token, userType = "donee" });
+        }
+
+        return Unauthorized(new { message = "Credenciais inválidas." });
     }
 
-    private string GenerateJwtToken(Donator donator, Donee donee)
+    private string GenerateJwtTokenForDonator(Donator donator)
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
-            new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
-            new Claim("cpf", donator.CPF),
-            new Claim("cnpj", donee.CNPJ),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
+        new Claim("cpf", donator.CPF),
+        new Claim("role", "donator"),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
+        return GenerateToken(claims);
+    }
+
+    private string GenerateJwtTokenForDonee(Donee donee)
+    {
+        var claims = new[]
+        {
+        new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
+        new Claim("cnpj", donee.CNPJ),
+        new Claim("role", "donee"),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
+
+        return GenerateToken(claims);
+    }
+    private string GenerateToken(Claim[] claims)
+    {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
