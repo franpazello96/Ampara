@@ -110,27 +110,22 @@ export default function SignupRecebedor() {
         Cadastro de Recebedor
       </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">
-        <div>
-          <Input type="text" placeholder="Nome da Instituição" {...register("Nome_instituicao")} />
-          {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
-        </div>
-        
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">        
         <div>
           <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-            Tipo de instituição:
+            
           </label>
           <select id="dropdown" {...register("Tipo_instituicao")} className="w-full p-2 border rounded-md mt-1">
-            <option value="">-- Selecione --</option>
+            <option value=""> Tipo de instituição: </option>
             <option value="ONG">ONG</option>
             <option value="Associação">Associação</option>
             <option value="Fundação">Fundação</option>
           </select>
         </div>
 
-        <div>
+        <div className="text-zinc-800 dark:text-zinc-100">
           <Input type="text" placeholder="CNPJ (00.000.000/0000-00)" {...register("CNPJ")} />
-          {errors.CNPJ && <p className="text-red-500 text-sm">{errors.CNPJ.message}</p>}
+          {errors.CNPJ && <p className="text-red-500 text-sm ">{errors.CNPJ.message}</p>}
         </div>
 
         <div>
@@ -142,17 +137,6 @@ export default function SignupRecebedor() {
           <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("Telefone")} />
           {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
         </div>
-
-        <div>
-          <Input type="text" placeholder="Nome do Representante" {...register("Nome_representante")} />
-          {errors.Nome_representante && <p className="text-red-500 text-sm">{errors.Nome_representante.message}</p>}
-        </div>
-
-        <div>
-          <Input type="text" placeholder="CPF do Representante (000.000.000-00)" {...register("CPF")} />
-          {errors.CPF && <p className="text-red-500 text-sm">{errors.CPF.message}</p>}
-        </div>
-
         <div>
           <Input type="password" placeholder="Senha" {...register("Senha")} />
           {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
