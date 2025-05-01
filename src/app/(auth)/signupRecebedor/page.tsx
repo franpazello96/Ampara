@@ -129,46 +129,23 @@ export default function SignupRecebedor() {
             Cadastro de Recebedor
           </h1>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="Nome da Instituição"
-                  {...register("Nome_instituicao")} 
-                />
-                {errors.Nome_instituicao && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Nome_instituicao.message}</p>
-                )}
-              </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">        
+        <div>
+          <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
+            
+          </label>
+          <select id="dropdown" {...register("Tipo_instituicao")} className="w-full p-2 border rounded-md mt-1">
+            <option value=""> Tipo de instituição: </option>
+            <option value="ONG">ONG</option>
+            <option value="Associação">Associação</option>
+            <option value="Fundação">Fundação</option>
+          </select>
+        </div>
 
-              <div>
-                <select 
-                  {...register("Tipo_instituicao")} 
-                  className="w-full h-12 px-4 rounded-lg border border-zinc-300 dark:border-zinc-600 
-                    focus:border-zinc-500 dark:focus:border-zinc-400 outline-none transition-colors
-                    bg-transparent text-zinc-800 dark:text-zinc-100"
-                >
-                  <option value="">Selecione o tipo de instituição</option>
-                  <option value="ONG">ONG</option>
-                  <option value="Associação">Associação</option>
-                  <option value="Fundação">Fundação</option>
-                </select>
-                {errors.Tipo_instituicao && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Tipo_instituicao.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="CNPJ (00.000.000/0000-00)" 
-                  {...register("CNPJ")} 
-                />
-                {errors.CNPJ && (
-                  <p className="text-red-500 text-sm mt-1">{errors.CNPJ.message}</p>
-                )}
-              </div>
+        <div className="text-zinc-800 dark:text-zinc-100">
+          <Input type="text" placeholder="CNPJ (00.000.000/0000-00)" {...register("CNPJ")} />
+          {errors.CNPJ && <p className="text-red-500 text-sm ">{errors.CNPJ.message}</p>}
+        </div>
 
               <div>
                 <Input 
@@ -181,75 +158,13 @@ export default function SignupRecebedor() {
                 )}
               </div>
 
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="Telefone (Apenas números)" 
-                  {...register("Telefone")} 
-                />
-                {errors.Telefone && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Telefone.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="Nome do Representante" 
-                  {...register("Nome_representante")} 
-                />
-                {errors.Nome_representante && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Nome_representante.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="CPF do Representante (000.000.000-00)" 
-                  {...register("CPF")} 
-                />
-                {errors.CPF && (
-                  <p className="text-red-500 text-sm mt-1">{errors.CPF.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Input 
-                  type="password" 
-                  placeholder="Senha" 
-                  {...register("Senha")} 
-                />
-                {errors.Senha && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Senha.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex justify-center mt-8 space-x-4">
-              <Button type="submit" className="px-12 h-12 text-base w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
-                Cadastrar
-              </Button>
-            </div>
-
-            <div className="text-center mt-4">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Já tem uma conta?{" "}
-                <Link href="/signin" className="text-blue-500 hover:underline">
-                  Faça login
-                </Link>
-              </p>
-            </div>
-
-            <div className="text-center mt-4">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Quero ser um{" "}
-                <Link href="/signupDoador" className="text-blue-500 hover:underline">
-                  Doador
-                </Link>
-              </p>
-            </div>
-          </form>
+        <div>
+          <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("Telefone")} />
+          {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
+        </div>
+        <div>
+          <Input type="password" placeholder="Senha" {...register("Senha")} />
+          {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
         </div>
       </div>
     </div>
