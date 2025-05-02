@@ -11,5 +11,6 @@ namespace AmparaCRUDApi.Data
 
         public DbSet<Donator> Donators { get; set; }
         public DbSet<Donee> Donees { get; set; }
+        public DbSet<Donation> Donations { get; set; }
     }
 }

@@ -48,15 +48,15 @@ namespace AmparaCRUDApi.Controllers
                 return BadRequest("CPF já cadastrado no sistema");
             }
             
-                //DTO (Data Transfer Object) is getting the object from the Class Donator, configuring it, and now we create the variables in the "constructor".
-                var donatorEntity = new Donator()
-                {
-                    CPF = addDonatorDTO.CPF,
-                    Name = addDonatorDTO.Name,
-                    Email = addDonatorDTO.Email,
-                    PhoneNumber = addDonatorDTO.PhoneNumber,
-                    Password = addDonatorDTO.Password
-                };
+            //DTO (Data Transfer Object) is getting the object from the Class Donator, configuring it, and now we create the variables in the "constructor".
+            var donatorEntity = new Donator()
+            {
+                CPF = addDonatorDTO.CPF,
+                Name = addDonatorDTO.Name,
+                Email = addDonatorDTO.Email,
+                PhoneNumber = addDonatorDTO.PhoneNumber,
+                Password = addDonatorDTO.Password
+            };
 
             //Add the data in the class Donators
             dbContext.Donators.Add(donatorEntity);
