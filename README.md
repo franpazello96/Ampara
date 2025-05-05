@@ -35,7 +35,7 @@ O sistema **Ampara** tem como objetivo facilitar a arrecadação e gestão de do
 ## 4. Tecnologias Utilizadas
 
 - **Backend:** C#, .NET Core
-- **Frontend:** React.js
+- **Frontend:** React.js **Next.js
 - **Banco de Dados:** Microsoft SQL Server
 - **Cloud e Hospedagem:** Azure (funcionalidade a ser discutida)
 

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from "react-toastify";
-import { Toaster } from "./Toaster";
+import { Toaster } from "../components/Toaster";
 
 export const metadata: Metadata = {
   title: "Ampara",
