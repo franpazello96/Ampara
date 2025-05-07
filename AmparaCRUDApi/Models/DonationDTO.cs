@@ -9,5 +9,6 @@
         public string Description { get; set; }
         public bool Recurrence { get; set; }
         public string TimeRecurrence { get; set; }
+        public DateTime Time { get; set; }
     }
 }
