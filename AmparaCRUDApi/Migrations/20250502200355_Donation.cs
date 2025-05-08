@@ -18,7 +18,7 @@ namespace AmparaCRUDApi.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DonationType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Recurrence = table.Column<bool>(type: "bit", nullable: false),
                     TimeRecurrence = table.Column<string>(type: "nvarchar(max)", nullable: false)
