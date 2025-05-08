@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from "recharts"
 
 import {
   Card,
@@ -20,7 +20,7 @@ import { useEffect, useState, useMemo } from "react"
 
 const chartConfig = {
   views: {
-    label: "Page Views",
+    label: "Total Doado",
   },
   recivedDonation: {
     label: "Doações recebidas",
@@ -39,14 +39,13 @@ export default function Dashboard() {
   const[activeChart, setActiveChart] = 
   useState<keyof typeof chartConfig>("recivedDonation")
     type DonationEntry = {
-        date: string
-        recivedDonation: number
-        donationMade: number
+        day: string
+        totalAmount: number
     }
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const res = await fetch("/")
+            const res = await fetch("https://localhost:5001/api/Donation/reciveddonation")
             if (!res.ok) throw new Error ("Erro ao buscar dados")
             const json = await res.json()
             setData(json)
@@ -61,8 +60,8 @@ export default function Dashboard() {
   }, [])
   const total = useMemo(() => {
     return {
-      recivedDonation: data.reduce((acc, curr) => acc + curr.recivedDonation, 0),
-      donationMade: data.reduce((acc, curr) => acc + curr.donationMade, 0),
+      recivedDonation: data.reduce((acc, curr) => acc + curr.totalAmount, 0),
+      donationMade: data.reduce((acc, curr) => acc + curr.totalAmount, 0),
     }
   }, [data])
 
@@ -114,35 +113,34 @@ export default function Dashboard() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
+              dataKey="day"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
+                return date.toLocaleDateString("pt-BR", {
                   month: "short",
                   day: "numeric",
                 })
               }}
             />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  className="w-[150px]"
-                  nameKey="views"
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  }}
-                />
-              }
+            <Tooltip
+            labelFormatter={(label) =>
+                new Date(label).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                })
+            }
+            formatter={(value: number) => {
+                return [`R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`]
+              }}
             />
-            <Bar dataKey={activeChart} fill={`var(--color-${activeChart})`} />
+
+
+            <Bar dataKey="totalAmount" fill={`var(--color-${activeChart})`} />
           </BarChart>
         </ChartContainer>
       </CardContent>

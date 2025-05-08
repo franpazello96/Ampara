@@ -12,6 +12,8 @@ namespace AmparaCRUDApi.Data
         public DbSet<Donator> Donators { get; set; }
         public DbSet<Donee> Donees { get; set; }
         public DbSet<Donation> Donations { get; set; }
+        public DbSet<DailyDonationTotals> DailyDonationTotals { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,7 +21,11 @@ namespace AmparaCRUDApi.Data
 
             modelBuilder.Entity<Donation>()
                 .Property(d => d.Amount)
-                .HasPrecision(18, 2); 
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<DailyDonationTotals>()
+                .HasNoKey()
+                .ToView("vw_DailyDonationTotals");
         }
     }
 }
