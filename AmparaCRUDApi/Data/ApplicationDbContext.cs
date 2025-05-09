@@ -11,5 +11,22 @@ namespace AmparaCRUDApi.Data
 
         public DbSet<Donator> Donators { get; set; }
         public DbSet<Donee> Donees { get; set; }
+        public DbSet<Donation> Donations { get; set; }
+        public DbSet<DailyDonationTotals> DailyDonationTotals { get; set; }
+        public DbSet<Buys>Buys { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Donation>()
+                .Property(d => d.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<DailyDonationTotals>()
+                .HasNoKey()
+                .ToView("vw_DailyDonationTotals");
+        }
     }
 }
