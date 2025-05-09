@@ -16,13 +16,14 @@ namespace AmparaCRUDApi.Controllers
         }
 
         [HttpPost("fooddonation")]
-        public IActionResult DoDonation(DonationDTO DonationDTO)
+        public IActionResult FoodDonation(DonationDTO DonationDTO)
         {
             var donationEntity = new Donation()
             {
                 Id = DonationDTO.Id,
                 DonationType = DonationDTO.DonationType,
                 Quantity = DonationDTO.Quantity,
+                Amount = 0,
                 Description = DonationDTO.Description,
                 Recurrence = DonationDTO.Recurrence,
                 TimeRecurrence = DonationDTO.TimeRecurrence
@@ -31,6 +32,33 @@ namespace AmparaCRUDApi.Controllers
             dbContext.Donations.Add(donationEntity);
             dbContext.SaveChanges();
             return Ok(donationEntity);
+        }
+
+        [HttpPost("moneydonation")]
+        public IActionResult MoneyDonation(DonationDTO DonationDTO)
+        {
+            var donationEntity = new Donation()
+            {
+                Id = DonationDTO.Id,
+                DonationType = DonationDTO.DonationType,
+                Quantity = 0,
+                Amount = DonationDTO.Amount,
+                Description = DonationDTO.Description,
+                Recurrence = DonationDTO.Recurrence,
+                TimeRecurrence = DonationDTO.TimeRecurrence
+            };
+
+            dbContext.Donations.Add(donationEntity);
+            dbContext.SaveChanges();
+            return Ok(donationEntity);
+        }
+
+        [HttpGet("reciveddonation")]
+        public IActionResult GetAllDailyTotals()
+        {
+            var totals = dbContext.DailyDonationTotals.OrderBy(x => x.Day).ToList();
+
+            return Ok(totals);
         }
     }
 }
