@@ -13,6 +13,7 @@ namespace AmparaCRUDApi.Data
         public DbSet<Donee> Donees { get; set; }
         public DbSet<Donation> Donations { get; set; }
         public DbSet<DailyDonationTotals> DailyDonationTotals { get; set; }
+        public DbSet<Benefitiary> Benefitiaries { get; set; }
         public DbSet<Buys>Buys { get; set; }
 
 
