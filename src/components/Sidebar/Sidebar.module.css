@@ -1,4 +1,8 @@
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
     width: 240px;
     height: 100vh;
     background-color: #2C3E50;
@@ -35,3 +39,40 @@
     background-color: #ECF0F1;
   }
   
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -240px;
+      width: 240px;
+      height: 100vh;
+      background-color: #2C3E50;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+  
+    .sidebar.open {
+      left: 0;
+    }
+  
+    .sidebar ul {
+      padding: 20px;
+    }
+  
+    .sidebar li {
+      margin: 10px 0;
+    }
+  
+    .toggle-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #2C3E50;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1100;
+    }
+  }

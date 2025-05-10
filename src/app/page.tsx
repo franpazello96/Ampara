@@ -26,9 +26,10 @@ export default function HomePage() {
       <header className="w-full bg-white dark:bg-zinc-800 shadow-lg px-8 py-6">
         <div className="flex items-center justify-between">
           <Image src={logo} alt="Logo" width={140} height={45} />
-          <button
+          <Button
             className="md:hidden focus:outline-none"
             onClick={() => setShowDropdown(!showDropdown)}
+            title="Toggle Menu"
           >
             <svg
               className="w-6 h-6 text-zinc-900 dark:text-zinc-100"
@@ -44,7 +45,7 @@ export default function HomePage() {
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
-          </button>
+          </Button>
 
           <nav className="hidden md:flex items-center space-x-25 text-xl font-medium text-zinc-900 dark:text-zinc-100">
             <Link
