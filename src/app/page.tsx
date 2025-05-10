@@ -12,6 +12,15 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 export default function HomePage() {
   const [showDropdown, setShowDropdown] = useState(false);
 
+export default function Home() {
+    const [showDropdown, setShowDropdown] = useState(false);
+    const carouselRef = useRef<Carousel | null>(null);
+
+    const handleCarouselChange = (index: number) => {
+      if (carouselRef.current) {
+        carouselRef.current.moveTo(index);
+      }
+    };
   return (
     <div className="min-h-screen w-full bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
       <header className="flex justify-between items-center px-8 py-6 shadow-md bg-white dark:bg-zinc-800">
