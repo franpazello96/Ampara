@@ -11,7 +11,7 @@ export default function Report() {
       <Image src={logo} alt="Logo" width={108.5} height={30} />
       <ThemeToggle />
       <Summary />
-      <Financial />
+      <Financial  />
       </div>
     </div>
   );
