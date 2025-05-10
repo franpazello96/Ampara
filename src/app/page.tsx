@@ -11,16 +11,15 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 
-export default function HomePage() {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const carouselRef = useRef<Carousel | null>(null);
+export default function Home() {
+    const [showDropdown, setShowDropdown] = useState(false);
+    const carouselRef = useRef<Carousel | null>(null);
 
-  const handleCarouselChange = (index: number) => {
-    if (carouselRef.current) {
-      carouselRef.current.moveTo(index);
-    }
-  };
-
+    const handleCarouselChange = (index: number) => {
+      if (carouselRef.current) {
+        carouselRef.current.moveTo(index);
+      }
+    };
   return (
     <div className="font-sans bg-gradient-to-r from-indigo-500 to-purple-600 dark:bg-zinc-900">
       <header className="w-full bg-white dark:bg-zinc-800 shadow-lg px-8 py-6">
