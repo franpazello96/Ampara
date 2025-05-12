@@ -18,9 +18,9 @@ const Sidebar: React.FC = () => {
       <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <nav>
           <ul>
-            <li><Link href="/homeAdmin">Homepage</Link></li>
+            <li><Link href="/homeAdmin">Relatórios</Link></li>
             <li><Link href="/profile">Editar Perfil</Link></li>
-            <li><Link href="/report">Financeiro</Link></li>
+            <li><Link href="/report">Lista de Entradas/Saídas</Link></li>
 
             <li><Link href="">Lista de doadores</Link></li>
             <li><Link href="">Lista de beneficiários</Link></li>
