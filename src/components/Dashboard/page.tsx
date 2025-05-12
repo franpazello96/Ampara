@@ -74,7 +74,7 @@ export default function Dashboard() {
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
           <CardTitle>Dashboard de receitas</CardTitle>
           <CardDescription>
-            Este gráfico mostra o total de receitas ganhas e enviadas nos últimos 3 meses
+            Este gráfico mostra o total de receitas ganhas e enviadas
           </CardDescription>
         </div>
         <div className="flex">
