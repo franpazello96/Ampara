@@ -1,0 +1,63 @@
+## Build results
+bin/
+obj/
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+
+## User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+## Visual Studio
+.vs/
+.vscode/
+
+## Rider
+.idea/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Package management
+packages/
+*.nupkg
+*.snupkg
+*.nuspec
+
+## dotCover
+.idea/.dotCover
+
+## Backup & logs
+*.log
+*.bak
+*.tmp
+
+## Test results
+TestResults/
+*.TestResults
+*.coverage
+*.coveragexml
+
+## Publish
+publish/
+out/
+
+## EF Core Migrations (se quiser ignorar snapshots antigos)
+Migrations/*Snapshot.cs
+
+## Others
+*.vsidx
+*.dbmdl
+*.db
+*.sqlite
+
+# Ignorar arquivos da pasta .vs
+**/.vs/
+
+# Ignorar configurações de layout do Visual Studio
+*.vssscc
+*.vspscc
