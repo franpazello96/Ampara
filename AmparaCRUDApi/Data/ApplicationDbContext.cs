@@ -14,6 +14,7 @@ namespace AmparaCRUDApi.Data
         public DbSet<Donation> Donations { get; set; }
         public DbSet<DailyDonationTotals> DailyDonationTotals { get; set; }
         public DbSet<Buys>Buys { get; set; }
+        public DbSet<Benefitiary> Benefitiaries { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
