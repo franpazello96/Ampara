@@ -7,7 +7,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AmparaCRUDApi.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -25,6 +24,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request)
     {
+
+        Console.WriteLine("Tentativa de login com email: " + request.Email + ", senha: " + request.Password);
         var donator = _context.Donators
             .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
 
@@ -35,7 +36,8 @@ public class AuthController : ControllerBase
         }
 
         var donee = _context.Donees
-            .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
+           .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password && u.CNPJ != null);
+
 
         if (donee != null)
         {

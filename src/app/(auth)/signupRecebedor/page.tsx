@@ -11,6 +11,7 @@ import Image from "next/image";
 import logo from "@/assets/logo.png";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 const signupSchema = z.object({
   Nome_instituicao: z.string()
@@ -34,9 +35,6 @@ const signupSchema = z.object({
     .min(3, "O nome do representante deve ter pelo menos 3 caracteres.")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome do representante deve conter apenas letras."),
 
-  CPF: z.string()
-    .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido. Use o formato 000.000.000-00."),
-
   Senha: z.string()
     .min(6, "A senha deve ter pelo menos 6 caracteres.")
     .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
@@ -47,6 +45,7 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupRecebedor() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -78,6 +77,7 @@ export default function SignupRecebedor() {
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Cadastro realizado com sucesso!");
+        router.push("/singnin");
         reset();
       }
     } catch (error: any) {
@@ -111,6 +111,12 @@ export default function SignupRecebedor() {
       </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">        
+                
+        <div>
+          <Input type="text" placeholder="Nome da Instituição" {...register("Nome_instituicao")} />
+          {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
+        </div>
+        
         <div>
           <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
             
@@ -137,6 +143,12 @@ export default function SignupRecebedor() {
           <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("Telefone")} />
           {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
         </div>
+
+        <div>
+          <Input type="text" placeholder="Nome do Representante" {...register("Nome_representante")} />
+          {errors.Nome_representante && <p className="text-red-500 text-sm">{errors.Nome_representante.message}</p>}
+        </div>
+
         <div>
           <Input type="password" placeholder="Senha" {...register("Senha")} />
           {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}

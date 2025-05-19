@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import styles from './Sidebar.module.css';
-import Financial from '../Financial/page';
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 

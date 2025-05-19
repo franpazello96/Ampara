@@ -72,21 +72,21 @@ export default function Home() {
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-lg shadow-lg focus:outline-none transition-all"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-lg shadow-lg focus:outline-none transition-all cursor-pointer"
               >
                 Cadastro
               </button>
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-10">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-10 ">
                   <Link
                     href="/signupDoador"
-                    className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all"
+                    className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all "
                   >
                     Sou Doador
                   </Link>
                   <Link
                     href="/signupRecebedor"
-                    className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all"
+                    className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all cursor-pointer"
                   >
                     Sou Recebedor
                   </Link>
@@ -95,7 +95,7 @@ export default function Home() {
             </div>
 
             <Link href="/signin">
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md transition-all">
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md transition-all cursor-pointer">
                 Login
               </Button>
             </Link>
@@ -155,7 +155,7 @@ export default function Home() {
           a nós nessa corrente do bem e ajude a transformar vidas!
         </p>
         <Link href="/signupDoador">
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-3 text-lg rounded-lg transition-all">
+          <Button className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-3 text-lg rounded-lg transition-all cursor-pointer">
             Quero Ajudar
           </Button>
         </Link>
