@@ -27,7 +27,10 @@ namespace AmparaCRUDApi.Data
 
             modelBuilder.Entity<DailyDonationTotals>()
                 .HasNoKey()
-                .ToView("vw_DailyDonationTotals");
+                .ToView("vw_DailyDonationTotals")
+                .Property(p => p.TotalAmount)
+                .HasColumnType("decimal(18,2)")
+                .HasPrecision(18, 2);
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AmparaCRUDApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250513183854_AddBenefitiaryTable")]
-    partial class AddBenefitiaryTable
+    [Migration("20250520171653_InitialCleanMigration")]
+    partial class InitialCleanMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,7 @@ namespace AmparaCRUDApi.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.ToTable((string)null);
