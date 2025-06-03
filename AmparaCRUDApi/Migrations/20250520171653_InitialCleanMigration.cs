@@ -91,25 +91,30 @@ namespace AmparaCRUDApi.Migrations
                 {
                     table.PrimaryKey("PK_Donees", x => x.CNPJ);
                 });
+
+            migrationBuilder.Sql(@"
+                CREATE VIEW vw_DailyDonationTotals AS
+                SELECT 
+                    CAST([Date] AS DATE) AS Day,
+                    SUM([Amount]) AS TotalAmount
+                FROM Donations
+                GROUP BY CAST([Date] AS DATE)
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Benefitiaries");
+            migrationBuilder.Sql(@"
+                IF OBJECT_ID('vw_DailyDonationTotals', 'V') IS NOT NULL
+                    DROP VIEW vw_DailyDonationTotals;
+            ");
 
-            migrationBuilder.DropTable(
-                name: "Buys");
-
-            migrationBuilder.DropTable(
-                name: "Donations");
-
-            migrationBuilder.DropTable(
-                name: "Donators");
-
-            migrationBuilder.DropTable(
-                name: "Donees");
+            migrationBuilder.DropTable(name: "Benefitiaries");
+            migrationBuilder.DropTable(name: "Buys");
+            migrationBuilder.DropTable(name: "Donations");
+            migrationBuilder.DropTable(name: "Donators");
+            migrationBuilder.DropTable(name: "Donees");
         }
     }
 }
