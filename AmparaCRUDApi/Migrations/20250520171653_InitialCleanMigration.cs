@@ -98,6 +98,7 @@ namespace AmparaCRUDApi.Migrations
                     CAST([Date] AS DATE) AS Day,
                     SUM([Amount]) AS TotalAmount
                 FROM Donations
+                WHERE [Amount] IS NOT NULL AND [DonationType] = 'Dinheiro'
                 GROUP BY CAST([Date] AS DATE)
             ");
         }

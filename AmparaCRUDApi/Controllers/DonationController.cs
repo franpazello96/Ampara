@@ -60,5 +60,24 @@ namespace AmparaCRUDApi.Controllers
 
             return Ok(totals);
         }
+
+        [HttpGet("getalltransactions")]
+        public IActionResult GetAllTransactions()
+        {
+            var transactions = dbContext.Donations
+                .OrderByDescending(d => d.Date)
+                .Select(d => new DonationOutputDTO
+                {
+                    Type = "Entrada", 
+                    Category = d.DonationType == "Alimento" ? "Alimentos" : (d.DonationType == "Dinheiro" ? "Dinheiro" : d.DonationType),
+                    FoodQuantity = d.DonationType == "Alimento" ? d.Quantity : null,
+                    Amount = d.DonationType == "Dinheiro" ? d.Amount : (d.DonationType == "Alimento" && d.Amount.HasValue ? d.Amount : null), // Handle cases like row 4 in image
+                    Date = d.Date, 
+                    TimeRecurrence = d.TimeRecurrence 
+                })
+                .ToList();
+
+            return Ok(transactions);
+        }
     }
 }

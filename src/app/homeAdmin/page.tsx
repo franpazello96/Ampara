@@ -18,31 +18,6 @@ export default function Home() {
       <Sidebar />
       <div className="flex-1 ml-64 p-6 space-y-6">
           <Dashboard />
-        <div className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Relatório de Doações</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>Janeiro</AccordionTrigger>
-                  <AccordionContent>
-                    <p>Relatório detalhado de doações de janeiro.</p>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>Fevereiro</AccordionTrigger>
-                  <AccordionContent>
-                    <p>Relatório detalhado de doações de fevereiro.</p>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </CardContent>
-            <div className="flex justify-end p-4"></div>
-              <Button variant="outline">Gerar Relatório</Button>
-          </Card>
-        </div>
       </div>
     </div>
   );
