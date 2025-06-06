@@ -1,0 +1,68 @@
+.carousel-arrow-prev,
+.carousel-arrow-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.carousel-arrow-prev:hover,
+.carousel-arrow-next:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-arrow-prev {
+  left: 20px;
+}
+
+.carousel-arrow-next {
+  right: 20px;
+}
+
+.carousel .control-dots {
+  padding: 0;
+  margin: 16px 0;
+  position: relative;
+  bottom: 0;
+}
+
+.carousel .control-dots .dot {
+  box-shadow: none;
+  background: #ccc;
+  opacity: 0.5;
+}
+
+.carousel .control-dots .dot.selected {
+  background: #6366f1;
+  opacity: 1;
+}
+
+.dark .carousel-arrow-prev,
+.dark .carousel-arrow-next {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.dark .carousel-arrow-prev:hover,
+.dark .carousel-arrow-next:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dark .carousel .control-dots .dot {
+  background: #666;
+}
+
+.dark .carousel .control-dots .dot.selected {
+  background: #8b5cf6;
+}
