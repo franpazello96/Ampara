@@ -10,23 +10,12 @@ namespace AmparaCRUDApi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Price",
-                table: "Donations");
 
             migrationBuilder.RenameColumn(
                 name: "Time",
                 table: "Donations",
                 newName: "Date");
 
-            migrationBuilder.AddColumn<decimal>(
-                name: "Amount",
-                table: "Donations",
-                type: "decimal(18,2)",
-                precision: 18,
-                scale: 2,
-                nullable: false,
-                defaultValue: 0m);
 
             migrationBuilder.Sql(@"
                 CREATE VIEW vw_DailyDonationTotals AS

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import styles from './Sidebar.module.css';
+import styles from './SidebarDoador.module.css';
 import Financial from '../Financial/page';
 import Image from "next/image";
 import logo from "@/assets/logo.png";
@@ -22,12 +22,9 @@ const Sidebar: React.FC = () => {
         </div>
         <nav>
           <ul>
-            <li><Link href="/homeAdmin">Relatórios</Link></li>
-            <li><Link href="/profile">Editar Perfil</Link></li>
-            <li><Link href="/report">Lista de Entradas/Saídas</Link></li>
-
-            <li><Link href="">Lista de doadores</Link></li>
-            <li><Link href="">Lista de beneficiários</Link></li>
+            <li><Link href="/doador/donation">Fazer uma doação</Link></li>
+            <li><Link href="/doador/profile">Editar Perfil</Link></li>
+            <li><Link href="/doador/report">Lista de Entradas/Saídas</Link></li>
 
           </ul>
         </nav>
