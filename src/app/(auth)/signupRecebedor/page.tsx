@@ -9,6 +9,7 @@ import { Button } from "@/components/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
 import Link from "next/link";
+import Link from "next/link";
 import logo from "@/assets/logo.png";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -124,28 +125,78 @@ export default function SignupRecebedor() {
             </div>
             <ThemeToggle />
           </div>
+    <div className="h-screen w-full flex">
+      {/* Coluna do Logo */}
+      <div className="hidden lg:flex w-1/2 bg-zinc-100 dark:bg-zinc-800 justify-center items-center">
+        <Image
+          src={logo}
+          alt="Logo"
+          width={500}
+          height={500}
+          className="object-contain p-8 transition-all duration-1000 ease-in-out hover:transform hover:-translate-y-2 animate-fade-in"
+        />
+      </div>
+
+      {/* Linha divisória vertical */}
+      <div className="hidden lg:block w-[1px] h-screen bg-zinc-200 dark:bg-zinc-700" />
+
+      {/* Coluna do Formulário */}
+      <div className="w-full lg:w-1/2 flex justify-center items-center p-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="flex flex-col justify-center items-center">
+            <div className="lg:hidden mb-6">
+              <Image src={logo} alt="Logo" width={108.5} height={30} />
+            </div>
+            <ThemeToggle />
+          </div>
 
           <h1 className="text-4xl font-medium text-zinc-800 dark:text-zinc-100 text-center">
             Cadastro de Recebedor
           </h1>
+          <h1 className="text-4xl font-medium text-zinc-800 dark:text-zinc-100 text-center">
+            Cadastro de Recebedor
+          </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">        
-        <div>
-          <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-            
-          </label>
-          <select id="dropdown" {...register("Tipo_instituicao")} className="w-full p-2 border rounded-md mt-1">
-            <option value=""> Tipo de instituição: </option>
-            <option value="ONG">ONG</option>
-            <option value="Associação">Associação</option>
-            <option value="Fundação">Fundação</option>
-          </select>
-        </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Input 
+                  type="text" 
+                  placeholder="Nome da Instituição"
+                  {...register("Nome_instituicao")} 
+                />
+                {errors.Nome_instituicao && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Nome_instituicao.message}</p>
+                )}
+              </div>
 
-        <div className="text-zinc-800 dark:text-zinc-100">
-          <Input type="text" placeholder="CNPJ (00.000.000/0000-00)" {...register("CNPJ")} />
-          {errors.CNPJ && <p className="text-red-500 text-sm ">{errors.CNPJ.message}</p>}
-        </div>
+              <div>
+                <select 
+                  {...register("Tipo_instituicao")} 
+                  className="w-full h-12 px-4 rounded-lg border border-zinc-300 dark:border-zinc-600 
+                    focus:border-zinc-500 dark:focus:border-zinc-400 outline-none transition-colors
+                    bg-transparent text-zinc-800 dark:text-zinc-100"
+                >
+                  <option value="">Selecione o tipo de instituição</option>
+                  <option value="ONG">ONG</option>
+                  <option value="Associação">Associação</option>
+                  <option value="Fundação">Fundação</option>
+                </select>
+                {errors.Tipo_instituicao && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Tipo_instituicao.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Input 
+                  type="text" 
+                  placeholder="CNPJ (00.000.000/0000-00)" 
+                  {...register("CNPJ")} 
+                />
+                {errors.CNPJ && (
+                  <p className="text-red-500 text-sm mt-1">{errors.CNPJ.message}</p>
+                )}
+              </div>
 
               <div>
                 <Input 
@@ -158,14 +209,77 @@ export default function SignupRecebedor() {
                 )}
               </div>
 
-        <div>
-          <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("Telefone")} />
-          {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
+              <div>
+                <Input 
+                  type="text" 
+                  placeholder="Telefone (Apenas números)" 
+                  {...register("Telefone")} 
+                />
+                {errors.Telefone && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Telefone.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Input 
+                  type="text" 
+                  placeholder="Nome do Representante" 
+                  {...register("Nome_representante")} 
+                />
+                {errors.Nome_representante && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Nome_representante.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Input 
+                  type="text" 
+                  placeholder="CPF do Representante (000.000.000-00)" 
+                  {...register("CPF")} 
+                />
+                {errors.CPF && (
+                  <p className="text-red-500 text-sm mt-1">{errors.CPF.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Input 
+                  type="password" 
+                  placeholder="Senha" 
+                  {...register("Senha")} 
+                />
+                {errors.Senha && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Senha.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-center mt-8 space-x-4">
+              <Button type="submit" className="px-12 h-12 text-base w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+                Cadastrar
+              </Button>
+            </div>
+
+            <div className="text-center mt-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Já tem uma conta?{" "}
+                <Link href="/signin" className="text-blue-500 hover:underline">
+                  Faça login
+                </Link>
+              </p>
+            </div>
+
+            <div className="text-center mt-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Quero ser um{" "}
+                <Link href="/signupDoador" className="text-blue-500 hover:underline">
+                  Doador
+                </Link>
+              </p>
+            </div>
+          </form>
         </div>
-        <div>
-          <Input type="password" placeholder="Senha" {...register("Senha")} />
-          {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
-        </div>
+      </div>
       </div>
     </div>
   );
