@@ -1,54 +1,53 @@
 ﻿using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
 using AmparaCRUDApi.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AmparaCRUDApi.Controllers
-{   //localhost:xxxxx/api/donator
-    [Route("api/[controller]")]
+{
+    [Route("api/donator")]
     [ApiController]
     public class DonatorController : Controller
     {
-        // Constructor to connect to the database from ApplicationDbContext
         private readonly ApplicationDbContext dbContext;
         public DonatorController(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
 
-        //Reading the table
         [HttpGet]
         public IActionResult GetAllDonators()
         {
             var allDonators = dbContext.Donators.ToList();
-
             return Ok(allDonators);
         }
 
-        [HttpGet]
-        [Route("cpf/{cpf}")]
+        [HttpGet("cpf/{cpf}")]
         public IActionResult GetDonatorByCpf(string cpf)
         {
-            var donatorCpf = dbContext.Donators.Find(cpf);
+            var donatorCpf = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
+            return donatorCpf is null ? NotFound() : Ok(donatorCpf);
+        }
 
-            if (donatorCpf is null)
-            {
-                return NotFound();
-            }
+        [HttpGet("profile")]
+        [Authorize]
+        public IActionResult GetDonatorProfile()
+        {
+            var cpf = User.FindFirst("cpf")?.Value;
+            if (cpf == null) return Unauthorized("Invalid or Not Found token.");
 
-            return Ok(donatorCpf);
+            var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
+            return donator == null ? NotFound("Donator not found.") : Ok(donator);
         }
 
         [HttpPost("signupdonator")]
-        public IActionResult AddDonator(AddDonatorDTO addDonatorDTO)
+        public IActionResult AddDonator([FromBody] AddDonatorDTO addDonatorDTO)
         {
-            bool cpfExists = dbContext.Donators.Any(d => d.CPF == addDonatorDTO.CPF);
-            if (cpfExists)
-            {
-                return BadRequest("CPF já cadastrado no sistema");
-            }
-            
-            //DTO (Data Transfer Object) is getting the object from the Class Donator, configuring it, and now we create the variables in the "constructor".
+            if (dbContext.Donators.Any(d => d.CPF == addDonatorDTO.CPF))
+                return BadRequest("CPF already registered");
+
             var donatorEntity = new Donator()
             {
                 CPF = addDonatorDTO.CPF,
@@ -58,45 +57,35 @@ namespace AmparaCRUDApi.Controllers
                 Password = addDonatorDTO.Password
             };
 
-            //Add the data in the class Donators
             dbContext.Donators.Add(donatorEntity);
-
-            //EF requires to save the changes before return
             dbContext.SaveChanges();
 
-            //Return the POST operation
             return Ok(donatorEntity);
         }
 
-        [HttpPut]
-        [Route("cpf/{cpf}")]
-        public IActionResult UpdateDonator(string cpf, UpdateDonatorDTO updateDonatorDTO)
+        [HttpPut("update")]
+        [Authorize]
+        public IActionResult UpdateDonator([FromBody] UpdateDonatorDTO updateDonatorDTO)
         {
-            var donator = dbContext.Donators.Find(cpf);
-            if (donator == null)
-            {
-                return NotFound();
-            }
+            var cpf = User.FindFirst("cpf")?.Value;
+            if (cpf == null) return Unauthorized("Invalid or Not Found token,");
 
+            var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
+            if (donator == null) return NotFound("Donator not found.");
+            if (donator.Password != updateDonatorDTO.Password) return Unauthorized("Wrong password.");
             donator.Name = updateDonatorDTO.Name;
-            donator.PhoneNumber = updateDonatorDTO.PhoneNumber;
             donator.Email = updateDonatorDTO.Email;
-            donator.Password = updateDonatorDTO.Password;
+            donator.PhoneNumber = updateDonatorDTO.PhoneNumber;
 
             dbContext.SaveChanges();
             return Ok(donator);
         }
 
-        [HttpDelete]
-        [Route("cpf/{cpf}")]
+        [HttpDelete("cpf/{cpf}")]
         public IActionResult DeleteDonator(string cpf)
         {
-            var donator = dbContext.Donators.Find(cpf);
-
-            if (donator == null)
-            {
-                return NotFound();
-            }
+            var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
+            if (donator == null) return NotFound();
 
             dbContext.Donators.Remove(donator);
             dbContext.SaveChanges();

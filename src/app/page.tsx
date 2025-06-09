@@ -11,7 +11,7 @@ import networkImg from "@/assets/network.jpg";
 import CountUp from 'react-countup';
 import { Button } from "@/components/button";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";

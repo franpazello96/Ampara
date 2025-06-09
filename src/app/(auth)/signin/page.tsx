@@ -13,44 +13,11 @@ export default function Signin() {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  async function handleSubmit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-
-    try {
-      const response = await fetch("https://localhost:5001/api/Auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-  
-      if (!response.ok){
-        console.log(JSON.stringify({ email, password }));
-        throw new Error ("Credencias inválidas")
-      }
-
-      const data = await response.json(); 
-      const token = data.token;
-      localStorage.setItem("token", token);
-
-      const decoded = jwtDecode<TokenPayload>(token);
-
-      if (decoded.cpf) {
-        router.push("/");
-      } else if (decoded.cnpj){
-        router.push("/homeAdmin");
-      } else {
-        throw new Error("Token inválido: sem cpf/cnpj");
-      }
-    } catch (error) {
-        if (error instanceof Error) {
-          console.error("Erro ao fazer login:", error.message);
-        } else {
-          console.error("Erro desconhecido:", error);
-        }
-    }
-}
+    console.log('E-mail', email);
+    console.log('Senha', password);
+  }
 
   return (
     <div className="h-screen w-full flex">
