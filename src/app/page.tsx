@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import logo from "@/assets/logo.png";
-import donationsImg from "@/assets/Donations.png";
-import charityImg from "@/assets/Charity.png";
+import donationsImg from "@/assets/8.png";
+import QuemSomosImg from "@/assets/1.png";
+import QuemSomosImg2 from "@/assets/6.png";
 import impactImg from "@/assets/impact.jpg";
 import missionImg from "@/assets/mission.jpg";
 import networkImg from "@/assets/network.jpg";
@@ -214,13 +215,13 @@ export default function Home() {
 
       <section
         id="quem-somos"
-        className="w-full px-6 md:px-20 py-20 bg-zinc-100 dark:bg-zinc-800 text-purple-800 dark:text-white"
+        className="w-full bg-zinc-100 dark:bg-zinc-800 text-purple-800 dark:text-white"
       >
-        <div className="text-center mb-12">
+        <div className="text-center py-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
             Descubra Mais Sobre Nosso Impacto
           </h2>
-          <p className="text-lg md:text-xl mt-4 mb-12 max-w-3xl mx-auto text-zinc-700 dark:text-zinc-300">
+          <p className="text-lg md:text-xl mt-4 mb-8 max-w-3xl mx-auto text-zinc-700 dark:text-zinc-300">
             Explore nossa história e descubra como estamos transformando vidas através da solidariedade digital
           </p>
         </div>
@@ -232,7 +233,7 @@ export default function Home() {
           showStatus={false}
           autoPlay={true}
           interval={5000}
-          className="w-full max-w-screen-xl mx-auto mb-12"
+          className="w-full"
           renderArrowPrev={(clickHandler, hasPrev) => {
             return (
               <button
@@ -262,66 +263,72 @@ export default function Home() {
             )
           }}
         >
-          <div className="flex flex-col items-center px-6 py-8  rounded-xl mx-4">
-            <h3 className="text-3xl font-bold mb-6 text-purple-600 dark:text-purple-400">
-              Quem Somos
-            </h3>
-            <p className="mb-8 text-center max-w-2xl text-lg text-zinc-700 dark:text-zinc-300 leading-relaxed">
-              Somos uma plataforma inovadora que une tecnologia e solidariedade,
-              criando pontes entre doadores e organizações não governamentais.
-              Nossa missão é transformar o ato de doar em uma experiência
-              transparente, segura e gratificante para todos os envolvidos.
-            </p>
-            <div className="w-full max-w-2xl h-[400px] relative rounded-lg overflow-hidden">
+          <div className="flex flex-col">
+            <div className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm py-12 px-6 md:px-12">
+              <h3 className="text-4xl font-bold mb-8 text-purple-600 dark:text-purple-400 text-center">
+                Quem Somos
+              </h3>
+              <p className="mx-auto max-w-3xl text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed text-center">
+                Somos uma plataforma inovadora que une tecnologia e solidariedade,
+                criando pontes entre doadores e organizações não governamentais.
+                Nossa missão é transformar o ato de doar em uma experiência
+                transparente, segura e gratificante para todos os envolvidos.
+              </p>
+            </div>
+            <div className="w-full h-[500px] relative">
               <Image
-                src={charityImg}
+                src={QuemSomosImg}
                 alt="Ampara - Quem Somos"
                 fill
-                className="object-cover hover:scale-105 transition-transform duration-500"
+                className="object-cover object-center hover:scale-105 transition-transform duration-500"
                 priority
               />
             </div>
           </div>
 
-          <div className="flex flex-col items-center px-6 py-8 rounded-xl mx-4">
-            <h3 className="text-3xl font-bold mb-6 text-purple-600 dark:text-purple-400">
-              Nosso Objetivo
-            </h3>
-            <p className="mb-8 text-center max-w-2xl text-lg text-zinc-700 dark:text-zinc-300 leading-relaxed">
-              Buscamos revolucionar a forma como as doações são feitas,
-              proporcionando uma plataforma moderna e eficiente. Oferecemos
-              ferramentas avançadas de acompanhamento, relatórios detalhados
-              e total transparência em cada etapa do processo de doação.
-            </p>
-            <div className="w-full max-w-2xl h-[400px] relative rounded-lg overflow-hidden ">
+          <div className="flex flex-col">
+            <div className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm py-12 px-6 md:px-12">
+              <h3 className="text-4xl font-bold mb-8 text-purple-600 dark:text-purple-400 text-center">
+                Nosso Objetivo
+              </h3>
+              <p className="mx-auto max-w-3xl text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed text-center">
+                Buscamos revolucionar a forma como as doações são feitas,
+                proporcionando uma plataforma moderna e eficiente. Oferecemos
+                ferramentas avançadas de acompanhamento, relatórios detalhados
+                e total transparência em cada etapa do processo de doação.
+              </p>
+            </div>
+            <div className="w-full h-[500px] relative">
               <Image
                 src={donationsImg}
                 alt="Ampara - Nosso Objetivo"
                 fill
-                className="object-cover hover:scale-105 transition-transform duration-500"
+                className="object-cover object-center hover:scale-105 transition-transform duration-500"
                 priority
               />
             </div>
           </div>
 
-          <div className="flex flex-col items-center px-6 py-8 rounded-xl mx-4">
-            <h3 className="text-3xl font-bold mb-6 text-purple-600 dark:text-purple-400">
-              ONG's Parceiras
-            </h3>
-            <p className="mb-8 text-center max-w-2xl text-lg text-zinc-700 dark:text-zinc-300 leading-relaxed">
-              Nossas parcerias com ONGs são cuidadosamente selecionadas para
-              garantir o máximo impacto social. Cada organização parceira
-              compartilha nossos valores de transparência, eficiência e
-              compromisso com a transformação social.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-2xl">
-              {[1, 2, 3].map((index) => (
-                <div key={index} className="bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900 dark:to-indigo-900 p-6 rounded-lg shadow-md">
-                  <div className="text-purple-600 dark:text-purple-400 text-center font-semibold">
-                    ONG Parceira {index}
-                  </div>
-                </div>
-              ))}
+          <div className="flex flex-col">
+            <div className="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm py-12 px-6 md:px-12">
+              <h3 className="text-4xl font-bold mb-8 text-purple-600 dark:text-purple-400 text-center">
+                ONG's Parceiras
+              </h3>
+              <p className="mx-auto max-w-3xl text-lg md:text-xl text-zinc-700 dark:text-zinc-300 leading-relaxed text-center">
+                Nossas parcerias com ONGs são cuidadosamente selecionadas para
+                garantir o máximo impacto social. Cada organização parceira
+                compartilha nossos valores de transparência, eficiência e
+                compromisso com a transformação social.
+              </p>
+            </div>
+            <div className="w-full h-[500px] relative">
+              <Image
+                src={QuemSomosImg2}
+                alt="Ampara - ONG's Parceiras"
+                fill
+                className="object-cover object-center hover:scale-105 transition-transform duration-500"
+                priority
+              />
             </div>
           </div>
         </Carousel>
