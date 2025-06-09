@@ -213,7 +213,7 @@ export default function Signup() {
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Quero ser um{" "}
                 <Link href="/signupRecebedor" className="text-blue-500 hover:underline">
-                  Recebedor
+                  Beneficiário
                 </Link>
               </p>
             </div>
