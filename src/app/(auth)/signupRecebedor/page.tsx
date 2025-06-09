@@ -126,7 +126,7 @@ export default function SignupRecebedor() {
           </div>
 
           <h1 className="text-4xl font-medium text-zinc-800 dark:text-zinc-100 text-center">
-            Cadastro de Recebedor
+            Cadastro de Beneficiário
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
