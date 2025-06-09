@@ -4,7 +4,7 @@ export default function Home() {
       <div className="flex flex-col justify-center items-center">
         <h1 className="text-2xl font-bold">Ampara</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          `Apoie o seu próximo.`
+          `Apoie o seu próximos.`
         </p>
       </div>
     </div>
