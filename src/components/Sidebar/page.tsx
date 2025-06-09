@@ -8,7 +8,7 @@ import Image from "next/image";
 import logo from "@/assets/logo.png";
 import { RiBarChartFill } from 'react-icons/ri';
 import { BiTransfer } from 'react-icons/bi';
-import { HiUsers, HiOutlineUserGroup } from 'react-icons/hi';
+import { HiUsers, HiOutlineUserGroup, HiOutlineShoppingBag } from 'react-icons/hi';
 import { IoLogOutOutline } from 'react-icons/io5';
 
 const Sidebar: React.FC = () => {
@@ -21,13 +21,14 @@ const Sidebar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    // Implementar lógica de logout aqui
-    localStorage.removeItem('token'); // Remove o token de autenticação
-    router.push('/'); // Redireciona para a página inicial
+    localStorage.removeItem('token'); 
+    router.push('/'); 
   };
 
   return (
     <>
+    <div className="min-h-screen flex">
+      <Sidebar />
       <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <div className="flex justify-center py-6">
           <Image src={logo} alt="Logo" width={70} height={45} />
@@ -41,7 +42,7 @@ const Sidebar: React.FC = () => {
                 className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-zinc-700"
               >
                 <RiBarChartFill className="w-5 h-5 mr-3" />
-                Relatórios
+                Dashboard
               </Link>
             </li>
             <li>
@@ -71,8 +72,18 @@ const Sidebar: React.FC = () => {
                 Lista de Beneficiários
               </Link>
             </li>
+            <li>
+              <Link 
+                href="/buys" 
+                className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-zinc-700"
+              >
+                <HiOutlineShoppingBag  className="w-5 h-5 mr-3" />
+                Cadastro de compras
+              </Link>
+            </li>
           </ul>
         </nav>
+        
 
         {/* Perfil e Botão de Sair */}
         <div className="mt-auto border-t border-gray-200 dark:border-zinc-700">
@@ -117,6 +128,7 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </>
   );
 };
