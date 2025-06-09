@@ -10,7 +10,7 @@ using AmparaCRUDApi.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")]
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -20,6 +20,15 @@ public class AuthController : ControllerBase
     {
         _context = context;
         _config = config;
+    }
+
+    [HttpOptions("login")]
+    public IActionResult PreflightLogin()
+    {
+        Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+        Response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
+        Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        return NoContent();
     }
 
     [HttpPost("login")]
@@ -50,11 +59,11 @@ public class AuthController : ControllerBase
     {
         var claims = new[]
         {
-        new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
-        new Claim("cpf", donator.CPF),
-        new Claim("role", "donator"),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
+            new Claim("cpf", donator.CPF),
+            new Claim("role", "donator"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
 
         return GenerateToken(claims);
     }
@@ -63,11 +72,11 @@ public class AuthController : ControllerBase
     {
         var claims = new[]
         {
-        new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
-        new Claim("cnpj", donee.CNPJ),
-        new Claim("role", "donee"),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
+            new Claim("cnpj", donee.CNPJ),
+            new Claim("role", "donee"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
 
         return GenerateToken(claims);
     }

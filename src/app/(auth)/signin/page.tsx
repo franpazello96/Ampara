@@ -12,11 +12,35 @@ export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    console.log('E-mail', email);
-    console.log('Senha', password);
+  async function handleSubmit(event: React.FormEvent) {
+  event.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+
+    console.log("Status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Erro ao fazer login.");
+    }
+
+    const data = await response.json();
+    console.log("Resposta da API:", data);
+
+    localStorage.setItem("token", data.token);
+    window.location.href = "/homeAdmin";
+
+  } catch (error: any) {
+    console.error("Erro ao conectar:", error);
   }
+}
+
+
 
   return (
     <div className="h-screen w-full flex">

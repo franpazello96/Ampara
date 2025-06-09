@@ -10,23 +10,82 @@ import Sidebar from "@/components/Sidebar/page";
 export default function EditProfile() {
   const [profilePic, setProfilePic] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
-    async function fetchGitHubProfile() {
+    async function fetchProfile() {
       try {
-        const response = await fetch("https://api.github.com/users/octocat");
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:5000/api/donator/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error("Erro ao buscar perfil.");
+
         const data = await response.json();
-        setProfilePic(data.avatar_url);
+        setName(data.name);
+        setEmail(data.email);
+        setPhoneNumber(data.phoneNumber);
+        if (data.profilePic) {
+          setProfilePic(data.profilePic);
+        } else {
+          fetchGitHubProfile();
+        }
       } catch (error) {
         console.error(error);
-        alert("Erro ao buscar dados do GitHub.");
+        alert("Erro ao carregar perfil.");
       }
     }
 
-    fetchGitHubProfile();
+    fetchProfile();
   }, []);
+
+  async function fetchGitHubProfile() {
+    try {
+      const response = await fetch("https://api.github.com/users/octocat");
+      const data = await response.json();
+      setProfilePic(data.avatar_url);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao buscar dados do GitHub.");
+    }
+  }
+
+  async function handleUpdateProfile() {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/api/donator/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name,
+          phoneNumber,
+          password,
+          email
+        })
+      });
+      console.log("Dados enviados:", { name, phoneNumber, password, email });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Erro ao atualizar perfil.");
+      }
+
+      alert("Perfil atualizado com sucesso!");
+    } catch (error: any) {
+      console.error("Erro ao atualizar perfil:", error);
+      alert(error.message || "Erro na requisição.");
+    }
+  }
 
   return (
     <div className="flex">
@@ -39,15 +98,7 @@ export default function EditProfile() {
         <h1 className="text-2xl font-bold mb-4">Editar Perfil</h1>
 
         <div className="mb-6">
-          {profilePic ? (
-            <img
-              src={profilePic}
-              alt="Foto de perfil"
-              className="w-24 h-24 rounded-full mx-auto"
-            />
-          ) : (
-            <p>Carregando imagem...</p>
-          )}
+          <img src={profilePic} alt="Foto de perfil" className="w-24 h-24 rounded-full mx-auto" />
         </div>
 
         <label className="block mb-2">Nome</label>
@@ -59,13 +110,22 @@ export default function EditProfile() {
           placeholder="Digite seu nome"
         />
 
+        <label className="block mb-2">E-mail</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 border rounded mb-4"
+          placeholder="Digite seu e-mail"
+        />
+
         <label className="block mb-2">Senha</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-2 border rounded mb-4"
-          placeholder="Digite sua senha"
+          placeholder="Confirme sua senha atual"
         />
 
         <label className="block mb-2">Telefone</label>
@@ -77,7 +137,7 @@ export default function EditProfile() {
           placeholder="Digite seu telefone"
         />
 
-        <Button type="submit">Editar</Button>
+        <Button type="button" onClick={handleUpdateProfile}>Salvar</Button>
       </div>
     </div>
   );
