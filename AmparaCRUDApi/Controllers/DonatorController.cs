@@ -1,9 +1,7 @@
 ﻿using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
-using AmparaCRUDApi.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace AmparaCRUDApi.Controllers
 {
@@ -54,13 +52,13 @@ namespace AmparaCRUDApi.Controllers
                 Name = addDonatorDTO.Name,
                 Email = addDonatorDTO.Email,
                 PhoneNumber = addDonatorDTO.PhoneNumber,
-                Password = addDonatorDTO.Password
+                Password = BCrypt.Net.BCrypt.HashPassword(addDonatorDTO.Password)
             };
 
             dbContext.Donators.Add(donatorEntity);
             dbContext.SaveChanges();
 
-            return Ok(donatorEntity);
+            return Ok("Donator successfully created.");
         }
 
         [HttpPut("update")]

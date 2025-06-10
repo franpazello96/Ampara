@@ -8,93 +8,108 @@ using System.Security.Claims;
 using System.Text;
 using AmparaCRUDApi.Models.Entities;
 
-[ApiController]
-[Route("api/auth")]
-public class AuthController : ControllerBase
+namespace AmparaCRUDApi.Controllers
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IConfiguration _config;
-
-    public AuthController(ApplicationDbContext context, IConfiguration config)
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
     {
-        _context = context;
-        _config = config;
-    }
+        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _config;
 
-    [HttpOptions("login")]
-    public IActionResult PreflightLogin()
-    {
-        Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
-        Response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
-        Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        return NoContent();
-    }
-
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
-    {
-
-        Console.WriteLine("Tentativa de login com email: " + request.Email + ", senha: " + request.Password);
-        var donator = _context.Donators
-            .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
-
-        if (donator != null)
+        public AuthController(ApplicationDbContext context, IConfiguration config)
         {
-            var token = GenerateJwtTokenForDonator(donator);
-            return Ok(new { token, userType = "donator" });
+            _context = context;
+            _config = config;
         }
 
-        var donee = _context.Donees
-           .FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password && u.CNPJ != null);
-
-
-        if (donee != null)
+        [HttpOptions("login")]
+        public IActionResult PreflightLogin()
         {
-            var token = GenerateJwtTokenForDonee(donee);
-            return Ok(new { token, userType = "donee" });
+            Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+            Response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
+            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            return NoContent();
         }
 
-        return Unauthorized(new { message = "Credenciais inválidas." });
-    }
-
-    private string GenerateJwtTokenForDonator(Donator donator)
-    {
-        var claims = new[]
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginRequest request)
         {
-            new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
-            new Claim("cpf", donator.CPF),
-            new Claim("role", "donator"),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+            var email = request.Email.Trim().ToLower();
 
-        return GenerateToken(claims);
-    }
+            var donator = _context.Donators.FirstOrDefault(u => u.Email.ToLower() == email);
+            if (donator != null)
+            {
+                Console.WriteLine($"[Login] Donator encontrado: {donator.Email}");
+                Console.WriteLine($"[Login] Senha hash no banco: {donator.Password}");
+                Console.WriteLine($"[Login] Senha recebida: {request.Password}");
 
-    private string GenerateJwtTokenForDonee(Donee donee)
-    {
-        var claims = new[]
+                var senhaCorreta = BCrypt.Net.BCrypt.Verify(request.Password, donator.Password);
+                Console.WriteLine($"[Login] Senha confere? {senhaCorreta}");
+
+                if (senhaCorreta)
+                {
+                    var token = GenerateJwtTokenForDonator(donator);
+                    return Ok(new { token, userType = "donator" });
+                }
+                else
+                {
+                    Console.WriteLine("[Login] Senha inválida para donator.");
+                }
+            }
+
+
+            var donee = _context.Donees.FirstOrDefault(u => u.Email.ToLower() == email);
+            if (donee != null && BCrypt.Net.BCrypt.Verify(request.Password, donee.Password))
+            {
+                var token = GenerateJwtTokenForDonee(donee);
+                return Ok(new { token, userType = "donee" });
+            }
+
+            return Unauthorized(new { message = "Credenciais inválidas." });
+        }
+
+
+        private string GenerateJwtTokenForDonator(Donator donator)
         {
-            new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
-            new Claim("cnpj", donee.CNPJ),
-            new Claim("role", "donee"),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
+                new Claim("cpf", donator.CPF),
+                new Claim("role", "donator"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-        return GenerateToken(claims);
-    }
-    private string GenerateToken(Claim[] claims)
-    {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            return GenerateToken(claims);
+        }
 
-        var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.Now.AddHours(2),
-            signingCredentials: creds
-        );
+        private string GenerateJwtTokenForDonee(Donee donee)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
+                new Claim("cnpj", donee.CNPJ),
+                new Claim("role", "donee"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            return GenerateToken(claims);
+        }
+
+        private string GenerateToken(Claim[] claims)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(2),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

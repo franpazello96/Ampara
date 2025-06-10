@@ -11,9 +11,10 @@ import Link from "next/link";
 import logo from "@/assets/logo.png";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation"; // 👈 Importa useRouter
 
 const signupSchema = z.object({
-  Nome: z
+  Name: z
     .string()
     .min(3, "O nome deve ter pelo menos 3 caracteres.")
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome deve conter apenas letras."),
@@ -39,6 +40,8 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function Signup() {
+  const router = useRouter(); // 👈 Inicializa router
+
   const {
     register,
     handleSubmit,
@@ -52,7 +55,7 @@ export default function Signup() {
     try {
       const addForm = {
         CPF: data.CPF,
-        Name: data.Nome,
+        Name: data.Name,
         Email: data.Email,
         PhoneNumber: data.PhoneNumber,
         Password: data.Password,
@@ -72,6 +75,7 @@ export default function Signup() {
       if (response.status === 200 || response.status === 201) {
         toast.success("Cadastro realizado com sucesso!");
         reset();
+        router.push("/signin"); // 👈 Redireciona para login
       }
     } catch (error: any) {
       let errorMessage = "Erro desconhecido";
@@ -89,14 +93,13 @@ export default function Signup() {
         }
       }
 
-      toast.error("Falha ao cadastrar o usuario:" + errorMessage);
+      toast.error("Falha ao cadastrar o usuario: " + errorMessage);
       console.log("Erro ao cadastrar o usuario: ", errorMessage);
     }
   }
 
   return (
     <div className="h-screen w-full flex">
-      {/* Coluna do Logo */}
       <div className="hidden lg:flex w-1/2 bg-zinc-100 dark:bg-zinc-800 justify-center items-center">
         <Image
           src={logo}
@@ -107,10 +110,8 @@ export default function Signup() {
         />
       </div>
 
-      {/* Linha divisória vertical */}
       <div className="hidden lg:block w-[1px] h-screen bg-zinc-200 dark:bg-zinc-700" />
 
-      {/* Coluna do Formulário */}
       <div className="w-full lg:w-1/2 flex justify-center items-center p-8">
         <div className="max-w-md w-full space-y-8">
           <div className="flex flex-col justify-center items-center">
@@ -130,11 +131,11 @@ export default function Signup() {
                 <Input
                   type="text"
                   placeholder="Nome"
-                  {...register("Nome")}
+                  {...register("Name")}
                 />
-                {errors.Nome && (
+                {errors.Name && (
                   <p className="text-red-500 text-sm mt-1">
-                    {errors.Nome.message}
+                    {errors.Name.message}
                   </p>
                 )}
               </div>
@@ -193,12 +194,14 @@ export default function Signup() {
             </div>
 
             <div className="flex justify-center mt-8 space-x-4">
-
-              <Button type="submit" className="px-12 h-12 text-base w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded transition-colors">
+              <Button
+                type="submit"
+                className="px-12 h-12 text-base w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded transition-colors"
+              >
                 Cadastrar
               </Button>
-
             </div>
+
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Já tem uma conta?{" "}
@@ -208,7 +211,6 @@ export default function Signup() {
               </p>
             </div>
 
-            {/* quero ser recebedor */}
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Quero ser um{" "}

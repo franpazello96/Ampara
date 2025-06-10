@@ -81,7 +81,7 @@ const Sidebar: React.FC = () => {
             </li>
                         <li>
               <Link 
-                href="/buys" 
+                href="/signupBenefitiary" 
                 className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-zinc-700"
               >
                 <IoAccessibilityOutline  className="w-5 h-5 mr-3" />

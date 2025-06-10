@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
-using AmparaCRUDApi.Models.Entities;
+using BCrypt.Net;
+
 
 namespace AmparaCRUDApi.Controllers
 {
@@ -25,11 +26,8 @@ namespace AmparaCRUDApi.Controllers
         [HttpPost("signupdonee")]
         public IActionResult AddDonee(AddDoneeDTO addDoneeDTO)
         {
-            bool cnpjExists = dbContext.Donees.Any(d => d.CNPJ == addDoneeDTO.CNPJ);
-            if (cnpjExists)
-            {
+            if (dbContext.Donees.Any(d => d.CNPJ == addDoneeDTO.CNPJ))
                 return BadRequest("CNPJ já cadastrado");
-            }
 
             var doneeEntity = new Donee()
             {
@@ -39,14 +37,14 @@ namespace AmparaCRUDApi.Controllers
                 Email = addDoneeDTO.Email,
                 PhoneNumber = addDoneeDTO.PhoneNumber,
                 RepresentativeName = addDoneeDTO.RepresentativeName,
-                Password = addDoneeDTO.Password,
+                Password = BCrypt.Net.BCrypt.HashPassword(addDoneeDTO.Password),
             };
 
             dbContext.Donees.Add(doneeEntity);
-
             dbContext.SaveChanges();
 
-            return Ok(doneeEntity);
+            return Ok("Donee successfully created.");
         }
+
     }
 }

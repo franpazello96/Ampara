@@ -1,0 +1,185 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { Button } from "@/components/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import Image from "next/image";
+import logo from "@/assets/logo.png";
+import Sidebar from "@/components/Sidebar/page";
+
+// Validações
+const schema = z
+  .object({
+    personType: z.enum(["Física", "Jurídica"]),
+    name: z.string().min(2, "O nome é obrigatório."),
+    cpf: z
+      .string()
+      .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido. Use o formato XXX.XXX.XXX-XX.")
+      .optional(),
+    cnpj: z
+      .string()
+      .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido. Use o formato XX.XXX.XXX/XXXX-XX.")
+      .optional(),
+    email: z.string().email("E-mail inválido.").optional(),
+    phoneNumber: z.string().min(8, "Número de telefone é obrigatório."),
+  })
+  .superRefine((data, ctx) => {
+    if (data.personType === "Física" && !data.cpf) {
+      ctx.addIssue({
+        path: ["cpf"],
+        code: z.ZodIssueCode.custom,
+        message: "O CPF é obrigatório para pessoa física.",
+      });
+    }
+    if (data.personType === "Jurídica" && !data.cnpj) {
+      ctx.addIssue({
+        path: ["cnpj"],
+        code: z.ZodIssueCode.custom,
+        message: "O CNPJ é obrigatório para pessoa jurídica.",
+      });
+    }
+  });
+
+type FormData = z.infer<typeof schema>;
+
+export default function SignUpBeneficiaryPage() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
+
+  const personType = watch("personType");
+
+  const onSubmit = async (data: FormData) => {
+    const payload = {
+      Name: data.name,
+      CPF: data.personType === "Física" ? data.cpf : "",
+      CNPJ: data.personType === "Jurídica" ? data.cnpj : "",
+      Email: data.email,
+      PhoneNumber: data.phoneNumber,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:5001/api/beneficiary/add", payload);
+      toast.success("Beneficiário cadastrado com sucesso!");
+      reset();
+    } catch (error: any) {
+      toast.error("Erro ao cadastrar beneficiário.");
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Sidebar />
+      <div className="flex-1 max-w-3xl mx-auto my-10 p-6 sm:p-8 border dark:border-gray-700 rounded-xl shadow-lg bg-white dark:bg-black">
+        <div className="flex justify-between items-center mb-8">
+          <Image src={logo} alt="Logo" width={108.5} height={30} className="hidden sm:block" />
+          <div className="flex-1 flex justify-center sm:justify-end">
+            <ThemeToggle />
+          </div>
+        </div>
+
+        <h1 className="text-3xl font-medium md:text-4xl text-center text-zinc-800 dark:text-zinc-100 mb-8">
+          Cadastro de Beneficiário
+        </h1>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+
+          {/* Tipo de Pessoa */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Tipo de Pessoa</label>
+            <select
+              {...register("personType")}
+              className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+            >
+              <option value="">Selecione</option>
+              <option value="Física">Física</option>
+              <option value="Jurídica">Jurídica</option>
+            </select>
+            {errors.personType && <p className="text-red-500 text-sm">{errors.personType.message}</p>}
+          </div>
+
+          {/* Renderizar somente após seleção */}
+          {personType && (
+            <>
+              {/* Nome */}
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Nome</label>
+                <input
+                  type="text"
+                  {...register("name")}
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                  placeholder="Nome ou razão social"
+                />
+                {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+              </div>
+
+              {/* CPF ou CNPJ */}
+              {personType === "Física" && (
+                <div>
+                  <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">CPF</label>
+                  <input
+                    type="text"
+                    {...register("cpf")}
+                    className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                    placeholder="123.456.789-00"
+                  />
+                  {errors.cpf && <p className="text-red-500 text-sm">{errors.cpf.message}</p>}
+                </div>
+              )}
+
+              {personType === "Jurídica" && (
+                <div>
+                  <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">CNPJ</label>
+                  <input
+                    type="text"
+                    {...register("cnpj")}
+                    className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                    placeholder="12.345.678/0001-99"
+                  />
+                  {errors.cnpj && <p className="text-red-500 text-sm">{errors.cnpj.message}</p>}
+                </div>
+              )}
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">E-mail</label>
+                <input
+                  type="email"
+                  {...register("email")}
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                  placeholder="usuario@email.com"
+                />
+                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+              </div>
+
+              {/* Telefone */}
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Telefone</label>
+                <input
+                  type="text"
+                  {...register("phoneNumber")}
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                  placeholder="(99) 99999-9999"
+                />
+                {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
+              </div>
+
+              <div className="mt-6">
+                <Button type="submit">Cadastrar Beneficiário</Button>
+              </div>
+            </>
+          )}
+        </form>
+      </div>
+    </div>
+  );
+}

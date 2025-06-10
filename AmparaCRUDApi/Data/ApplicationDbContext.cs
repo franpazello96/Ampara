@@ -21,6 +21,7 @@ namespace AmparaCRUDApi.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configurar views
             modelBuilder.Entity<Donation>()
                 .Property(d => d.Amount)
                 .HasPrecision(18, 2);
@@ -33,11 +34,40 @@ namespace AmparaCRUDApi.Data
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<DailyExpensesTotals>()
-                .HasNoKey() 
-                .ToView("vw_DailyExpensesTotals") 
-                .Property(p => p.TotalAmount) 
+                .HasNoKey()
+                .ToView("vw_DailyExpensesTotals")
+                .Property(p => p.TotalAmount)
                 .HasColumnType("decimal(18,2)")
                 .HasPrecision(18, 2);
+
+            // RELACIONAMENTO Donation → Donator
+            modelBuilder.Entity<Donation>()
+                .HasOne(d => d.Donator)
+                .WithMany(d => d.Donations)
+                .HasForeignKey(d => d.DonatorCpf)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // RELACIONAMENTO Donation → Donee
+            modelBuilder.Entity<Donation>()
+                .HasOne(d => d.Donee)
+                .WithMany(o => o.DonationsReceived)
+                .HasForeignKey(d => d.DoneeCnpj)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // RELACIONAMENTO Buys → Donee
+            modelBuilder.Entity<Buys>()
+                .HasOne(b => b.Donee)
+                .WithMany(o => o.Purchases)
+                .HasForeignKey(b => b.DoneeCnpj)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // RELACIONAMENTO Benefitiary → Donee
+            modelBuilder.Entity<Benefitiary>()
+                .HasOne(b => b.Donee)
+                .WithMany(o => o.Benefitiaries)
+                .HasForeignKey(b => b.DoneeCnpj)
+                .OnDelete(DeleteBehavior.Restrict);
         }
+
     }
 }

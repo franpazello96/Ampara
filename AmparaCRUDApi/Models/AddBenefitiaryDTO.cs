@@ -5,6 +5,7 @@ namespace AmparaCRUDApi.Models
     public class AddBenefitiaryDTO
     {
         [Required]
+        [Key]
         public string Name { get; set; }
 
         [Required]

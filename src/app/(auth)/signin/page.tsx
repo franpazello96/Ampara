@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Input } from "@/components/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -6,17 +6,45 @@ import Image from "next/image";
 import logo from "@/assets/logo.png";
 import { useState } from "react";
 import { Button } from "@/components/button";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    console.log('E-mail', email);
-    console.log('Senha', password);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || 'Erro ao fazer login.');
+        return;
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userType', data.userType);
+
+      if (data.userType === 'donator') {
+        router.push('/doador/donation');
+      } else if (data.userType === 'donee') {
+        router.push('/dashboard');
+      }
+
+    } catch (error) {
+      console.error('Erro no login:', error);
+      alert('Erro na comunicação com o servidor.');
+    }
   }
 
   return (
@@ -56,14 +84,12 @@ export default function Signin() {
                 placeholder="E-mail"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-              
               />
               <Input
                 type="password"
                 placeholder="Senha"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-              
               />
             </div>
 
@@ -71,8 +97,8 @@ export default function Signin() {
               <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition-colors w-full"> 
                 Entrar 
               </Button>
-              
             </div>
+
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Não tem uma conta?{' '}
@@ -82,13 +108,13 @@ export default function Signin() {
               </p>
             </div>
 
-          <div className="text-center mt-4">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              <a href="/" className="hover:underline">
-                Cancelar
-              </a>
-            </p>
-          </div>
+            <div className="text-center mt-4">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <a href="/" className="hover:underline">
+                  Cancelar
+                </a>
+              </p>
+            </div>
           </form>
         </div>
       </div>
