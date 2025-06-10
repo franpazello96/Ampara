@@ -10,17 +10,16 @@ namespace AmparaCRUDApi.Controllers
     [Route("api/[controller]")]
     public class BenefitiaryController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public BenefitiaryController(ApplicationDbContext context)
+        private readonly ApplicationDbContext dbContext;
+        public BenefitiaryController(ApplicationDbContext dbContext)
         {
-            _context = context;
+            this.dbContext = dbContext;
         }
 
         [HttpGet]
         public IActionResult GetBenefitiaries([FromQuery] string? name)
         {
-            var query = _context.Benefitiaries.AsQueryable();
+            var query = dbContext.Benefitiaries.AsQueryable();
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -41,7 +40,7 @@ namespace AmparaCRUDApi.Controllers
         [HttpPost("signupbenefitiary")]
         public IActionResult AddBenefitiary(AddBenefitiaryDTO dto)
         {
-            bool exists = _context.Benefitiaries.Any(b =>
+            bool exists = dbContext.Benefitiaries.Any(b =>
                 (!string.IsNullOrEmpty(dto.CPF) && b.CPF == dto.CPF) ||
                 (!string.IsNullOrEmpty(dto.CNPJ) && b.CNPJ == dto.CNPJ));
 
@@ -59,8 +58,8 @@ namespace AmparaCRUDApi.Controllers
                 PhoneNumber = dto.PhoneNumber
             };
 
-            _context.Benefitiaries.Add(entity);
-            _context.SaveChanges();
+            dbContext.Benefitiaries.Add(entity);
+            dbContext.SaveChanges();
 
             return Ok(entity);
         }

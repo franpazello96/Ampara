@@ -1,0 +1,57 @@
+﻿using AmparaCRUDApi.Data;
+using AmparaCRUDApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AmparaCRUDApi.Controllers
+{
+    [Route("api/transactions")]
+    [ApiController]
+    public class TransactionController : ControllerBase
+    {
+        private readonly ApplicationDbContext dbContext;
+
+        public TransactionController(ApplicationDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+
+        [HttpGet("getalltransactions")]
+        public async Task<IActionResult> GetAllTransactions()
+        {
+            var donations = await dbContext.Donations
+                .Select(d => new TransactionDTO
+                {
+                    Type = "Entrada",
+                    Category = d.DonationType,
+                    Quantity = d.Quantity,
+                    Amount = d.Amount,
+                    Description = d.Description,
+                    TimeRecurrence = d.TimeRecurrence,
+                    Date = d.Date
+                })
+                .ToListAsync();
+
+            var buys = await dbContext.Buys
+                .Select(b => new TransactionDTO
+                {
+                    Type = "Saída",
+                    Category = b.Type,
+                    Quantity = b.Quantity,
+                    Amount = b.Price,
+                    Description = b.Description,
+                    TimeRecurrence = null,
+                    Date = b.Date
+                })
+                .ToListAsync();
+
+            var all = donations.Concat(buys)
+                               .OrderByDescending(t => t.Date)
+                               .ToList();
+
+            return Ok(all);
+        }
+    }
+}

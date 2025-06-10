@@ -9,7 +9,7 @@ import logo from "@/assets/logo.png";
 import { RiBarChartFill } from 'react-icons/ri';
 import { BiTransfer } from 'react-icons/bi';
 import { HiUsers, HiOutlineUserGroup, HiOutlineShoppingBag } from 'react-icons/hi';
-import { IoLogOutOutline } from 'react-icons/io5';
+import { IoAccessibilityOutline, IoLogOutOutline } from 'react-icons/io5';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +36,7 @@ const Sidebar: React.FC = () => {
           <ul className="space-y-2">
             <li>
               <Link 
-                href="/homeAdmin" 
+                href="/dashboard" 
                 className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-zinc-700"
               >
                 <RiBarChartFill className="w-5 h-5 mr-3" />
@@ -77,6 +77,15 @@ const Sidebar: React.FC = () => {
               >
                 <HiOutlineShoppingBag  className="w-5 h-5 mr-3" />
                 Cadastro de compras
+              </Link>
+            </li>
+                        <li>
+              <Link 
+                href="/buys" 
+                className="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-purple-50 dark:hover:bg-zinc-700"
+              >
+                <IoAccessibilityOutline  className="w-5 h-5 mr-3" />
+                Cadastro de Beneficiários
               </Link>
             </li>
           </ul>

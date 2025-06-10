@@ -17,6 +17,7 @@ namespace AmparaCRUDApi.Models.Entities
         [Required]
         public string StoreName { get; set; }
 
+        [Required]
         public string? CNPJ { get; set; }
 
         [Required]
