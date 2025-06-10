@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from "recharts"
-
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, Legend } from "recharts"
 import {
   Card,
   CardContent,
@@ -13,60 +12,104 @@ import {
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart"
 import { useEffect, useState, useMemo } from "react"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 const chartConfig = {
-  views: {
-    label: "Total Doado",
-  },
   recivedDonation: {
     label: "Doações recebidas",
-    color: "hsl(var(--chart-1))",
+    color: "#22c55e",
   },
   donationMade: {
     label: "Doações enviadas",
-    color: "hsl(var(--chart-2))",
+    color: "#ef4444",
+  },
+  balance: {
+    label: "Em saldo",
+    color: "#3b82f6",
   },
 } satisfies ChartConfig
 
+type Entry = {
+  day: string
+  receita?: number
+  despesa?: number
+  saldo?: number
+}
+
 export default function Dashboard() {
-  const [data, setData] = useState<DonationEntry[]>([])
+  const [data, setData] = useState<Entry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const[activeChart, setActiveChart] = 
-  useState<keyof typeof chartConfig>("recivedDonation")
-    type DonationEntry = {
-        day: string
-        totalAmount: number
-    }
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
+
+  const activeChart = "balance"
+
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const res = await fetch("https://localhost:5001/api/Donation/reciveddonation")
-            if (!res.ok) throw new Error ("Erro ao buscar dados")
-            const json = await res.json()
-            setData(json)
-        } catch (err: unknown) {
-            const message = err instanceof Error ? err.message:"Erro desconhecido"
-            setError(message)
-        } finally {
-            setLoading(false)
-        }
+      try {
+        const [resReceita, resDespesa] = await Promise.all([
+          fetch("https://localhost:5001/api/dashboard/reciveddonation"),
+          fetch("https://localhost:5001/api/dashboard/expenses"),
+        ])
+        if (!resReceita.ok || !resDespesa.ok) throw new Error("Erro ao buscar dados")
+
+        const receitas = await resReceita.json()
+        const despesas = await resDespesa.json()
+
+        const mapa: Record<string, Entry> = {}
+
+        receitas.forEach((item: any) => {
+          const day = item.day.split("T")[0]
+          if (!mapa[day]) mapa[day] = { day }
+          mapa[day].receita = item.totalAmount
+        })
+
+        despesas.forEach((item: any) => {
+          const day = item.day.split("T")[0]
+          if (!mapa[day]) mapa[day] = { day }
+          mapa[day].despesa = item.totalAmount
+        })
+
+        const combinados = Object.values(mapa).map((entry) => ({
+          ...entry,
+          saldo: (entry.receita || 0) - (entry.despesa || 0),
+        }))
+
+        setData(combinados)
+      } catch (err: any) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
     }
-    fetchData()   
+    fetchData()
   }, [])
+
+  const filteredData = useMemo(() => {
+    if (!startDate && !endDate) return data
+
+    return data.filter((entry) => {
+      const entryDate = new Date(entry.day)
+      const from = startDate ? new Date(startDate) : null
+      const to = endDate ? new Date(endDate) : null
+
+      return (!from || entryDate >= from) && (!to || entryDate <= to)
+    })
+  }, [data, startDate, endDate])
+
   const total = useMemo(() => {
     return {
-      recivedDonation: data.reduce((acc, curr) => acc + curr.totalAmount, 0),
-      donationMade: data.reduce((acc, curr) => acc + curr.totalAmount, 0),
+      recivedDonation: filteredData.reduce((acc, curr) => acc + (curr.receita || 0), 0),
+      donationMade: filteredData.reduce((acc, curr) => acc + (curr.despesa || 0), 0),
+      balance: filteredData.reduce((acc, curr) => acc + (curr.saldo || 0), 0),
     }
-  }, [data])
+  }, [filteredData])
 
   if (loading) return <p>Carregando dados...</p>
-  if (error) return <p>Error: {error}</p>
+  if (error) return <p>Erro: {error}</p>
 
   return (
     <Card>
@@ -77,39 +120,62 @@ export default function Dashboard() {
             Este gráfico mostra o total de entradas e saídas financeiras
           </CardDescription>
         </div>
+        <div className="flex items-center gap-2 pr-4">
+          <ThemeToggle />
+        </div>
+        <div className="flex gap-2 px-6 py-5">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+          <span className="text-muted-foreground">até</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+        </div>
         <div className="flex">
           {["recivedDonation", "donationMade"].map((key) => {
             const chart = key as keyof typeof chartConfig
             return (
-              <button
+              <div
                 key={chart}
-                data-active={activeChart === chart}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                onClick={() => setActiveChart(chart)}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
               >
                 <span className="text-xs text-muted-foreground">
                   {chartConfig[chart].label}
                 </span>
-                <span className="text-lg font-bold leading-none sm:text-3xl">
-                  {total[key as keyof typeof total].toLocaleString()}
+                <span className={`text-lg font-bold leading-none sm:text-3xl ${chart === 'recivedDonation' ? 'text-green-500' : 'text-red-500'}`}>
+                  {total[chart].toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
-              </button>
+              </div>
             )
           })}
+          <div
+            className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
+          >
+            <span className="text-xs text-muted-foreground">
+              {chartConfig.balance.label}
+            </span>
+            <span className="text-lg font-bold leading-none sm:text-3xl text-blue-500">
+              {total.balance.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </span>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="px-2 sm:p-6">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-[250px] w-full transition-all duration-300"
         >
           <BarChart
-            accessibilityLayer
-            data={data}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+            data={filteredData.filter(d => d.receita || d.despesa)}
+            margin={{ left: 12, right: 12 }}
+            barGap={8}
           >
             <CartesianGrid vertical={false} />
             <XAxis
@@ -127,20 +193,20 @@ export default function Dashboard() {
               }}
             />
             <Tooltip
-            labelFormatter={(label) =>
+              labelFormatter={(label) =>
                 new Date(label).toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
                 })
-            }
-            formatter={(value: number) => {
+              }
+              formatter={(value: number) => {
                 return [`R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`]
               }}
             />
-
-
-            <Bar dataKey="totalAmount" fill={`var(--color-${activeChart})`} />
+            <Legend />
+            <Bar dataKey="receita" name="Receita" fill={chartConfig.recivedDonation.color} isAnimationActive animationDuration={500} />
+            <Bar dataKey="despesa" name="Despesa" fill={chartConfig.donationMade.color} isAnimationActive animationDuration={500} />
           </BarChart>
         </ChartContainer>
       </CardContent>

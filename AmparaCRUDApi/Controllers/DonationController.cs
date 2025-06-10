@@ -53,14 +53,6 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donationEntity);
         }
 
-        [HttpGet("reciveddonation")]
-        public IActionResult GetAllDailyTotals()
-        {
-            var totals = dbContext.DailyDonationTotals.OrderBy(x => x.Day).ToList();
-
-            return Ok(totals);
-        }
-
         [HttpGet("getalltransactions")]
         public IActionResult GetAllTransactions()
         {

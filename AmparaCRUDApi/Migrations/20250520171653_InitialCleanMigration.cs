@@ -11,6 +11,8 @@ namespace AmparaCRUDApi.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // ... (código de CreateTable para Benefitiaries, Buys, Donations, Donators, Donees permanece o mesmo) ...
+
             migrationBuilder.CreateTable(
                 name: "Benefitiaries",
                 columns: table => new
@@ -31,10 +33,14 @@ namespace AmparaCRUDApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                          .Annotation("SqlServer:Identity", "1, 1"),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StoreName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CNPJ = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,13 +52,13 @@ namespace AmparaCRUDApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                          .Annotation("SqlServer:Identity", "1, 1"),
                     DonationType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Recurrence = table.Column<bool>(type: "bit", nullable: false),
-                    TimeRecurrence = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Recurrence = table.Column<bool>(type: "bit", nullable: true),
+                    TimeRecurrence = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -92,6 +98,7 @@ namespace AmparaCRUDApi.Migrations
                     table.PrimaryKey("PK_Donees", x => x.CNPJ);
                 });
 
+            // View para total de doações diárias
             migrationBuilder.Sql(@"
                 CREATE VIEW vw_DailyDonationTotals AS
                 SELECT 
@@ -101,11 +108,27 @@ namespace AmparaCRUDApi.Migrations
                 WHERE [Amount] IS NOT NULL AND [DonationType] = 'Dinheiro'
                 GROUP BY CAST([Date] AS DATE)
             ");
+
+            // ADICIONADO: View para total de despesas diárias
+            migrationBuilder.Sql(@"
+                CREATE VIEW vw_DailyExpensesTotals AS
+                SELECT 
+                    CAST([Date] AS DATE) AS Day,
+                    SUM([Price]) AS TotalAmount
+                FROM Buys
+                GROUP BY CAST([Date] AS DATE)
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            // ADICIONADO: Drop da view de despesas
+            migrationBuilder.Sql(@"
+                IF OBJECT_ID('vw_DailyExpensesTotals', 'V') IS NOT NULL
+                    DROP VIEW vw_DailyExpensesTotals;
+            ");
+
             migrationBuilder.Sql(@"
                 IF OBJECT_ID('vw_DailyDonationTotals', 'V') IS NOT NULL
                     DROP VIEW vw_DailyDonationTotals;

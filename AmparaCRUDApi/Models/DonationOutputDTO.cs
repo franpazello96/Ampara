@@ -4,8 +4,8 @@
     {
         public string Type { get; set; }
         public string Category { get; set; }
-        public decimal? FoodQuantity { get; set; } // Matches your snippet's field name
-        public decimal? Amount { get; set; }       // Matches your snippet's field name
+        public decimal? FoodQuantity { get; set; } 
+        public decimal? Amount { get; set; }       
         public DateTime Date { get; set; }
         public string? TimeRecurrence { get; set; }
 

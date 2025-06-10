@@ -1,12 +1,6 @@
 'use client';
 
-import Financial from "@/components/Financial/page";
 import Sidebar from "@/components/Sidebar/page";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/input";
-import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import Dashboard from "@/components/Dashboard/page";
 

@@ -27,8 +27,6 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-    <div className="min-h-screen flex">
-      <Sidebar />
       <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <div className="flex justify-center py-6">
           <Image src={logo} alt="Logo" width={70} height={45} />
@@ -128,7 +126,6 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 };
