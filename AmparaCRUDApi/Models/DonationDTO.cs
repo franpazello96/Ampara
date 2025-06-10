@@ -10,5 +10,9 @@
         public bool Recurrence { get; set; }
         public string? TimeRecurrence { get; set; }
         public DateTime Date { get; set; }
+
+        public string DonatorCpf { get; set; }
+        public string DoneeCnpj { get; set; }
+
     }
 }

@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import SidebarDoador from "@/components/SidebarDoador/page";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function EditProfile() {
+  const { isAuthenticated, user } = useAuth("donator");
+
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     nome: "",
@@ -14,19 +17,23 @@ export default function EditProfile() {
   });
 
   useEffect(() => {
-    async function fetchProfile() {
-      await new Promise((r) => setTimeout(r, 1000));
-      setFormData({
-        nome: "João Silva",
-        email: "joao@email.com",
-        telefone: "(41) 99999-0000",
-        senha: "",
-      });
-      setLoading(false);
-    }
-    fetchProfile();
-  }, []);
+    if (isAuthenticated) {
+      async function fetchProfile() {
+        await new Promise((r) => setTimeout(r, 1000));
+        setFormData({
+          nome: "João Silva",
+          email: "joao@email.com",
+          telefone: "(41) 99999-0000",
+          senha: "",
+        });
+        setLoading(false);
+      }
 
+      fetchProfile();
+    }
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) return null;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

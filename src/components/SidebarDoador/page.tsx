@@ -10,6 +10,7 @@ import { BiTransfer } from 'react-icons/bi';
 import { IoLogOutOutline } from 'react-icons/io5';
 import { MdOutlineVolunteerActivism } from 'react-icons/md';
 import { HiOutlineUser } from 'react-icons/hi2';
+import { toast } from 'react-toastify';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,9 +22,12 @@ const Sidebar: React.FC = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.push('/');
+    localStorage.removeItem("token");
+    localStorage.removeItem("userType");
+    toast.success("Logout realizado com sucesso!");
+    router.push("/signin");
   };
+
 
   return (
     <>

@@ -11,7 +11,7 @@ import Link from "next/link";
 import logo from "@/assets/logo.png";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation"; // 👈 Importa useRouter
+import { useRouter } from "next/navigation";
 
 const signupSchema = z.object({
   Name: z
@@ -40,7 +40,7 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function Signup() {
-  const router = useRouter(); // 👈 Inicializa router
+  const router = useRouter();
 
   const {
     register,
@@ -60,22 +60,15 @@ export default function Signup() {
         PhoneNumber: data.PhoneNumber,
         Password: data.Password,
       };
-      const response = await axios.post(
-        "https://localhost:5001/api/donator/signupdonator",
-        addForm,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
-      console.log("Dados enviados:", data);
+      const response = await axios.post("https://localhost:5001/api/donator/signupdonator", addForm, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Cadastro realizado com sucesso!");
         reset();
-        router.push("/signin"); // 👈 Redireciona para login
+        router.push("/signin");
       }
     } catch (error: any) {
       let errorMessage = "Erro desconhecido";
@@ -83,18 +76,15 @@ export default function Signup() {
       if (error.response?.data) {
         if (typeof error.response.data === "string") {
           errorMessage = error.response.data;
-        } else if (
-          typeof error.response.data === "object" &&
-          error.response.data.message
-        ) {
+        } else if (typeof error.response.data === "object" && error.response.data.message) {
           errorMessage = error.response.data.message;
         } else {
           errorMessage = JSON.stringify(error.response.data);
         }
       }
 
-      toast.error("Falha ao cadastrar o usuario: " + errorMessage);
-      console.log("Erro ao cadastrar o usuario: ", errorMessage);
+      toast.error("Falha ao cadastrar o usuário: " + errorMessage);
+      console.log("Erro ao cadastrar o usuário: ", errorMessage);
     }
   }
 
@@ -127,70 +117,20 @@ export default function Signup() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
             <div className="space-y-4">
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Nome"
-                  {...register("Name")}
-                />
-                {errors.Name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.Name.message}
-                  </p>
-                )}
-              </div>
+              <Input type="text" placeholder="Nome" {...register("Name")} />
+              {errors.Name && toast.error(errors.Name.message)}
 
-              <div>
-                <Input
-                  type="text"
-                  placeholder="CPF (000.000.000-00)"
-                  {...register("CPF")}
-                />
-                {errors.CPF && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.CPF.message}
-                  </p>
-                )}
-              </div>
+              <Input type="text" placeholder="CPF (000.000.000-00)" {...register("CPF")} />
+              {errors.CPF && toast.error(errors.CPF.message)}
 
-              <div>
-                <Input
-                  type="email"
-                  placeholder="E-mail"
-                  {...register("Email")}
-                />
-                {errors.Email && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.Email.message}
-                  </p>
-                )}
-              </div>
+              <Input type="email" placeholder="E-mail" {...register("Email")} />
+              {errors.Email && toast.error(errors.Email.message)}
 
-              <div>
-                <Input
-                  type="text"
-                  placeholder="Telefone (Apenas números)"
-                  {...register("PhoneNumber")}
-                />
-                {errors.PhoneNumber && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.PhoneNumber.message}
-                  </p>
-                )}
-              </div>
+              <Input type="text" placeholder="Telefone (Apenas números)" {...register("PhoneNumber")} />
+              {errors.PhoneNumber && toast.error(errors.PhoneNumber.message)}
 
-              <div>
-                <Input
-                  type="password"
-                  placeholder="Senha"
-                  {...register("Password")}
-                />
-                {errors.Password && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.Password.message}
-                  </p>
-                )}
-              </div>
+              <Input type="password" placeholder="Senha" {...register("Password")} />
+              {errors.Password && toast.error(errors.Password.message)}
             </div>
 
             <div className="flex justify-center mt-8 space-x-4">

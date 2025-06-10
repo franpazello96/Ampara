@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,7 +11,7 @@ import Link from "next/link";
 import logo from "@/assets/logo.png";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const signupSchema = z.object({
   Nome_instituicao: z.string()
@@ -26,8 +25,7 @@ const signupSchema = z.object({
   CNPJ: z.string()
     .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido. Use o formato 00.000.000/0000-00."),
 
-  Email: z.string()
-    .email("Insira um e-mail válido."),
+  Email: z.string().email("Insira um e-mail válido."),
 
   Telefone: z.string()
     .regex(/^\d{11}$/, "O telefone deve ter 11 números e não pode conter espaços ou caracteres especiais."),
@@ -47,6 +45,7 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function SignupRecebedor() {
   const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -65,21 +64,19 @@ export default function SignupRecebedor() {
         Email: data.Email,
         PhoneNumber: data.Telefone,
         RepresentativeName: data.Nome_representante,
-        Password: data.Senha
+        Password: data.Senha,
       };
 
       const response = await axios.post("https://localhost:5001/api/donee/signupdonee", addForm, {
-        headers: {
-          "Content-Type": "application/json"
-        }
+        headers: { "Content-Type": "application/json" },
       });
 
       console.log("Dados enviados:", data);
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Cadastro realizado com sucesso!");
-        router.push("/singnin");
         reset();
+        router.push("/signin");
       }
     } catch (error: any) {
       let errorMessage = "Erro desconhecido";
@@ -101,21 +98,12 @@ export default function SignupRecebedor() {
 
   return (
     <div className="h-screen w-full flex">
-      {/* Coluna do Logo */}
       <div className="hidden lg:flex w-1/2 bg-zinc-100 dark:bg-zinc-800 justify-center items-center">
-        <Image
-          src={logo}
-          alt="Logo"
-          width={500}
-          height={500}
-          className="object-contain p-8 transition-all duration-1000 ease-in-out hover:transform hover:-translate-y-2 animate-fade-in"
-        />
+        <Image src={logo} alt="Logo" width={500} height={500} className="object-contain p-8" />
       </div>
 
-      {/* Linha divisória vertical */}
       <div className="hidden lg:block w-[1px] h-screen bg-zinc-200 dark:bg-zinc-700" />
 
-      {/* Coluna do Formulário */}
       <div className="w-full lg:w-1/2 flex justify-center items-center p-8">
         <div className="max-w-md w-full space-y-8">
           <div className="flex flex-col justify-center items-center">
@@ -129,48 +117,46 @@ export default function SignupRecebedor() {
             Cadastro de Beneficiário
           </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">        
-        <div>
-          <label htmlFor="dropdown" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-            
-          </label>
-          <select id="dropdown" {...register("Tipo_instituicao")} className="w-full p-2 border rounded-md mt-1">
-            <option value=""> Tipo de instituição: </option>
-            <option value="ONG">ONG</option>
-            <option value="Associação">Associação</option>
-            <option value="Fundação">Fundação</option>
-          </select>
-        </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">
+            <Input type="text" placeholder="Nome da Instituição" {...register("Nome_instituicao")} />
+            {errors.Nome_instituicao && <p className="text-red-500 text-sm">{errors.Nome_instituicao.message}</p>}
 
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="Telefone (Apenas números)" 
-                  {...register("Telefone")} 
-                />
-                {errors.Telefone && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Telefone.message}</p>
-                )}
-              </div>
+            <select {...register("Tipo_instituicao")} className="w-full p-2 border rounded-md">
+              <option value="">Tipo de instituição:</option>
+              <option value="ONG">ONG</option>
+              <option value="Associação">Associação</option>
+              <option value="Fundação">Fundação</option>
+            </select>
+            {errors.Tipo_instituicao && <p className="text-red-500 text-sm">{errors.Tipo_instituicao.message}</p>}
 
-              <div>
-                <Input 
-                  type="text" 
-                  placeholder="Nome do Representante" 
-                  {...register("Nome_representante")} 
-                />
-                {errors.Nome_representante && (
-                  <p className="text-red-500 text-sm mt-1">{errors.Nome_representante.message}</p>
-                )}
-              </div>
+            <Input type="text" placeholder="CNPJ (00.000.000/0000-00)" {...register("CNPJ")} />
+            {errors.CNPJ && <p className="text-red-500 text-sm">{errors.CNPJ.message}</p>}
 
-        <div>
-          <Input type="text" placeholder="Telefone (Apenas números, ex: 11999998888)" {...register("Telefone")} />
-          {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
-        </div>
-        <div>
-          <Input type="password" placeholder="Senha" {...register("Senha")} />
-          {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
+            <Input type="email" placeholder="E-mail" {...register("Email")} />
+            {errors.Email && <p className="text-red-500 text-sm">{errors.Email.message}</p>}
+
+            <Input type="text" placeholder="Telefone (somente números)" {...register("Telefone")} />
+            {errors.Telefone && <p className="text-red-500 text-sm">{errors.Telefone.message}</p>}
+
+            <Input type="text" placeholder="Nome do Representante" {...register("Nome_representante")} />
+            {errors.Nome_representante && (
+              <p className="text-red-500 text-sm">{errors.Nome_representante.message}</p>
+            )}
+
+            <Input type="password" placeholder="Senha" {...register("Senha")} />
+            {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
+
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 mt-4">
+              Cadastrar
+            </Button>
+
+            <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-2">
+              Já tem uma conta?{" "}
+              <Link href="/signin" className="text-blue-500 hover:underline">
+                Faça login
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </div>
