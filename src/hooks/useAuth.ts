@@ -12,7 +12,7 @@ interface TokenPayload {
 }
 
 export function useAuth(requiredRole?: string) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<TokenPayload | null>(null);
   const router = useRouter();
 
@@ -21,6 +21,7 @@ export function useAuth(requiredRole?: string) {
     const toastId = "auth-toast";
 
     if (!token) {
+      setIsAuthenticated(false); // <- isso agora é importante
       if (!toast.isActive(toastId)) {
         toast.warn("Você precisa estar logado para acessar esta página.", { toastId });
       }
@@ -34,6 +35,7 @@ export function useAuth(requiredRole?: string) {
 
       if (decoded.exp * 1000 < currentTime) {
         localStorage.removeItem("token");
+        setIsAuthenticated(false);
         if (!toast.isActive(toastId)) {
           toast.warn("Sessão expirada. Faça login novamente.", { toastId });
         }
@@ -42,6 +44,7 @@ export function useAuth(requiredRole?: string) {
       }
 
       if (requiredRole && decoded.role !== requiredRole) {
+        setIsAuthenticated(false);
         if (!toast.isActive(toastId)) {
           toast.warn("Permissão insuficiente.", { toastId });
         }
@@ -53,6 +56,7 @@ export function useAuth(requiredRole?: string) {
       setIsAuthenticated(true);
     } catch (error) {
       localStorage.removeItem("token");
+      setIsAuthenticated(false);
       if (!toast.isActive(toastId)) {
         toast.error("Token inválido. Faça login novamente.", { toastId });
       }

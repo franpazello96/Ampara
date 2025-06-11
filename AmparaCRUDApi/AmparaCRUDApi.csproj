@@ -8,7 +8,11 @@
 
   <ItemGroup>
     <Compile Remove="Models\BuysOutputDTO.cs" />
+    <Compile Remove="Models\DonationListDTO.cs" />
     <Compile Remove="Models\DonationOutputDTO.cs" />
+    <Compile Remove="Models\DonationWithDoneeDTO.cs" />
+    <Compile Remove="Models\Entities\DonationWithDonee.cs" />
+    <Compile Remove="Models\Entities\DonationWithDoneeDTO.cs" />
   </ItemGroup>
 
   <ItemGroup>
