@@ -98,16 +98,17 @@ export default function Signin() {
                 Entrar 
               </Button>
             </div>
-
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Não tem uma conta?{' '}
-                <a href="/signupDoador" className="text-blue-500 hover:underline">
-                  Cadastre-se
+                <a href="/signupDoador" className="block text-blue-500 hover:underline">
+                  Cadastre-se como Doador
+                </a>
+                <a href="/signupRecebedor" className="block text-blue-500 hover:underline">
+                  Cadastre-se como Doador
                 </a>
               </p>
             </div>
-
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 <a href="/" className="hover:underline">

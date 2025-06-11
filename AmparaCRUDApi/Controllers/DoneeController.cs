@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AmparaCRUDApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/donee")]
     [ApiController]
     public class DoneeController : Controller
     {
@@ -35,7 +35,17 @@ namespace AmparaCRUDApi.Controllers
         public IActionResult AddDonee(AddDoneeDTO addDoneeDTO)
         {
             if (dbContext.Donees.Any(d => d.CNPJ == addDoneeDTO.CNPJ))
-                return BadRequest("CNPJ já cadastrado");
+                return BadRequest("CNPJ já cadastrado.");
+
+            bool emailExists = dbContext.Donees.Any(d => d.Email == addDoneeDTO.Email)
+                            || dbContext.Donators.Any(d => d.Email == addDoneeDTO.Email);
+            if (emailExists)
+                return BadRequest("E-mail já cadastrado.");
+
+            bool phoneExists = dbContext.Donees.Any(d => d.PhoneNumber == addDoneeDTO.PhoneNumber)
+                            || dbContext.Donators.Any(d => d.PhoneNumber == addDoneeDTO.PhoneNumber);
+            if (phoneExists)
+                return BadRequest("Telefone já cadastrado.");
 
             var doneeEntity = new Donee()
             {
@@ -53,6 +63,7 @@ namespace AmparaCRUDApi.Controllers
 
             return Ok("Donee successfully created.");
         }
+
 
     }
 }

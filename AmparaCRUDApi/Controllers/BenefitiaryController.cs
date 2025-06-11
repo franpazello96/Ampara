@@ -7,7 +7,7 @@ using AmparaCRUDApi.Models;
 namespace AmparaCRUDApi.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/benefitiary")]
     public class BenefitiaryController : ControllerBase
     {
         private readonly ApplicationDbContext dbContext;
@@ -16,30 +16,43 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
-        public IActionResult GetBenefitiaries([FromQuery] string? name)
+        [HttpGet("bydonee")]
+        public ActionResult<List<BenefitiaryDTO>> GetByDonee([FromQuery] CnpjRequestModel cnpjModel)
         {
-            var query = dbContext.Benefitiaries.AsQueryable();
-
-            if (!string.IsNullOrEmpty(name))
-            {
-                query = query.Where(b => b.Name.Contains(name));
-            }
-
-            var result = query
-                .Select(b => new
+            var beneficiaries = dbContext.Benefitiaries
+                .Where(b => b.DoneeCnpj.Trim().ToLower() == cnpjModel.Cnpj)
+                .OrderByDescending(b => b.CreatedAt)
+                .Select(b => new BenefitiaryDTO
                 {
-                    id = b.CPF ?? b.CNPJ,
-                    name = b.Name
+                    Id = b.Id,
+                    Name = b.Name,
+                    Email = b.Email,
+                    PhoneNumber = b.PhoneNumber,
+                    CPF = b.CPF,
+                    CNPJ = b.CNPJ,
+                    CreatedAt = b.CreatedAt
                 })
                 .ToList();
 
-            return Ok(result);
+            return Ok(beneficiaries);
         }
 
         [HttpPost("signupbenefitiary")]
         public IActionResult AddBenefitiary(AddBenefitiaryDTO dto)
         {
+            // Garante que um dos dois está preenchido
+            if (string.IsNullOrEmpty(dto.CPF) && string.IsNullOrEmpty(dto.CNPJ))
+            {
+                return BadRequest("Informe CPF ou CNPJ.");
+            }
+
+            // Garante que não estejam os dois preenchidos ao mesmo tempo
+            if (!string.IsNullOrEmpty(dto.CPF) && !string.IsNullOrEmpty(dto.CNPJ))
+            {
+                return BadRequest("Informe apenas CPF ou apenas CNPJ, nunca os dois.");
+            }
+
+            // Verifica se já existe um registro com o mesmo CPF ou CNPJ
             bool exists = dbContext.Benefitiaries.Any(b =>
                 (!string.IsNullOrEmpty(dto.CPF) && b.CPF == dto.CPF) ||
                 (!string.IsNullOrEmpty(dto.CNPJ) && b.CNPJ == dto.CNPJ));
@@ -55,7 +68,9 @@ namespace AmparaCRUDApi.Controllers
                 CPF = dto.CPF,
                 CNPJ = dto.CNPJ,
                 Email = dto.Email,
-                PhoneNumber = dto.PhoneNumber
+                PhoneNumber = dto.PhoneNumber,
+                DoneeCnpj = dto.DoneeCnpj,
+                CreatedAt = dto.CreatedAt
             };
 
             dbContext.Benefitiaries.Add(entity);
@@ -63,5 +78,67 @@ namespace AmparaCRUDApi.Controllers
 
             return Ok(entity);
         }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateBenefitiary(int id, [FromBody] AddBenefitiaryDTO dto)
+        {
+            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
+            if (existing == null)
+                return NotFound("Beneficiário não encontrado.");
+
+            existing.Name = dto.Name;
+            existing.CPF = string.IsNullOrWhiteSpace(dto.CPF) ? null : dto.CPF;
+            existing.CNPJ = string.IsNullOrWhiteSpace(dto.CNPJ) ? null : dto.CNPJ;
+            existing.Email = dto.Email;
+            existing.PhoneNumber = dto.PhoneNumber;
+            existing.DoneeCnpj = dto.DoneeCnpj;
+
+            dbContext.SaveChanges();
+
+            return Ok(existing);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteBenefitiary(int id)
+        {
+            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
+            if (existing == null)
+                return NotFound("Beneficiário não encontrado.");
+
+            dbContext.Benefitiaries.Remove(existing);
+            dbContext.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpGet("bydocument")]
+        public IActionResult GetByDocument([FromQuery] string document)
+        {
+            if (string.IsNullOrWhiteSpace(document))
+                return BadRequest("Documento não informado.");
+
+            var beneficiary = dbContext.Benefitiaries
+                .FirstOrDefault(b =>
+                    (!string.IsNullOrEmpty(b.CPF) && b.CPF == document) ||
+                    (!string.IsNullOrEmpty(b.CNPJ) && b.CNPJ == document));
+
+            if (beneficiary == null)
+                return NotFound("Beneficiário não encontrado.");
+
+            var dto = new BenefitiaryDTO
+            {
+                Id = beneficiary.Id,
+                Name = beneficiary.Name,
+                Email = beneficiary.Email,
+                PhoneNumber = beneficiary.PhoneNumber,
+                CPF = beneficiary.CPF,
+                CNPJ = beneficiary.CNPJ,
+                CreatedAt = beneficiary.CreatedAt
+            };
+
+            return Ok(dto);
+        }
+
+
     }
 }

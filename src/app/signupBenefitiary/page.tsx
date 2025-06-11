@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import Sidebar from "@/components/Sidebar/page";
+import { useAuth } from "@/hooks/useAuth";
 
 // Validações
 const schema = z
@@ -47,6 +48,8 @@ const schema = z
 type FormData = z.infer<typeof schema>;
 
 export default function SignUpBeneficiaryPage() {
+  const { user } = useAuth("donee");
+
   const {
     register,
     handleSubmit,
@@ -58,21 +61,27 @@ export default function SignUpBeneficiaryPage() {
   const personType = watch("personType");
 
   const onSubmit = async (data: FormData) => {
+    if (!user?.cnpj) {
+      toast.error("CNPJ da instituição não encontrado.");
+      return;
+    }
+
     const payload = {
       Name: data.name,
-      CPF: data.personType === "Física" ? data.cpf : "",
-      CNPJ: data.personType === "Jurídica" ? data.cnpj : "",
+      CPF: data.personType === "Física" ? data.cpf : null,
+      CNPJ: data.personType === "Jurídica" ? data.cnpj : null,
       Email: data.email,
       PhoneNumber: data.phoneNumber,
+      DoneeCnpj: user.cnpj,
     };
 
     try {
-      const response = await axios.post("http://localhost:5001/api/beneficiary/add", payload);
+      const response = await axios.post("https://localhost:5001/api/benefitiary/signupbenefitiary", payload);
       toast.success("Beneficiário cadastrado com sucesso!");
       reset();
     } catch (error: any) {
-      toast.error("Erro ao cadastrar beneficiário.");
       console.error(error);
+      toast.error("Erro ao cadastrar beneficiário.");
     }
   };
 

@@ -31,7 +31,8 @@ namespace AmparaCRUDApi.Controllers
                 CNPJ = dto.CNPJ,
                 Price = dto.Price,
                 Description = dto.Description,
-                Quantity = dto.Quantity
+                Quantity = dto.Quantity,
+                DoneeCnpj = dto.DoneeCnpj
             };
 
             dbContext.Buys.Add(buy);

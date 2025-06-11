@@ -79,21 +79,31 @@ export default function SignupRecebedor() {
         router.push("/signin");
       }
     } catch (error: any) {
-      let errorMessage = "Erro desconhecido";
+        let errorMessage = "Erro desconhecido";
 
-      if (error.response?.data) {
-        if (typeof error.response.data === "string") {
-          errorMessage = error.response.data;
-        } else if (typeof error.response.data === "object" && error.response.data.message) {
-          errorMessage = error.response.data.message;
-        } else {
-          errorMessage = JSON.stringify(error.response.data);
+        if (error.response?.data) {
+          if (typeof error.response.data === "string") {
+            errorMessage = error.response.data;
+          } else if (typeof error.response.data === "object" && error.response.data.message) {
+            errorMessage = error.response.data.message;
+          } else {
+            errorMessage = JSON.stringify(error.response.data);
+          }
         }
+
+        if (
+          errorMessage.includes("E-mail já cadastrado") ||
+          errorMessage.includes("Telefone já cadastrado") ||
+          errorMessage.includes("CNPJ já cadastrado")
+        ) {
+          toast.warn(errorMessage);
+        } else {
+          toast.error("Falha ao cadastrar o usuário: " + errorMessage);
+        }
+
+        console.log("Erro ao cadastrar o usuário:", errorMessage);
       }
 
-      toast.error("Falha ao cadastrar o usuário: " + errorMessage);
-      console.log("Erro ao cadastrar o usuário:", errorMessage);
-    }
   }
 
   return (

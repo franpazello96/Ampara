@@ -5,19 +5,21 @@ namespace AmparaCRUDApi.Models
     public class AddBenefitiaryDTO
     {
         [Required]
-        [Key]
         public string Name { get; set; }
 
-        [Required]
-        public string CPF { get; set; }
-
-        [Required]
-        public string CNPJ { get; set; }
+        public string? CPF { get; set; }
+        public string? CNPJ { get; set; }
 
         [EmailAddress]
         public string? Email { get; set; }
 
         [Required]
         public string? PhoneNumber { get; set; }
+
+        [Required]
+        public string DoneeCnpj { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
     }
 }
