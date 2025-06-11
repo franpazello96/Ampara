@@ -22,11 +22,14 @@ namespace AmparaCRUDApi.Controllers
             {
                 Id = DonationDTO.Id,
                 DonationType = DonationDTO.DonationType,
-                Quantity = DonationDTO.Quantity,
-                Amount = 0,
+                Quantity = 0,
+                Amount = DonationDTO.Amount,
                 Description = DonationDTO.Description,
                 Recurrence = DonationDTO.Recurrence,
-                TimeRecurrence = DonationDTO.TimeRecurrence
+                TimeRecurrence = DonationDTO.TimeRecurrence,
+                DonatorCpf = DonationDTO.DonatorCpf,
+                DoneeCnpj = DonationDTO.DoneeCnpj,
+                Date = DonationDTO.Date
             };
 
             dbContext.Donations.Add(donationEntity);
@@ -45,12 +48,16 @@ namespace AmparaCRUDApi.Controllers
                 Amount = DonationDTO.Amount,
                 Description = DonationDTO.Description,
                 Recurrence = DonationDTO.Recurrence,
-                TimeRecurrence = DonationDTO.TimeRecurrence
+                TimeRecurrence = DonationDTO.TimeRecurrence,
+                DonatorCpf = DonationDTO.DonatorCpf,
+                DoneeCnpj = DonationDTO.DoneeCnpj,
+                Date = DonationDTO.Date
             };
 
             dbContext.Donations.Add(donationEntity);
             dbContext.SaveChanges();
             return Ok(donationEntity);
         }
+
     }
 }

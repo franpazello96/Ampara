@@ -29,11 +29,11 @@ export function useAuth(requiredRole?: string) {
     }
 
     try {
-      const decoded: TokenPayload = jwtDecode(token);
-      const isExpired = decoded.exp * 1000 < Date.now();
+      const decoded = jwtDecode<TokenPayload>(token);
+      const currentTime = Date.now();
 
-      if (isExpired) {
-        localStorage.clear();
+      if (decoded.exp * 1000 < currentTime) {
+        localStorage.removeItem("token");
         if (!toast.isActive(toastId)) {
           toast.warn("Sessão expirada. Faça login novamente.", { toastId });
         }
@@ -52,7 +52,7 @@ export function useAuth(requiredRole?: string) {
       setUser(decoded);
       setIsAuthenticated(true);
     } catch (error) {
-      localStorage.clear();
+      localStorage.removeItem("token");
       if (!toast.isActive(toastId)) {
         toast.error("Token inválido. Faça login novamente.", { toastId });
       }

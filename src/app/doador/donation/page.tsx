@@ -1,91 +1,223 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Input } from "@/components/input";
 import { Button } from "@/components/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import SidebarDoador from "@/components/SidebarDoador/page";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
-import SidebarDoador from "@/components/SidebarDoador/page";
-import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/hooks/useAuth";
+import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
+
+interface Donee {
+  institutionName: string;
+  cnpj: string;
+}
 
 export default function DonationPage() {
   const { isAuthenticated, user } = useAuth("donator");
 
+  const [donees, setDonees] = useState<Donee[]>([]);
+  const [selectedCnpj, setSelectedCnpj] = useState("");
   const [donationType, setDonationType] = useState("");
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [recurrence, setRecurrence] = useState("");
-  const [additionalInfo, setAdditionalInfo] = useState({
-    quantity: "",
-    description: "",
-  });
+  const [quantity, setQuantity] = useState("");
+  const [description, setDescription] = useState("");
+  const [recurrence, setRecurrence] = useState(false);
+  const [timeRecurrence, setTimeRecurrence] = useState("");
 
-  const [errors, setErrors] = useState({
-    donationType: "",
-    quantity: "",
-    description: "",
-    recurrence: "",
-  });
+  useEffect(() => {
+    async function fetchInstitutions() {
+      try {
+        const response = await axios.get("https://localhost:5001/api/donee");
 
-  const validateForm = () => {
-    const newErrors = {
-      donationType: donationType ? "" : "Selecione o tipo de doação.",
-      quantity:
-        donationType && !additionalInfo.quantity ? "Informe a quantidade." : "",
-      description:
-        donationType && !additionalInfo.description ? "Adicione uma descrição." : "",
-      recurrence:
-        isRecurring && !recurrence ? "Selecione a frequência da doação." : "",
-    };
+        const data = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.$values)
+          ? response.data.$values
+          : [];
 
-    setErrors(newErrors);
+        if (data.length === 0) {
+          console.warn("Nenhuma instituição disponível:", response.data);
+          toast.warn("Nenhuma instituição disponível.");
+        }
 
-    return Object.values(newErrors).every((err) => !err);
-  };
+        setDonees(data);
+      } catch (error) {
+        console.error("Erro ao buscar instituições:", error);
+        toast.error("Erro ao buscar instituições.");
+      }
+    }
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+    fetchInstitutions();
+  }, []);
 
-    if (!validateForm()) {
-      toast.error("Por favor, corrija os erros no formulário.");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!donationType || !quantity || !description || !selectedCnpj) {
+      toast.warn("Preencha todos os campos obrigatórios.");
       return;
     }
 
-    console.log("Tipo de Doação:", donationType);
-    console.log("Doação Recorrente:", isRecurring);
-    console.log("Frequência da Doação:", recurrence);
-    console.log("Informações Adicionais:", additionalInfo);
-    toast.success("Doação registrada com sucesso!");
-  };
+    const quantityValue = Number(quantity);
+    if (isNaN(quantityValue) || quantityValue <= 0) {
+      toast.warn("Informe um valor numérico válido e maior que zero.");
+      return;
+    }
 
-  const fadeSlideProps = {
-    initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -10 },
-    transition: { duration: 0.4 },
+    const isMoney = donationType === "Dinheiro";
+
+    const donation = {
+      donationType,
+      quantity: isMoney ? null : quantityValue,
+      amount: isMoney ? quantityValue : null,
+      description,
+      recurrence,
+      timeRecurrence: recurrence ? timeRecurrence : null,
+      date: new Date().toISOString(),
+      donatorCpf: user?.cpf ?? "",
+      doneeCnpj: selectedCnpj
+    };
+
+    const endpoint =
+      isMoney
+        ? "https://localhost:5001/api/donation/moneydonation"
+        : "https://localhost:5001/api/donation/fooddonation";
+
+    try {
+      const response = await axios.post(endpoint, donation, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.status === 200) {
+        toast.success("Doação registrada com sucesso!");
+        setDonationType("");
+        setQuantity("");
+        setDescription("");
+        setSelectedCnpj("");
+        setRecurrence(false);
+        setTimeRecurrence("");
+      }
+    } catch (error) {
+      console.error("Erro ao registrar doação:", error);
+
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data || "Erro ao registrar doação.");
+      } else {
+        toast.error("Erro desconhecido ao registrar doação.");
+      }
+    }
   };
 
   if (!isAuthenticated) return null;
+
+  const recurrenceOptions = [
+    "Semanal",
+    "Mensal",
+    "Bimestral",
+    "Trimestral",
+    "Semestral",
+    "Anual"
+  ];
 
   return (
     <div className="flex min-h-screen bg-zinc-100 dark:bg-zinc-900">
       <div className="w-64 bg-white dark:bg-zinc-800 p-4">
         <SidebarDoador />
       </div>
-      <div className="flex-1 flex justify-center items-start py-10 px-4">
-        <div className="max-w-3xl w-full bg-white dark:bg-zinc-800 p-8 rounded-xl shadow-md">
-          <div className="flex flex-col items-center mb-8">
-            <Image src={logo} alt="Logo" width={108.5} height={30} />
-            <ThemeToggle />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-zinc-800 dark:text-zinc-100 mb-6">
-            Fazer uma Doação
-          </h1>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            {/* ... permanece igual ... */}
-          </form>
+      <div className="flex-1 flex flex-col items-center p-10">
+        <Image src={logo} alt="Logo" width={120} height={40} />
+        <ThemeToggle />
+        <h1 className="text-3xl font-bold mt-4 mb-6">Fazer uma Doação</h1>
+
+        <div className="w-full max-w-lg mb-6">
+          <label>Tipo de Doação</label>
+          <select
+            className="w-full p-2 rounded border"
+            value={donationType}
+            onChange={(e) => setDonationType(e.target.value)}
+          >
+            <option value="">Selecione</option>
+            <option value="Alimentos">Alimentos</option>
+            <option value="Dinheiro">Dinheiro</option>
+          </select>
         </div>
+
+        {donationType && (
+          <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4">
+            <div>
+              <label>Instituição</label>
+              <select
+                className="w-full p-2 rounded border"
+                value={selectedCnpj}
+                onChange={(e) => setSelectedCnpj(e.target.value)}
+              >
+                <option value="">Selecione a instituição</option>
+                {donees.map((d) => (
+                  <option key={d.cnpj} value={d.cnpj}>
+                    {d.institutionName} ({d.cnpj})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label>{donationType === "Dinheiro" ? "Valor (R$)" : "Quantidade (kg)"}</label>
+              <Input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="Informe a quantidade"
+              />
+            </div>
+
+            <div>
+              <label>Descrição</label>
+              <textarea
+                className="w-full p-2 rounded border"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ex: arroz, feijão, doação pontual..."
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={recurrence}
+                onChange={(e) => setRecurrence(e.target.checked)}
+              />
+              <label>Doação Recorrente</label>
+            </div>
+
+            {recurrence && (
+              <div>
+                <label>Frequência</label>
+                <select
+                  className="w-full p-2 rounded border"
+                  value={timeRecurrence}
+                  onChange={(e) => setTimeRecurrence(e.target.value)}
+                >
+                  <option value="">Selecione a frequência</option>
+                  {recurrenceOptions.map((freq) => (
+                    <option key={freq} value={freq}>
+                      {freq}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full bg-green-600 text-white py-2 rounded">
+              Confirmar Doação
+            </Button>
+          </form>
+        )}
       </div>
     </div>
   );

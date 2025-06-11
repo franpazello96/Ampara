@@ -2,6 +2,7 @@
 using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
 using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AmparaCRUDApi.Controllers
@@ -19,8 +20,15 @@ namespace AmparaCRUDApi.Controllers
         [HttpGet]
         public IActionResult GetAllDonees()
         {
-            var allDonee = dbContext.Donees.ToList();
-            return Ok(allDonee);
+            var donees = dbContext.Donees
+                .Select(d => new
+                {
+                    d.InstitutionName,
+                    d.CNPJ
+                })
+                .ToList();
+
+            return Ok(donees);
         }
 
         [HttpPost("signupdonee")]
