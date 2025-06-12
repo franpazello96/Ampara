@@ -20,8 +20,13 @@ export function Summary() {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const res = await fetch("https://localhost:5001/api/transactions/getalltransactions");
-        const data: BackendTransaction[] = await res.json();
+        const cnpj = localStorage.getItem("cnpj");
+        if (!cnpj) return;
+
+        const response = await fetch(`https://localhost:5001/api/transactions/getalltransactions?doneeCnpj=${encodeURIComponent(cnpj)}`);
+        if (!response.ok) throw new Error("Erro ao buscar dados");
+
+        const data: BackendTransaction[] = await response.json();
 
         let totalEntries = 0;
         let totalExits = 0;

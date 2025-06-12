@@ -4,5 +4,6 @@
     {
         public DateTime Day { get; set; }
         public decimal TotalAmount { get; set; }
+        public string DoneeCnpj { get; set; }
     }
 }

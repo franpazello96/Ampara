@@ -1,5 +1,3 @@
-// ✅ Financial ajustado: valor em kg para alimentos nas entradas
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -42,9 +40,13 @@ export default function Financial() {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        const response = await fetch("https://localhost:5001/api/transactions/getalltransactions");
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const cnpj = localStorage.getItem("cnpj");
+        if (!cnpj) throw new Error("CNPJ não encontrado no localStorage");
+
+        const response = await fetch(`https://localhost:5001/api/transactions/getalltransactions?doneeCnpj=${cnpj}`);
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
         const backendData: BackendTransaction[] = await response.json();
 
@@ -74,14 +76,14 @@ export default function Financial() {
             quantidade: displayQuantidade,
             categoria: item.category,
             data: formattedDate,
-            recorrencia: item.timeRecurrence && item.timeRecurrence.trim() !== "" ? item.timeRecurrence : "Não",
+            recorrencia: item.timeRecurrence?.trim() || "Não",
             descricao: item.description || "",
           };
         });
 
         setData(transformedData);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Erro desconhecido ao buscar transações.");
+        setError(e instanceof Error ? e.message : "Erro desconhecido.");
         console.error("Erro ao buscar transações:", e);
       } finally {
         setLoading(false);
@@ -118,9 +120,6 @@ export default function Financial() {
 
   const paginar = (array: DataItem[], page: number) => array.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
-  if (loading) return <div className="mt-5 w-full flex"><Sidebar /><div className="flex-1 ml-64 p-4">Carregando transações...</div></div>;
-  if (error) return <div className="mt-5 w-full flex"><Sidebar /><div className="flex-1 ml-64 p-4">Erro ao buscar dados: {error}</div></div>;
-
   const entradas = filterAndSort("Entrada");
   const saidas = filterAndSort("Saída");
   const entradasPaginadas = paginar(entradas, pageEntrada);
@@ -128,10 +127,14 @@ export default function Financial() {
   const totalPagesEntrada = Math.ceil(entradas.length / ITEMS_PER_PAGE);
   const totalPagesSaida = Math.ceil(saidas.length / ITEMS_PER_PAGE);
 
+  if (loading) return <div className="mt-5 w-full flex"><Sidebar /><div className="flex-1 ml-64 p-4">Carregando...</div></div>;
+  if (error) return <div className="mt-5 w-full flex"><Sidebar /><div className="flex-1 ml-64 p-4">Erro: {error}</div></div>;
+
   return (
     <div className="mt-5 w-full overflow-x-auto flex">
       <Sidebar />
       <div className="flex-1 ml-64 p-4 space-y-10">
+        {/* Filtros */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-2">
           <input type="text" placeholder="Pesquisar..." value={search} onChange={(e) => setSearch(e.target.value)} className="p-2 border rounded w-full md:w-1/3" />
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto">
@@ -168,13 +171,6 @@ export default function Financial() {
               )}
             </tbody>
           </table>
-          {entradas.length > ITEMS_PER_PAGE && (
-            <div className="flex justify-center mt-3 items-center gap-2">
-              <button onClick={() => setPageEntrada(prev => Math.max(prev - 1, 0))} disabled={pageEntrada === 0} className="p-2 bg-green-700 text-white rounded disabled:opacity-50"><ChevronLeft /></button>
-              <span>Página {pageEntrada + 1} de {totalPagesEntrada}</span>
-              <button onClick={() => setPageEntrada(prev => Math.min(prev + 1, totalPagesEntrada - 1))} disabled={(pageEntrada + 1) >= totalPagesEntrada} className="p-2 bg-green-700 text-white rounded disabled:opacity-50"><ChevronRight /></button>
-            </div>
-          )}
         </div>
 
         {/* Saídas */}
@@ -206,13 +202,6 @@ export default function Financial() {
               )}
             </tbody>
           </table>
-          {saidas.length > ITEMS_PER_PAGE && (
-            <div className="flex justify-center mt-3 items-center gap-2">
-              <button onClick={() => setPageSaida(prev => Math.max(prev - 1, 0))} disabled={pageSaida === 0} className="p-2 bg-red-700 text-white rounded disabled:opacity-50"><ChevronLeft /></button>
-              <span>Página {pageSaida + 1} de {totalPagesSaida}</span>
-              <button onClick={() => setPageSaida(prev => Math.min(prev + 1, totalPagesSaida - 1))} disabled={(pageSaida + 1) >= totalPagesSaida} className="p-2 bg-red-700 text-white rounded disabled:opacity-50"><ChevronRight /></button>
-            </div>
-          )}
         </div>
       </div>
     </div>

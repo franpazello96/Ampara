@@ -17,19 +17,24 @@ namespace AmparaCRUDApi.Controllers
         }
 
         [HttpGet("reciveddonation")]
-        public IActionResult GetAllDailyTotals()
+        public IActionResult GetAllDailyTotals([FromQuery] string doneeCnpj)
         {
-            var totals = dbContext.DailyDonationTotals.OrderBy(x => x.Day).ToList();
+            var totals = dbContext.DailyDonationTotals
+                .Where(x => x.DoneeCnpj == doneeCnpj)
+                .OrderBy(x => x.Day)
+                .ToList();
 
             return Ok(totals);
         }
 
         [HttpGet("expenses")]
-        public async Task<IActionResult> GetExpenses()
+        public async Task<IActionResult> GetExpenses([FromQuery] string doneeCnpj)
         {
             var totals = await dbContext.DailyExpensesTotals
-                                       .OrderBy(x => x.Day)
-                                       .ToListAsync();
+                .Where(x => x.DoneeCnpj == doneeCnpj)
+                .OrderBy(x => x.Day)
+                .ToListAsync();
+
             return Ok(totals);
         }
     }

@@ -19,9 +19,13 @@ namespace AmparaCRUDApi.Controllers
         }
 
         [HttpGet("getalltransactions")]
-        public async Task<IActionResult> GetAllTransactions()
+        public async Task<IActionResult> GetAllTransactions([FromQuery] string doneeCnpj)
         {
+            if (string.IsNullOrWhiteSpace(doneeCnpj))
+                return BadRequest("O CNPJ do donatário é obrigatório.");
+
             var donations = await dbContext.Donations
+                .Where(d => d.DoneeCnpj == doneeCnpj)
                 .Select(d => new TransactionDTO
                 {
                     Type = "Entrada",
@@ -35,6 +39,7 @@ namespace AmparaCRUDApi.Controllers
                 .ToListAsync();
 
             var buys = await dbContext.Buys
+                .Where(b => b.DoneeCnpj == doneeCnpj)
                 .Select(b => new TransactionDTO
                 {
                     Type = "Saída",
@@ -47,9 +52,10 @@ namespace AmparaCRUDApi.Controllers
                 })
                 .ToListAsync();
 
-            var all = donations.Concat(buys)
-                               .OrderByDescending(t => t.Date)
-                               .ToList();
+            var all = donations
+                .Concat(buys)
+                .OrderByDescending(t => t.Date)
+                .ToList();
 
             return Ok(all);
         }
