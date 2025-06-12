@@ -147,23 +147,25 @@ namespace AmparaCRUDApi.Migrations
                 column: "DoneeCnpj");
 
             migrationBuilder.Sql(@"
-                CREATE VIEW vw_DailyDonationTotals AS
-                SELECT 
-                    CAST([Date] AS DATE) AS Day,
-                    SUM([Amount]) AS TotalAmount
-                FROM Donations
-                WHERE [Amount] IS NOT NULL AND [DonationType] = 'Dinheiro'
-                GROUP BY CAST([Date] AS DATE)
-            ");
+                        CREATE VIEW vw_DailyDonationTotals AS
+                        SELECT 
+                            CAST([Date] AS DATE) AS Day,
+                            SUM([Amount]) AS TotalAmount,
+                            [DoneeCnpj]
+                        FROM Donations
+                        WHERE [Amount] IS NOT NULL AND [DonationType] = 'Dinheiro'
+                        GROUP BY CAST([Date] AS DATE), [DoneeCnpj]
+                    ");
 
-            migrationBuilder.Sql(@"
-                CREATE VIEW vw_DailyExpensesTotals AS
-                SELECT 
-                    CAST([Date] AS DATE) AS Day,
-                    SUM([Price]) AS TotalAmount
-                FROM Buys
-                GROUP BY CAST([Date] AS DATE)
-            ");
+                                migrationBuilder.Sql(@"
+                        CREATE VIEW vw_DailyExpensesTotals AS
+                        SELECT 
+                            CAST([Date] AS DATE) AS Day,
+                            SUM([Price]) AS TotalAmount,
+                            [DoneeCnpj]
+                        FROM Buys
+                        GROUP BY CAST([Date] AS DATE), [DoneeCnpj]
+                    ");
 
         }
 
