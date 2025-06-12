@@ -21,7 +21,7 @@ namespace AmparaCRUDApi.Controllers
             var donationEntity = new Donation()
             {
                 DonationType = DonationDTO.DonationType,
-                Quantity = 0,
+                Quantity = DonationDTO.Quantity, 
                 Amount = DonationDTO.Amount,
                 Description = DonationDTO.Description,
                 Recurrence = DonationDTO.Recurrence,
@@ -43,7 +43,7 @@ namespace AmparaCRUDApi.Controllers
             {
                 Id = DonationDTO.Id,
                 DonationType = DonationDTO.DonationType,
-                Quantity = 0,
+                Quantity = DonationDTO.Quantity,
                 Amount = DonationDTO.Amount,
                 Description = DonationDTO.Description,
                 Recurrence = DonationDTO.Recurrence,

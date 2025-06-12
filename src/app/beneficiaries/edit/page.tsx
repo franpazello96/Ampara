@@ -1,159 +1,181 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Sidebar from '@/components/Sidebar/page';
+import SidebarDoador from '@/components/SidebarDoador/page';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { toast } from 'react-toastify';
+import { useAuth } from '@/hooks/useAuth';
 
-interface Beneficiary {
-  id: number;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  cpf?: string;
-  cnpj?: string;
-  createdAt: string;
-  doneeCnpj: string;
-}
-
-export default function EditBeneficiary() {
-  const searchParams = useSearchParams();
-  const document = searchParams.get('document');
+export default function EditProfile() {
+  const { isAuthenticated, user } = useAuth("donator");
   const router = useRouter();
-  const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    nome: '',
+    email: '',
+    telefone: '',
+    senhaAtual: '',
+    novaSenha: '',
+  });
 
   useEffect(() => {
-    if (!document) {
-      setError('Documento não informado.');
-      setLoading(false);
-      return;
-    }
+    if (!user?.cpf) return;
 
-    const fetchBeneficiary = async () => {
+    const fetchProfile = async () => {
       try {
-        const res = await fetch(`https://localhost:5001/api/benefitiary/bydocument?document=${encodeURIComponent(document)}`);
-        if (!res.ok) throw new Error('Não encontrado');
+        const res = await fetch(`https://localhost:5001/api/donator/cpf/${user.cpf}`);
+        if (!res.ok) throw new Error();
         const data = await res.json();
-        setBeneficiary(data);
+        setFormData({
+          ...formData,
+          nome: data.name,
+          email: data.email,
+          telefone: data.phoneNumber
+        });
       } catch (err) {
-        setError('Erro ao carregar beneficiário');
-        console.error(err);
+        toast.error("Erro ao carregar dados do perfil.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBeneficiary();
-  }, [document]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setBeneficiary(prev => prev ? { ...prev, [name]: value } : null);
-  };
+    fetchProfile();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!beneficiary) return;
+    if (!user?.cpf) return;
 
     setSaving(true);
-    setError('');
 
     try {
-      const dto = {
-        name: beneficiary.name,
-        email: beneficiary.email,
-        phoneNumber: beneficiary.phoneNumber,
-        cpf: beneficiary.cpf || null,
-        cnpj: beneficiary.cnpj || null,
-        doneeCnpj: beneficiary.doneeCnpj,
-        createdAt: beneficiary.createdAt
+      const payload = {
+        name: formData.nome,
+        email: formData.email,
+        phoneNumber: formData.telefone,
+        password: formData.senhaAtual,
+        newPassword: formData.novaSenha || null
       };
 
-      const res = await fetch(`https://localhost:5001/api/benefitiary/${beneficiary.id}`, {
-        method: 'PUT',
+      const response = await fetch(`https://localhost:5001/api/donator/cpf/${user.cpf}`, {
+        method: "PUT",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dto)
+        body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error();
+      if (!response.ok) {
+        const msg = await response.text();
+        throw new Error(msg);
+      }
 
-      router.push('/beneficiaries');
-    } catch (err) {
-      setError('Erro ao salvar');
+      toast.success("Perfil atualizado com sucesso!");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao atualizar perfil.");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return <div className="p-10 text-gray-500">Carregando...</div>;
+  if (isAuthenticated === null || !user) {
+    return <div className="p-10 text-gray-500">Carregando autenticação...</div>;
   }
 
-  if (!beneficiary) {
-    return <div className="p-10 text-red-500">Beneficiário não encontrado</div>;
+  if (!isAuthenticated || !user?.cpf) {
+    return <div className="p-10 text-red-500">Usuário não autenticado ou CPF não disponível</div>;
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-900">
-      <ThemeToggle />
-      <Sidebar />
-      <main className="pl-64 p-8">
+    <div className="min-h-screen bg-white dark:bg-zinc-900 flex">
+      <SidebarDoador />
+      <main className="pl-64 p-8 w-full">
+        <ThemeToggle />
         <h1 className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-6">
-          Editar Beneficiário
+          Editar Perfil
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-xl bg-white dark:bg-zinc-800 p-6 rounded-md shadow">
-          <div>
-            <label className="text-sm text-gray-700 dark:text-gray-200">Nome</label>
-            <input name="name" value={beneficiary.name} onChange={handleChange} required
-              className="w-full p-2 border dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-white" />
-          </div>
+        {loading ? (
+          <p>Carregando dados...</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6 max-w-xl bg-white dark:bg-zinc-800 p-6 rounded shadow">
+            <div>
+              <label className="text-sm text-gray-700 dark:text-gray-300">Nome</label>
+              <input
+                name="nome"
+                value={formData.nome}
+                onChange={e => setFormData({ ...formData, nome: e.target.value })}
+                required
+                className="w-full p-2 rounded border dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-700 dark:text-gray-200">Email</label>
-            <input name="email" type="email" value={beneficiary.email} onChange={handleChange} required
-              className="w-full p-2 border dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-white" />
-          </div>
+            <div>
+              <label className="text-sm text-gray-700 dark:text-gray-300">Email</label>
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                required
+                className="w-full p-2 rounded border dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-700 dark:text-gray-200">Telefone</label>
-            <input name="phoneNumber" value={beneficiary.phoneNumber} onChange={handleChange} required
-              className="w-full p-2 border dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-white" />
-          </div>
+            <div>
+              <label className="text-sm text-gray-700 dark:text-gray-300">Telefone</label>
+              <input
+                name="telefone"
+                type="tel"
+                value={formData.telefone}
+                onChange={e => setFormData({ ...formData, telefone: e.target.value })}
+                required
+                className="w-full p-2 rounded border dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-700 dark:text-gray-200">
-              {beneficiary.cpf ? "CPF" : "CNPJ"}
-            </label>
-            <input
-              name={beneficiary.cpf ? "cpf" : "cnpj"}
-              value={beneficiary.cpf || beneficiary.cnpj || ""}
-              onChange={handleChange}
-              className="w-full p-2 border dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-white"
-              required
-            />
-          </div>
+            <div>
+              <label className="text-sm text-gray-700 dark:text-gray-300">Senha atual</label>
+              <input
+                name="senhaAtual"
+                type="password"
+                value={formData.senhaAtual}
+                onChange={e => setFormData({ ...formData, senhaAtual: e.target.value })}
+                required
+                className="w-full p-2 rounded border dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white"
+              />
+            </div>
 
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
-            >
-              {saving ? "Salvando..." : "Salvar"}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/beneficiaries")}
-              className="bg-gray-200 dark:bg-zinc-700 text-black dark:text-white py-2 px-4 rounded"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
+            <div>
+              <label className="text-sm text-gray-700 dark:text-gray-300">Nova senha (opcional)</label>
+              <input
+                name="novaSenha"
+                type="password"
+                value={formData.novaSenha}
+                onChange={e => setFormData({ ...formData, novaSenha: e.target.value })}
+                className="w-full p-2 rounded border dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white"
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                disabled={saving}
+                className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700"
+              >
+                {saving ? "Salvando..." : "Salvar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/profile")}
+                className="bg-gray-200 dark:bg-zinc-700 text-black dark:text-white py-2 px-4 rounded"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
       </main>
     </div>
   );

@@ -10,7 +10,6 @@ interface Donation {
   amount: number | null;
   quantity: number | null;
   donationType: string;
-  category?: string;
   description?: string;
   date: string;
   recurrence: boolean;
@@ -18,6 +17,7 @@ interface Donation {
   doneeName?: string;
   doneeCnpj?: string;
 }
+
 
 const ITEMS_PER_PAGE = 10;
 
@@ -121,25 +121,26 @@ export default function FinancialDonator() {
         <table className="w-full table-auto border-collapse rounded-md overflow-hidden">
           <thead className="bg-blue-200 dark:bg-blue-800">
             <tr>
-              <th className="p-2">Valor</th>
-              <th className="p-2">Quantidade</th>
-              <th className="p-2">Categoria</th>
-              <th className="p-2">Data</th>
-              <th className="p-2">Descrição</th>
-              <th className="p-2">Instituição</th>
+              <th className="p-2 text-center">Valor</th>
+              <th className="p-2 text-center">Quantidade</th>
+              <th className="p-2 text-center">Categoria</th>
+              <th className="p-2 text-center">Data</th>
+              <th className="p-2 text-center">Descrição</th>
+              <th className="p-2 text-center">Instituição</th>
             </tr>
           </thead>
           <tbody>
             {paginated
-              .filter(d => [d.category ?? "", d.description ?? "", d.doneeName ?? ""].some(f => f.toLowerCase().includes(search.toLowerCase())))
+              .filter(d => [d.donationType ?? "", d.description ?? "", d.doneeName ?? ""]
+              .some(f => f.toLowerCase().includes(search.toLowerCase())))
               .map((d, i) => (
                 <tr key={i} className="border-t">
-                  <td className="p-2">{formatCurrency(d.amount)}</td>
-                  <td className="p-2">{formatQuantity(d.quantity, d.donationType)}</td>
-                  <td className="p-2">{d.category ?? "-"}</td>
-                  <td className="p-2">{formatDate(d.date)}</td>
-                  <td className="p-2">{d.description ?? "-"}</td>
-                  <td className="p-2">{d.doneeName ?? "-"}</td>
+                  <td className="p-2 text-center">{formatCurrency(d.amount)}</td>
+                  <td className="p-2 text-center">{formatQuantity(d.quantity, d.donationType)}</td>
+                  <td className="p-2 text-center">{d.donationType}</td>
+                  <td className="p-2 text-center">{formatDate(d.date)}</td>
+                  <td className="p-2 text-center">{d.description ?? "-"}</td>
+                  <td className="p-2 text-center">{d.doneeName ?? "-"}</td>
                 </tr>
               ))}
           </tbody>
@@ -167,21 +168,19 @@ export default function FinancialDonator() {
           <table className="w-full table-auto border-collapse rounded-md overflow-hidden">
             <thead className="bg-green-200 dark:bg-green-800">
               <tr>
-                <th className="p-2">Valor</th>
-                <th className="p-2">Frequência</th>
-                <th className="p-2">Descrição</th>
-                <th className="p-2">Instituição</th>
-                <th className="p-2">Ações</th>
+                <th className="p-2 text-center">Valor</th>
+                <th className="p-2 text-center">Frequência</th>
+                <th className="p-2 text-center">Descrição</th>
+                <th className="p-2 text-center">Instituição</th>
+                <th className="p-2 text-center">Ações</th>
               </tr>
             </thead>
             <tbody>
               {recurringDonations.map((d, i) => (
-                <tr key={i} className="border-t">
+                <tr key={i} className="border-t text-center">
                   <td className="p-2">
-                    <div className="flex items-center">
-                      {d.donationType === "Dinheiro" && (
-                        <span className="mr-1 text-sm">R$</span>
-                      )}
+                    <div className="flex items-center justify-center">
+                      {d.donationType === "Dinheiro" && <span className="mr-1 text-sm">R$</span>}
                       <input
                         type="number"
                         className="border p-2 rounded w-full text-sm"
@@ -193,9 +192,7 @@ export default function FinancialDonator() {
                           })
                         }
                       />
-                      {d.donationType === "Alimento" && (
-                        <span className="ml-1 text-sm">Kg</span>
-                      )}
+                      {d.donationType === "Alimento" && <span className="ml-1 text-sm">Kg</span>}
                     </div>
                   </td>
                   <td className="p-2">

@@ -29,17 +29,6 @@ namespace AmparaCRUDApi.Controllers
             return donatorCpf is null ? NotFound() : Ok(donatorCpf);
         }
 
-        [HttpGet("profile")]
-        [Authorize]
-        public IActionResult GetDonatorProfile()
-        {
-            var cpf = User.FindFirst("cpf")?.Value;
-            if (cpf == null) return Unauthorized("Invalid or Not Found token.");
-
-            var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
-            return donator == null ? NotFound("Donator not found.") : Ok(donator);
-        }
-
         [HttpPost("signupdonator")]
         public IActionResult AddDonator([FromBody] AddDonatorDTO addDonatorDTO)
         {
@@ -61,23 +50,34 @@ namespace AmparaCRUDApi.Controllers
             return Ok("Donator successfully created.");
         }
 
-        [HttpPut("update")]
-        [Authorize]
-        public IActionResult UpdateDonator([FromBody] UpdateDonatorDTO updateDonatorDTO)
+        [HttpPut("cpf/{cpf}")]
+        public IActionResult UpdateDonator(string cpf, [FromBody] UpdateDonatorDTO dto)
         {
-            var cpf = User.FindFirst("cpf")?.Value;
-            if (cpf == null) return Unauthorized("Invalid or Not Found token,");
-
             var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
-            if (donator == null) return NotFound("Donator not found.");
-            if (donator.Password != updateDonatorDTO.Password) return Unauthorized("Wrong password.");
-            donator.Name = updateDonatorDTO.Name;
-            donator.Email = updateDonatorDTO.Email;
-            donator.PhoneNumber = updateDonatorDTO.PhoneNumber;
+            if (donator == null)
+                return NotFound("Doador não encontrado.");
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, donator.Password))
+                return Unauthorized("Senha atual incorreta.");
+
+            donator.Name = dto.Name;
+            donator.Email = dto.Email;
+            donator.PhoneNumber = dto.PhoneNumber;
+
+            if (!string.IsNullOrEmpty(dto.NewPassword))
+            {
+                if (dto.NewPassword != dto.ConfirmPassword)
+                    return BadRequest("Nova senha e confirmação não coincidem.");
+
+                donator.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            }
 
             dbContext.SaveChanges();
             return Ok(donator);
         }
+
+
+
 
         [HttpDelete("cpf/{cpf}")]
         public IActionResult DeleteDonator(string cpf)
