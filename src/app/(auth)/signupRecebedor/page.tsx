@@ -124,7 +124,7 @@ export default function SignupRecebedor() {
           </div>
 
           <h1 className="text-4xl font-medium text-zinc-800 dark:text-zinc-100 text-center">
-            Cadastro de Beneficiário
+            Cadastro de Donatário
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-md mx-auto mt-6">
