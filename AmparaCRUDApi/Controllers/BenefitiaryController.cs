@@ -3,6 +3,7 @@ using AmparaCRUDApi.Data;
 using System.Linq;
 using AmparaCRUDApi.Models.Entities;
 using AmparaCRUDApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AmparaCRUDApi.Controllers
 {
@@ -16,128 +17,171 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("bydonee")]
         public ActionResult<List<BenefitiaryDTO>> GetByDonee([FromQuery] CnpjRequestModel cnpjModel)
         {
-            var beneficiaries = dbContext.Benefitiaries
-                .Where(b => b.DoneeCnpj.Trim().ToLower() == cnpjModel.Cnpj)
-                .OrderByDescending(b => b.CreatedAt)
-                .Select(b => new BenefitiaryDTO
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    Email = b.Email,
-                    PhoneNumber = b.PhoneNumber,
-                    CPF = b.CPF,
-                    CNPJ = b.CNPJ,
-                    CreatedAt = b.CreatedAt
-                })
-                .ToList();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(cnpjModel?.Cnpj))
+                    return BadRequest("CNPJ não informado.");
 
-            return Ok(beneficiaries);
+                var beneficiaries = dbContext.Benefitiaries
+                    .Where(b => b.DoneeCnpj.Trim().ToLower() == cnpjModel.Cnpj.Trim().ToLower())
+                    .OrderByDescending(b => b.CreatedAt)
+                    .Select(b => new BenefitiaryDTO
+                    {
+                        Id = b.Id,
+                        Name = b.Name,
+                        Email = b.Email,
+                        PhoneNumber = b.PhoneNumber,
+                        CPF = b.CPF,
+                        CNPJ = b.CNPJ,
+                        CreatedAt = b.CreatedAt
+                    })
+                    .ToList();
+
+                return Ok(beneficiaries);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetByDonee Error] {ex.Message}");
+                return StatusCode(500, "Erro interno ao buscar beneficiários.");
+            }
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPost("signupbenefitiary")]
         public IActionResult AddBenefitiary(AddBenefitiaryDTO dto)
         {
-            // Garante que um dos dois está preenchido
-            if (string.IsNullOrEmpty(dto.CPF) && string.IsNullOrEmpty(dto.CNPJ))
+            try
             {
-                return BadRequest("Informe CPF ou CNPJ.");
+                if (dto == null)
+                    return BadRequest("Dados do beneficiário não informados.");
+
+                if (string.IsNullOrEmpty(dto.CPF) && string.IsNullOrEmpty(dto.CNPJ))
+                    return BadRequest("Informe CPF ou CNPJ.");
+
+                if (!string.IsNullOrEmpty(dto.CPF) && !string.IsNullOrEmpty(dto.CNPJ))
+                    return BadRequest("Informe apenas CPF ou apenas CNPJ, nunca os dois.");
+
+                bool exists = dbContext.Benefitiaries.Any(b =>
+                    (!string.IsNullOrEmpty(dto.CPF) && b.CPF == dto.CPF) ||
+                    (!string.IsNullOrEmpty(dto.CNPJ) && b.CNPJ == dto.CNPJ));
+
+                if (exists)
+                    return BadRequest("CPF ou CNPJ já cadastrado.");
+
+                var entity = new Benefitiary
+                {
+                    Name = dto.Name,
+                    CPF = dto.CPF,
+                    CNPJ = dto.CNPJ,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber,
+                    DoneeCnpj = dto.DoneeCnpj,
+                    CreatedAt = dto.CreatedAt
+                };
+
+                dbContext.Benefitiaries.Add(entity);
+                dbContext.SaveChanges();
+
+                return Ok(entity);
             }
-
-            // Garante que não estejam os dois preenchidos ao mesmo tempo
-            if (!string.IsNullOrEmpty(dto.CPF) && !string.IsNullOrEmpty(dto.CNPJ))
+            catch (Exception ex)
             {
-                return BadRequest("Informe apenas CPF ou apenas CNPJ, nunca os dois.");
+                Console.WriteLine($"[AddBenefitiary Error] {ex.Message}");
+                return StatusCode(500, "Erro ao adicionar beneficiário.");
             }
-
-            // Verifica se já existe um registro com o mesmo CPF ou CNPJ
-            bool exists = dbContext.Benefitiaries.Any(b =>
-                (!string.IsNullOrEmpty(dto.CPF) && b.CPF == dto.CPF) ||
-                (!string.IsNullOrEmpty(dto.CNPJ) && b.CNPJ == dto.CNPJ));
-
-            if (exists)
-            {
-                return BadRequest("CPF ou CNPJ já cadastrado.");
-            }
-
-            var entity = new Benefitiary
-            {
-                Name = dto.Name,
-                CPF = dto.CPF,
-                CNPJ = dto.CNPJ,
-                Email = dto.Email,
-                PhoneNumber = dto.PhoneNumber,
-                DoneeCnpj = dto.DoneeCnpj,
-                CreatedAt = dto.CreatedAt
-            };
-
-            dbContext.Benefitiaries.Add(entity);
-            dbContext.SaveChanges();
-
-            return Ok(entity);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPut("{id}")]
         public IActionResult UpdateBenefitiary(int id, [FromBody] AddBenefitiaryDTO dto)
         {
-            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
-            if (existing == null)
-                return NotFound("Beneficiário não encontrado.");
+            try
+            {
+                var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
+                if (existing == null)
+                    return NotFound("Beneficiário não encontrado.");
 
-            existing.Name = dto.Name;
-            existing.CPF = string.IsNullOrWhiteSpace(dto.CPF) ? null : dto.CPF;
-            existing.CNPJ = string.IsNullOrWhiteSpace(dto.CNPJ) ? null : dto.CNPJ;
-            existing.Email = dto.Email;
-            existing.PhoneNumber = dto.PhoneNumber;
-            existing.DoneeCnpj = dto.DoneeCnpj;
+                existing.Name = dto.Name;
+                existing.CPF = string.IsNullOrWhiteSpace(dto.CPF) ? null : dto.CPF;
+                existing.CNPJ = string.IsNullOrWhiteSpace(dto.CNPJ) ? null : dto.CNPJ;
+                existing.Email = dto.Email;
+                existing.PhoneNumber = dto.PhoneNumber;
+                existing.DoneeCnpj = dto.DoneeCnpj;
 
-            dbContext.SaveChanges();
+                dbContext.SaveChanges();
 
-            return Ok(existing);
+                return Ok(existing);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UpdateBenefitiary Error] {ex.Message}");
+                return StatusCode(500, "Erro ao atualizar beneficiário.");
+            }
         }
 
+        [Authorize(Roles = "donee")]
         [HttpDelete("{id}")]
         public IActionResult DeleteBenefitiary(int id)
         {
-            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
-            if (existing == null)
-                return NotFound("Beneficiário não encontrado.");
+            try
+            {
+                var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
+                if (existing == null)
+                    return NotFound("Beneficiário não encontrado.");
 
-            dbContext.Benefitiaries.Remove(existing);
-            dbContext.SaveChanges();
+                dbContext.Benefitiaries.Remove(existing);
+                dbContext.SaveChanges();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DeleteBenefitiary Error] {ex.Message}");
+                return StatusCode(500, "Erro ao deletar beneficiário.");
+            }
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("bydocument")]
         public IActionResult GetByDocument([FromQuery] string document)
         {
-            if (string.IsNullOrWhiteSpace(document))
-                return BadRequest("Documento não informado.");
-
-            var beneficiary = dbContext.Benefitiaries
-                .FirstOrDefault(b =>
-                    (!string.IsNullOrEmpty(b.CPF) && b.CPF == document) ||
-                    (!string.IsNullOrEmpty(b.CNPJ) && b.CNPJ == document));
-
-            if (beneficiary == null)
-                return NotFound("Beneficiário não encontrado.");
-
-            var dto = new BenefitiaryDTO
+            try
             {
-                Id = beneficiary.Id,
-                Name = beneficiary.Name,
-                Email = beneficiary.Email,
-                PhoneNumber = beneficiary.PhoneNumber,
-                CPF = beneficiary.CPF,
-                CNPJ = beneficiary.CNPJ,
-                CreatedAt = beneficiary.CreatedAt
-            };
+                if (string.IsNullOrWhiteSpace(document))
+                    return BadRequest("Documento não informado.");
 
-            return Ok(dto);
+                var beneficiary = dbContext.Benefitiaries
+                    .FirstOrDefault(b =>
+                        (!string.IsNullOrEmpty(b.CPF) && b.CPF == document) ||
+                        (!string.IsNullOrEmpty(b.CNPJ) && b.CNPJ == document));
+
+                if (beneficiary == null)
+                    return NotFound("Beneficiário não encontrado.");
+
+                var dto = new BenefitiaryDTO
+                {
+                    Id = beneficiary.Id,
+                    Name = beneficiary.Name,
+                    Email = beneficiary.Email,
+                    PhoneNumber = beneficiary.PhoneNumber,
+                    CPF = beneficiary.CPF,
+                    CNPJ = beneficiary.CNPJ,
+                    CreatedAt = beneficiary.CreatedAt
+                };
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetByDocument Error] {ex.Message}");
+                return StatusCode(500, "Erro ao buscar beneficiário por documento.");
+            }
         }
+
 
 
     }

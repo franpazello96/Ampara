@@ -35,38 +35,40 @@ namespace AmparaCRUDApi.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var email = request.Email.Trim().ToLower();
-
-            var donator = _context.Donators.FirstOrDefault(u => u.Email.ToLower() == email);
-            if (donator != null)
+            try
             {
-                Console.WriteLine($"[Login] Donator encontrado: {donator.Email}");
-                Console.WriteLine($"[Login] Senha hash no banco: {donator.Password}");
-                Console.WriteLine($"[Login] Senha recebida: {request.Password}");
-
-                var senhaCorreta = BCrypt.Net.BCrypt.Verify(request.Password, donator.Password);
-                Console.WriteLine($"[Login] Senha confere? {senhaCorreta}");
-
-                if (senhaCorreta)
+                if (string.IsNullOrWhiteSpace(request?.Email) || string.IsNullOrWhiteSpace(request?.Password))
                 {
-                    var token = GenerateJwtTokenForDonator(donator);
-                    return Ok(new { token, userType = "donator" });
+                    return BadRequest(new { message = "Email e senha são obrigatórios." });
                 }
-                else
+
+                var email = request.Email.Trim().ToLower();
+
+                var donator = _context.Donators.FirstOrDefault(u => u.Email.ToLower() == email);
+                if (donator != null)
                 {
-                    Console.WriteLine("[Login] Senha inválida para donator.");
+                    var senhaCorreta = BCrypt.Net.BCrypt.Verify(request.Password, donator.Password);
+                    if (senhaCorreta)
+                    {
+                        var token = GenerateJwtTokenForDonator(donator);
+                        return Ok(new { token, userType = "donator" });
+                    }
                 }
+
+                var donee = _context.Donees.FirstOrDefault(u => u.Email.ToLower() == email);
+                if (donee != null && BCrypt.Net.BCrypt.Verify(request.Password, donee.Password))
+                {
+                    var token = GenerateJwtTokenForDonee(donee);
+                    return Ok(new { token, userType = "donee" });
+                }
+
+                return Unauthorized(new { message = "Credenciais inválidas." });
             }
-
-
-            var donee = _context.Donees.FirstOrDefault(u => u.Email.ToLower() == email);
-            if (donee != null && BCrypt.Net.BCrypt.Verify(request.Password, donee.Password))
+            catch (Exception ex)
             {
-                var token = GenerateJwtTokenForDonee(donee);
-                return Ok(new { token, userType = "donee" });
+                Console.WriteLine($"[Login Error] {ex.Message}");
+                return StatusCode(500, new { message = "Erro interno no servidor. Tente novamente mais tarde." });
             }
-
-            return Unauthorized(new { message = "Credenciais inválidas." });
         }
 
 

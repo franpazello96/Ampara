@@ -44,6 +44,9 @@ export default function Signin() {
         }
         router.push("/dashboard");
       } else if (data.userType === "donator") {
+        const decodedToken: any = jwtDecode(data.token);
+        const cpf = decodedToken["cpf"];
+        if (cpf) localStorage.setItem("cpf", cpf);
         router.push("/doador/donation");
       }
     } catch (error) {

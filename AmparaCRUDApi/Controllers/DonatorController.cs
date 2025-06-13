@@ -15,6 +15,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet]
         public IActionResult GetAllDonators()
         {
@@ -22,6 +23,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(allDonators);
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet("cpf/{cpf}")]
         public IActionResult GetDonatorByCpf(string cpf)
         {
@@ -29,8 +31,8 @@ namespace AmparaCRUDApi.Controllers
             return donatorCpf is null ? NotFound() : Ok(donatorCpf);
         }
 
+        [Authorize(Roles = "donator")]
         [HttpGet("profile")]
-        [Authorize]
         public IActionResult GetDonatorProfile()
         {
             var cpf = User.FindFirst("cpf")?.Value;
@@ -61,16 +63,19 @@ namespace AmparaCRUDApi.Controllers
             return Ok("Donator successfully created.");
         }
 
+        [Authorize(Roles = "donator")]
         [HttpPut("update")]
-        [Authorize]
         public IActionResult UpdateDonator([FromBody] UpdateDonatorDTO updateDonatorDTO)
         {
             var cpf = User.FindFirst("cpf")?.Value;
-            if (cpf == null) return Unauthorized("Invalid or Not Found token,");
+            if (cpf == null) return Unauthorized("Invalid or Not Found token.");
 
             var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
             if (donator == null) return NotFound("Donator not found.");
-            if (donator.Password != updateDonatorDTO.Password) return Unauthorized("Wrong password.");
+
+            if (!BCrypt.Net.BCrypt.Verify(updateDonatorDTO.Password, donator.Password))
+                return Unauthorized("Wrong password.");
+
             donator.Name = updateDonatorDTO.Name;
             donator.Email = updateDonatorDTO.Email;
             donator.PhoneNumber = updateDonatorDTO.PhoneNumber;
@@ -79,6 +84,8 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donator);
         }
 
+
+        [Authorize(Roles = "donator")]
         [HttpDelete("cpf/{cpf}")]
         public IActionResult DeleteDonator(string cpf)
         {

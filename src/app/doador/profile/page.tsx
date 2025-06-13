@@ -19,15 +19,32 @@ export default function EditProfile() {
   useEffect(() => {
     if (isAuthenticated) {
       async function fetchProfile() {
-        await new Promise((r) => setTimeout(r, 1000));
-        setFormData({
-          nome: "João Silva",
-          email: "joao@email.com",
-          telefone: "(41) 99999-0000",
-          senha: "",
-        });
-        setLoading(false);
-      }
+  try {
+    const response = await fetch("https://localhost:5001/api/donator/profile", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Erro ao buscar perfil");
+
+    const data = await response.json();
+    setFormData({
+      nome: data.name,
+      email: data.email,
+      telefone: data.phoneNumber,
+      senha: "",
+    });
+  } catch (error) {
+    console.error(error);
+    alert("Erro ao carregar perfil.");
+  } finally {
+    setLoading(false);
+  }
+}
+
 
       fetchProfile();
     }
@@ -37,10 +54,36 @@ export default function EditProfile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    alert("Perfil atualizado com sucesso!");
-    setLoading(false);
+
+    try {
+      const response = await fetch("https://localhost:5001/api/donator/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          name: formData.nome,
+          email: formData.email,
+          phoneNumber: formData.telefone,
+          password: formData.senha,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        alert("Erro ao atualizar: " + err);
+      } else {
+        alert("Perfil atualizado com sucesso!");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+      alert("Erro ao comunicar com o servidor.");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <div className="min-h-screen flex bg-white dark:bg-zinc-900">
@@ -136,7 +179,7 @@ export default function EditProfile() {
                   onChange={(e) =>
                     setFormData({ ...formData, senha: e.target.value })
                   }
-                  placeholder="Deixe em branco para manter a senha atual"
+                  placeholder="Digite sua senha atual"
                 />
               </div>
 

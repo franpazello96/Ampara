@@ -1,6 +1,7 @@
 ﻿using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
 using AmparaCRUDApi.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -17,37 +18,59 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPost("addbuy")]
         public async Task<IActionResult> AddBuy([FromBody] AddBuysDTO dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var buy = new Buys
+            try
             {
-                Date = dto.Date,
-                Type = dto.Type, 
-                StoreName = dto.StoreName,
-                CNPJ = dto.CNPJ,
-                Price = dto.Price,
-                Description = dto.Description,
-                Quantity = dto.Quantity,
-                DoneeCnpj = dto.DoneeCnpj
-            };
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            dbContext.Buys.Add(buy);
-            await dbContext.SaveChangesAsync();
+                if (dto == null)
+                    return BadRequest("Dados da compra não fornecidos.");
 
-            return CreatedAtAction(nameof(GetBuyById), new { id = buy.Id }, buy);
+                var buy = new Buys
+                {
+                    Date = dto.Date,
+                    Type = dto.Type,
+                    StoreName = dto.StoreName,
+                    CNPJ = dto.CNPJ,
+                    Price = dto.Price,
+                    Description = dto.Description,
+                    Quantity = dto.Quantity,
+                    DoneeCnpj = dto.DoneeCnpj
+                };
+
+                dbContext.Buys.Add(buy);
+                await dbContext.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetBuyById), new { id = buy.Id }, buy);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AddBuy Error] {ex.Message}");
+                return StatusCode(500, "Erro ao registrar compra.");
+            }
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBuyById(int id)
         {
-            var buy = await dbContext.Buys.FindAsync(id);
-            if (buy == null) return NotFound();
+            try
+            {
+                var buy = await dbContext.Buys.FindAsync(id);
+                if (buy == null)
+                    return NotFound("Compra não encontrada.");
 
-            return Ok(buy);
+                return Ok(buy);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[GetBuyById Error] {ex.Message}");
+                return StatusCode(500, "Erro ao buscar compra.");
+            }
         }
     }
 }
