@@ -2,9 +2,12 @@
 {
     public class UpdateDonatorDTO
     {
-        public required string Name { get; set; }
-        public required string Email { get; set; }
-        public required string PhoneNumber { get; set; }
-        public required string Password { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string CurrentPassword { get; set; } 
+        public string? NewPassword { get; set; }    
+        public string? ConfirmPassword { get; set; } 
     }
+
 }
