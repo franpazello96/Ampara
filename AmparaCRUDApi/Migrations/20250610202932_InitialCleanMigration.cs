@@ -106,8 +106,9 @@ namespace AmparaCRUDApi.Migrations
                     Recurrence = table.Column<bool>(type: "bit", nullable: false),
                     TimeRecurrence = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DonatorCpf = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    DonatorCpf = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DonatorNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -117,7 +118,7 @@ namespace AmparaCRUDApi.Migrations
                         column: x => x.DonatorCpf,
                         principalTable: "Donators",
                         principalColumn: "CPF",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Donations_Donees_DoneeCnpj",
                         column: x => x.DoneeCnpj,
@@ -147,56 +148,38 @@ namespace AmparaCRUDApi.Migrations
                 column: "DoneeCnpj");
 
             migrationBuilder.Sql(@"
-                        CREATE VIEW vw_DailyDonationTotals AS
-                        SELECT 
-                            CAST([Date] AS DATE) AS Day,
-                            SUM([Amount]) AS TotalAmount,
-                            [DoneeCnpj]
-                        FROM Donations
-                        WHERE [Amount] IS NOT NULL AND [DonationType] = 'Dinheiro'
-                        GROUP BY CAST([Date] AS DATE), [DoneeCnpj]
-                    ");
+                CREATE VIEW vw_DailyDonationTotals AS
+                SELECT 
+                    CAST([Date] AS DATE) AS Day,
+                    SUM([Amount]) AS TotalAmount,
+                    [DoneeCnpj]
+                FROM Donations
+                WHERE [Amount] IS NOT NULL AND [DonationType] = 'Dinheiro'
+                GROUP BY CAST([Date] AS DATE), [DoneeCnpj]
+            ");
 
-                                migrationBuilder.Sql(@"
-                        CREATE VIEW vw_DailyExpensesTotals AS
-                        SELECT 
-                            CAST([Date] AS DATE) AS Day,
-                            SUM([Price]) AS TotalAmount,
-                            [DoneeCnpj]
-                        FROM Buys
-                        GROUP BY CAST([Date] AS DATE), [DoneeCnpj]
-                    ");
-
+            migrationBuilder.Sql(@"
+                CREATE VIEW vw_DailyExpensesTotals AS
+                SELECT 
+                    CAST([Date] AS DATE) AS Day,
+                    SUM([Price]) AS TotalAmount,
+                    [DoneeCnpj]
+                FROM Buys
+                GROUP BY CAST([Date] AS DATE), [DoneeCnpj]
+            ");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Benefitiaries");
+            migrationBuilder.DropTable(name: "Benefitiaries");
+            migrationBuilder.DropTable(name: "Buys");
+            migrationBuilder.DropTable(name: "Donations");
+            migrationBuilder.DropTable(name: "Donators");
+            migrationBuilder.DropTable(name: "Donees");
 
-            migrationBuilder.DropTable(
-                name: "Buys");
-
-            migrationBuilder.DropTable(
-                name: "Donations");
-
-            migrationBuilder.DropTable(
-                name: "Donators");
-
-            migrationBuilder.DropTable(
-                name: "Donees");
-
-            migrationBuilder.Sql(@"
-                IF OBJECT_ID('vw_DailyExpensesTotals', 'V') IS NOT NULL
-                    DROP VIEW vw_DailyExpensesTotals;
-            ");
-
-                        migrationBuilder.Sql(@"
-                IF OBJECT_ID('vw_DailyDonationTotals', 'V') IS NOT NULL
-                    DROP VIEW vw_DailyDonationTotals;
-            ");
-
+            migrationBuilder.Sql("DROP VIEW IF EXISTS vw_DailyExpensesTotals;");
+            migrationBuilder.Sql("DROP VIEW IF EXISTS vw_DailyDonationTotals;");
         }
     }
 }

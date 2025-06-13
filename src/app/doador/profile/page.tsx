@@ -211,6 +211,59 @@ export default function EditProfile() {
                 >
                   {loading ? 'Salvando...' : 'Salvar'}
                 </button>
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => {
+                    toast.info(
+                      ({ closeToast }) => (
+                        <div className="space-y-2">
+                          <p>Tem certeza que deseja excluir sua conta? Essa ação é irreversível.</p>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={closeToast}
+                              className="px-4 py-1 rounded bg-gray-300 text-gray-800 hover:bg-gray-400"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              onClick={async () => {
+                                const cpf = user?.cpf;
+                                if (!cpf) return toast.error("CPF não encontrado.");
+
+                                try {
+                                  const res = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`, {
+                                    method: 'DELETE'
+                                  });
+
+                                  if (!res.ok) throw new Error("Erro ao deletar conta.");
+
+                                  toast.dismiss(); // fecha o toast
+                                  toast.success("Conta excluída com sucesso!");
+                                  localStorage.removeItem("token");
+                                  localStorage.removeItem("cpf");
+                                  window.location.href = "/signin";
+                                } catch (err: any) {
+                                  toast.error(`Erro: ${err.message}`);
+                                }
+                              }}
+                              className="px-4 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+                            >
+                              Confirmar
+                            </button>
+                          </div>
+                        </div>
+                      ),
+                      {
+                        autoClose: false,
+                        closeOnClick: false
+                      }
+                    );
+                  }}
+                  className="px-6 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 ml-auto"
+                >
+                  Excluir Conta
+                </button>
               </div>
             </form>
           )}

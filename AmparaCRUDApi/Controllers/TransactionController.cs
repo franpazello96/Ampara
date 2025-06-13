@@ -24,19 +24,22 @@ namespace AmparaCRUDApi.Controllers
             if (string.IsNullOrWhiteSpace(doneeCnpj))
                 return BadRequest("O CNPJ do donatário é obrigatório.");
 
-            var donations = await dbContext.Donations
-                .Where(d => d.DoneeCnpj == doneeCnpj)
-                .Select(d => new TransactionDTO
-                {
-                    Type = "Entrada",
-                    Category = d.DonationType,
-                    Quantity = d.Quantity,
-                    Amount = d.Amount,
-                    Description = d.Description,
-                    TimeRecurrence = d.TimeRecurrence,
-                    Date = d.Date
-                })
-                .ToListAsync();
+            var donations = await (from d in dbContext.Donations
+                                   join donator in dbContext.Donators
+                                       on d.DonatorCpf equals donator.CPF
+                                   where d.DoneeCnpj == doneeCnpj
+                                   select new TransactionDTO
+                                   {
+                                       Type = "Entrada",
+                                       Category = d.DonationType,
+                                       Quantity = d.Quantity,
+                                       Amount = d.Amount,
+                                       Description = d.Description,
+                                       TimeRecurrence = d.TimeRecurrence,
+                                       Date = d.Date,
+                                       DonatorCpf = donator.CPF,
+                                       DonatorName = donator.Name
+                                   }).ToListAsync();
 
             var buys = await dbContext.Buys
                 .Where(b => b.DoneeCnpj == doneeCnpj)

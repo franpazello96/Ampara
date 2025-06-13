@@ -21,31 +21,12 @@ namespace AmparaCRUDApi.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configurar views
-            modelBuilder.Entity<Donation>()
-                .Property(d => d.Amount)
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<DailyDonationTotals>()
-                .HasNoKey()
-                .ToView("vw_DailyDonationTotals")
-                .Property(p => p.TotalAmount)
-                .HasColumnType("decimal(18,2)")
-                .HasPrecision(18, 2);
-
-            modelBuilder.Entity<DailyExpensesTotals>()
-                .HasNoKey()
-                .ToView("vw_DailyExpensesTotals")
-                .Property(p => p.TotalAmount)
-                .HasColumnType("decimal(18,2)")
-                .HasPrecision(18, 2);
-
             // RELACIONAMENTO Donation → Donator
             modelBuilder.Entity<Donation>()
                 .HasOne(d => d.Donator)
                 .WithMany(d => d.Donations)
                 .HasForeignKey(d => d.DonatorCpf)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             // RELACIONAMENTO Donation → Donee
             modelBuilder.Entity<Donation>()
@@ -67,7 +48,22 @@ namespace AmparaCRUDApi.Data
                 .WithMany(o => o.Benefitiaries)
                 .HasForeignKey(b => b.DoneeCnpj)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
 
+            // VIEW vw_DailyDonationTotals
+            modelBuilder.Entity<DailyDonationTotals>()
+                .HasNoKey()
+                .ToView("vw_DailyDonationTotals")
+                .Property(p => p.TotalAmount)
+                .HasColumnType("decimal(18,2)")
+                .HasPrecision(18, 2);
+
+            // VIEW vw_DailyExpensesTotals
+            modelBuilder.Entity<DailyExpensesTotals>()
+                .HasNoKey()
+                .ToView("vw_DailyExpensesTotals")
+                .Property(p => p.TotalAmount)
+                .HasColumnType("decimal(18,2)")
+                .HasPrecision(18, 2);
+        }
     }
 }

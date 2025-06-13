@@ -19,11 +19,12 @@ public class Donation
     public DateTime Date { get; set; } = DateTime.UtcNow;
 
     // RELACIONAMENTOS
-    [Required]
-    public string DonatorCpf { get; set; }
-    public Donator Donator { get; set; }
+    public string? DonatorCpf { get; set; }
+    public Donator? Donator { get; set; }
 
-    [Required]
-    public string DoneeCnpj { get; set; }
+    public string? DoneeCnpj { get; set; }
     public Donee Donee { get; set; }
+
+    public string? DonatorNameSnapshot { get; set; } 
+
 }

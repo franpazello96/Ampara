@@ -12,7 +12,10 @@ interface DataItem {
   recorrencia?: string;
   descricao?: string;
   tipo: string;
+  doador?: string;
+  documento?: string;
 }
+
 
 interface BackendTransaction {
   type: string;
@@ -22,6 +25,8 @@ interface BackendTransaction {
   description?: string;
   date: string;
   timeRecurrence?: string;
+  donatorName?: string;
+  donatorCpf?: string;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -71,14 +76,16 @@ export default function Financial() {
           }
 
           return {
-            tipo: item.type,
-            valor: displayValor,
-            quantidade: displayQuantidade,
-            categoria: item.category,
-            data: formattedDate,
-            recorrencia: item.timeRecurrence?.trim() || "Não",
-            descricao: item.description || "",
-          };
+              tipo: item.type,
+              valor: displayValor,
+              quantidade: displayQuantidade,
+              categoria: item.category,
+              data: formattedDate,
+              recorrencia: item.timeRecurrence?.trim() || "Não",
+              descricao: item.description || "",
+              doador: item.donatorName || "",
+              documento: item.donatorCpf || ""
+            };
         });
 
         setData(transformedData);
@@ -154,6 +161,7 @@ export default function Financial() {
                 <th className="p-3">Categoria</th>
                 <th className="p-3">Data</th>
                 <th className="p-3">Recorrência</th>
+                <th className="p-3">Doador</th>
               </tr>
             </thead>
             <tbody>
@@ -164,10 +172,16 @@ export default function Financial() {
                     <td className="p-3">{item.categoria}</td>
                     <td className="p-3">{item.data}</td>
                     <td className="p-3">{item.recorrencia}</td>
+                    <td className="p-3">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{item.doador || "-"}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{item.documento || "-"}</span>
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={4} className="p-3 text-center">Nenhuma entrada encontrada.</td></tr>
+                <tr><td colSpan={5} className="p-3 text-center">Nenhuma entrada encontrada.</td></tr>
               )}
             </tbody>
           </table>
