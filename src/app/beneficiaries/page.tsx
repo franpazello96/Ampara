@@ -19,7 +19,7 @@ interface Beneficiary {
 }
 
 export default function Beneficiaries() {
-  const { user } = useAuth("donee"); // Supondo que o CNPJ da ONG está em user.cnpj
+  const { user } = useAuth("donee"); 
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [filtered, setFiltered] = useState<Beneficiary[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,7 +54,9 @@ const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${e
       result = result.filter(b =>
         b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         b.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        b.phoneNumber?.includes(searchTerm)
+        b.phoneNumber?.includes(searchTerm) ||
+        (b.cpf && b.cpf.includes(searchTerm)) ||
+        (b.cnpj && b.cnpj.includes(searchTerm))
       );
     }
 

@@ -70,7 +70,7 @@ namespace AmparaCRUDApi.Controllers
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 DoneeCnpj = dto.DoneeCnpj,
-                CreatedAt = dto.CreatedAt
+                CreatedAt = dto.CreatedAt == default ? DateTime.UtcNow : dto.CreatedAt
             };
 
             dbContext.Benefitiaries.Add(entity);
@@ -79,22 +79,34 @@ namespace AmparaCRUDApi.Controllers
             return Ok(entity);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateBenefitiary(int id, [FromBody] AddBenefitiaryDTO dto)
+        [HttpPut("cpf/{cpf}")]
+        public IActionResult UpdateByCpf(string cpf, [FromBody] UpdateBenefitiaryDTO dto)
         {
-            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.Id == id);
-            if (existing == null)
-                return NotFound("Beneficiário não encontrado.");
+            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.CPF == cpf);
+            if (existing == null) return NotFound("Beneficiário não encontrado.");
 
             existing.Name = dto.Name;
-            existing.CPF = string.IsNullOrWhiteSpace(dto.CPF) ? null : dto.CPF;
-            existing.CNPJ = string.IsNullOrWhiteSpace(dto.CNPJ) ? null : dto.CNPJ;
             existing.Email = dto.Email;
             existing.PhoneNumber = dto.PhoneNumber;
-            existing.DoneeCnpj = dto.DoneeCnpj;
 
             dbContext.SaveChanges();
+            return Ok(existing);
+        }
 
+        [HttpPut("cnpj")]
+        public IActionResult UpdateByCnpj([FromQuery] CnpjRequestModel model, [FromBody] UpdateBenefitiaryDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existing = dbContext.Benefitiaries.FirstOrDefault(b => b.CNPJ == model.Cnpj);
+            if (existing == null) return NotFound("Beneficiário não encontrado.");
+
+            existing.Name = dto.Name;
+            existing.Email = dto.Email;
+            existing.PhoneNumber = dto.PhoneNumber;
+
+            dbContext.SaveChanges();
             return Ok(existing);
         }
 
