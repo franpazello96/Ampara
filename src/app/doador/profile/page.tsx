@@ -1,32 +1,34 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import SidebarDoador from "@/components/SidebarDoador/page";
-import { useAuth } from "@/hooks/useAuth";
-import { toast } from "react-toastify";
+import { useState, useEffect } from 'react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import SidebarDoador from '@/components/SidebarDoador/page';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'react-toastify';
 
 export default function EditProfile() {
-  const { isAuthenticated } = useAuth("donator");
+  const { isAuthenticated, user } = useAuth('donator');
 
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    senhaAtual: "",
-    novaSenha: "",
-    confirmarSenha: ""
+    nome: '',
+    email: '',
+    telefone: '',
+    senhaAtual: '',
+    novaSenha: '',
+    confirmarSenha: ''
   });
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      const cpf = localStorage.getItem("cpf");
+  const [senhaValida, setSenhaValida] = useState(true);
+  const [senhasCoincidem, setSenhasCoincidem] = useState(true);
 
+  useEffect(() => {
+    const cpf = user?.cpf;
+    if (isAuthenticated && cpf) {
       async function fetchProfile() {
         try {
           const response = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`);
-          if (!response.ok) throw new Error("Erro ao buscar perfil.");
+          if (!response.ok) throw new Error('Erro ao buscar perfil.');
 
           const data = await response.json();
           setFormData(prev => ({
@@ -36,7 +38,7 @@ export default function EditProfile() {
             telefone: data.phoneNumber
           }));
         } catch (err) {
-          toast.error("Erro ao carregar perfil.");
+          toast.error('Erro ao carregar perfil.');
         } finally {
           setLoading(false);
         }
@@ -44,25 +46,38 @@ export default function EditProfile() {
 
       fetchProfile();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
+
+  const validateSenha = (senha: string) => {
+    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{5,}$/;
+    return regex.test(senha);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.senhaAtual) {
-      toast.warn("A senha atual é obrigatória.");
+    const cpf = user?.cpf;
+    if (!cpf) {
+      toast.error('CPF do usuário não encontrado.');
       return;
     }
 
-    if (formData.novaSenha && formData.novaSenha !== formData.confirmarSenha) {
-      toast.warn("A nova senha e a confirmação não coincidem.");
+    if (!formData.senhaAtual) {
+      toast.warn('A senha atual é obrigatória.');
       return;
+    }
+
+    if (formData.novaSenha) {
+      const valida = validateSenha(formData.novaSenha);
+      setSenhaValida(valida);
+      const coincidem = formData.novaSenha === formData.confirmarSenha;
+      setSenhasCoincidem(coincidem);
+
+      if (!valida || !coincidem) return;
     }
 
     setLoading(true);
     try {
-      const cpf = localStorage.getItem("cpf");
-
       const payload = {
         name: formData.nome,
         email: formData.email,
@@ -73,9 +88,9 @@ export default function EditProfile() {
       };
 
       const response = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
@@ -85,8 +100,8 @@ export default function EditProfile() {
         throw new Error(msg);
       }
 
-      toast.success("Perfil atualizado com sucesso!");
-      setFormData({ ...formData, senhaAtual: "", novaSenha: "", confirmarSenha: "" });
+      toast.success('Perfil atualizado com sucesso!');
+      setFormData({ ...formData, senhaAtual: '', novaSenha: '', confirmarSenha: '' });
     } catch (err: any) {
       toast.error(`Erro: ${err.message}`);
     } finally {
@@ -95,6 +110,9 @@ export default function EditProfile() {
   };
 
   if (!isAuthenticated) return null;
+
+  const inputBase =
+    'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100';
 
   return (
     <div className="min-h-screen flex bg-white dark:bg-zinc-900">
@@ -118,83 +136,49 @@ export default function EditProfile() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Nome */}
-              <div className="space-y-2">
-                <label htmlFor="nome" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Nome
-                </label>
-                <input
-                  id="nome"
-                  type="text"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                />
-              </div>
+              {['nome', 'email', 'telefone'].map(campo => (
+                <div className="space-y-2" key={campo}>
+                  <label htmlFor={campo} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {campo.charAt(0).toUpperCase() + campo.slice(1)}
+                  </label>
+                  <input
+                    id={campo}
+                    type={campo === 'email' ? 'email' : 'text'}
+                    required
+                    className={`${inputBase} border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500`}
+                    value={(formData as any)[campo]}
+                    onChange={(e) => setFormData({ ...formData, [campo]: e.target.value })}
+                  />
+                </div>
+              ))}
 
-              {/* Email */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-
-              {/* Telefone */}
-              <div className="space-y-2">
-                <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Telefone
-                </label>
-                <input
-                  id="telefone"
-                  type="tel"
-                  required
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500"
-                  value={formData.telefone}
-                  onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
-                />
-              </div>
-
-              {/* Senha atual */}
               <div className="space-y-2">
                 <label htmlFor="senhaAtual" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Senha atual
+                  Senha atual <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="senhaAtual"
                   type="password"
                   required
-                  className="w-full px-4 py-2.5 rounded-lg border border-red-300 dark:border-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-400"
+                  className={`${inputBase} border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500`}
                   value={formData.senhaAtual}
                   onChange={(e) => setFormData({ ...formData, senhaAtual: e.target.value })}
-                  placeholder="Digite sua senha atual para confirmar"
                 />
               </div>
 
-              {/* Nova senha */}
               <div className="space-y-2">
                 <label htmlFor="novaSenha" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Nova senha (opcional)
+                  Nova senha
                 </label>
                 <input
                   id="novaSenha"
                   type="password"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
+                  className={`${inputBase} ${senhaValida ? 'border-gray-300 dark:border-gray-600' : 'border-red-500'}`}
                   value={formData.novaSenha}
                   onChange={(e) => setFormData({ ...formData, novaSenha: e.target.value })}
-                  placeholder="Digite a nova senha (opcional)"
                 />
               </div>
 
-              {/* Confirmar senha */}
               <div className="space-y-2">
                 <label htmlFor="confirmarSenha" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Confirmar nova senha
@@ -202,11 +186,13 @@ export default function EditProfile() {
                 <input
                   id="confirmarSenha"
                   type="password"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
+                  className={`${inputBase} ${senhasCoincidem ? 'border-gray-300 dark:border-gray-600' : 'border-red-500'}`}
                   value={formData.confirmarSenha}
                   onChange={(e) => setFormData({ ...formData, confirmarSenha: e.target.value })}
-                  placeholder="Confirme a nova senha"
                 />
+                {!senhasCoincidem && (
+                  <p className="text-sm text-red-500">As senhas não coincidem</p>
+                )}
               </div>
 
               <div className="flex justify-end space-x-4">
@@ -223,7 +209,7 @@ export default function EditProfile() {
                   disabled={loading}
                   className="px-6 py-2.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
                 >
-                  {loading ? "Salvando..." : "Salvar"}
+                  {loading ? 'Salvando...' : 'Salvar'}
                 </button>
               </div>
             </form>
