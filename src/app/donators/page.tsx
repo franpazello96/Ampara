@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Sidebar from "@/components/Sidebar/page";
@@ -26,115 +26,44 @@ export default function Donators() {
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
-  const mockDonators: Donator[] = [
-    {
-      id: 1,
-      name: "Maria Silva",
-      email: "maria.silva@email.com",
-      phone: "(41) 99999-1111",
-      cpf: "123.456.789-00",
-      password: "******",
-      donationType: "Mensal",
-      createdAt: "2025-03-15T10:30:00",
-      monthlyDonation: 100.00,
-      status: 'ativo'
-    },
-    {
-      id: 2,
-      name: "João Santos",
-      email: "joao.santos@email.com",
-      phone: "(41) 99999-2222",
-      cpf: "987.654.321-00",
-      password: "******",
-      donationType: "Anual",
-      createdAt: "2025-04-16T14:20:00",
-      monthlyDonation: 50.00,
-      status: 'ativo'
-    },
-    {
-      id: 3,
-      name: "Ana Oliveira",
-      email: "ana.oliveira@email.com",
-      phone: "(41) 99999-3333",
-      cpf: "456.789.123-00",
-      password: "******",
-      donationType: "Semestral",
-      createdAt: "2025-02-17T09:15:00",
-      monthlyDonation: 200.00,
-      status: 'inativo'
-    },
-    {
-      id: 4,
-      name: "Carlos Ferreira",
-      email: "carlos.ferreira@email.com",
-      phone: "(41) 99999-4444",
-      cpf: "789.123.456-00",
-      password: "******",
-      donationType: "Bimestral",
-      createdAt: "2025-05-18T16:45:00",
-      monthlyDonation: 75.00,
-      status: 'ativo'
-    },
-    {
-      id: 5,
-      name: "Paula Costa",
-      email: "paula.costa@email.com",
-      phone: "(41) 99999-5555",
-      cpf: "321.654.987-00",
-      password: "******",
-      donationType: "Trimestral",
-      createdAt: "2025-01-19T11:00:00",
-      monthlyDonation: 150.00,
-      status: 'inativo'
-    }
-  ];
+  const router = useRouter();
 
   useEffect(() => {
-    // Comentado temporariamente para usar dados mockados
-    /*const fetchDonators = async () => {
+    const fetchDonators = async () => {
       try {
-        const response = await fetch('http://localhost:5264/api/Donator');
+        const response = await fetch('https://localhost:5001/api/Donator');
         const data = await response.json();
         setDonators(data);
+        setFilteredDonators(data);
       } catch (error) {
         console.error('Erro ao buscar doadores:', error);
       } finally {
         setLoading(false);
       }
-    };*/
-
-    const fetchMockData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simula delay de rede
-      setDonators(mockDonators);
-      setFilteredDonators(mockDonators);
-      setLoading(false);
     };
 
-    fetchMockData();
+    fetchDonators();
   }, []);
 
   useEffect(() => {
     const filterDonators = () => {
       let filtered = [...donators];
 
-      // Filtra por termo de busca
       if (searchTerm) {
-        filtered = filtered.filter(donator =>
-          donator.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          donator.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          donator.phone.includes(searchTerm)
+        filtered = filtered.filter(d =>
+          d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          d.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          d.phone.includes(searchTerm)
         );
       }
 
-      // Filtra por data
       if (startDate && endDate) {
-        filtered = filtered.filter(donator => {
-          const donatorDate = new Date(donator.createdAt);
-          const start = new Date(startDate);
-          const end = new Date(endDate);
-          end.setHours(23, 59, 59); // Inclui todo o último dia
-          return donatorDate >= start && donatorDate <= end;
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59);
+        filtered = filtered.filter(d => {
+          const created = new Date(d.createdAt);
+          return created >= start && created <= end;
         });
       }
 
@@ -151,21 +80,15 @@ export default function Donators() {
     }).format(value);
   };
 
-  const router = useRouter();
-
   const handleEdit = (id: number) => {
     router.push(`/donators/edit/${id}`);
   };
 
   const handleDelete = (id: number) => {
     if (window.confirm('Tem certeza que deseja excluir este doador?')) {
-      // Implementar exclusão do doador
-      console.log('Excluir doador:', id);
-      
-      // Mock da exclusão
-      const updatedDonators = donators.filter(donator => donator.id !== id);
-      setDonators(updatedDonators);
-      setFilteredDonators(updatedDonators);
+      const updated = donators.filter(d => d.id !== id);
+      setDonators(updated);
+      setFilteredDonators(updated);
     }
   };
 
@@ -184,38 +107,35 @@ export default function Donators() {
           <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Buscar
                 </label>
                 <input
-                  id="search"
                   type="text"
                   placeholder="Buscar por nome, email ou telefone..."
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Data Inicial
                 </label>
                 <input
-                  id="start-date"
                   type="date"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Data Final
                 </label>
                 <input
-                  id="end-date"
                   type="date"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -225,8 +145,7 @@ export default function Donators() {
 
           <button
             onClick={() => router.push('/signupDoador')}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors mb-6"
-            aria-label="Adicionar novo doador"
+            className="inline-flex items-center px-4 py-2 mb-6 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
           >
             Adicionar Doador
           </button>
@@ -235,87 +154,51 @@ export default function Donators() {
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
             </div>
+          ) : filteredDonators.length === 0 ? (
+            <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+              Nenhum doador encontrado.
+            </div>
           ) : (
             <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-zinc-700">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Nome
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        CPF
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
-                        Contato
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Tipo de Doação
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Valor Mensal
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">
-                        Data de Início
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Ações
-                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium">Nome</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium">CPF</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium hidden md:table-cell">Contato</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium">Tipo de Doação</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium">Valor Mensal</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium hidden lg:table-cell">Data de Início</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {filteredDonators.map((donator) => (
-                      <tr key={donator.id} className="hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                          {donator.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                          {donator.cpf}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 hidden md:table-cell">
-                          {donator.phone}
-                          <br />
-                          {donator.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                          {donator.donationType}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                          {formatCurrency(donator.monthlyDonation)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 hidden lg:table-cell">
-                          {new Date(donator.createdAt).toLocaleDateString('pt-BR')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            donator.status === 'ativo' 
-                              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {filteredDonators.map((d) => (
+                      <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-zinc-700">
+                        <td className="px-6 py-4 text-sm">{d.name}</td>
+                        <td className="px-6 py-4 text-sm">{d.cpf}</td>
+                        <td className="px-6 py-4 text-sm hidden md:table-cell">{d.phone}<br />{d.email}</td>
+                        <td className="px-6 py-4 text-sm">{d.donationType}</td>
+                        <td className="px-6 py-4 text-sm">{formatCurrency(d.monthlyDonation)}</td>
+                        <td className="px-6 py-4 text-sm hidden lg:table-cell">{new Date(d.createdAt).toLocaleDateString('pt-BR')}</td>
+                        <td className="px-6 py-4 text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            d.status === 'ativo'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100'
                               : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
                           }`}>
-                            {donator.status.charAt(0).toUpperCase() + donator.status.slice(1)}
+                            {d.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={() => handleEdit(donator.id)}
-                              className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
-                              title="Editar doador"
-                              aria-label="Editar doador"
-                            >
-                              <FaEdit className="w-5 h-5" aria-hidden="true" />
+                        <td className="px-6 py-4 text-sm">
+                          <div className="flex space-x-2">
+                            <button onClick={() => handleEdit(d.id)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">
+                              <FaEdit className="w-5 h-5" />
                             </button>
-                            <button
-                              onClick={() => handleDelete(donator.id)}
-                              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                              title="Excluir doador"
-                              aria-label="Excluir doador"
-                            >
-                              <FaTrash className="w-5 h-5" aria-hidden="true" />
+                            <button onClick={() => handleDelete(d.id)} className="text-red-600 hover:text-red-900 dark:text-red-400">
+                              <FaTrash className="w-5 h-5" />
                             </button>
                           </div>
                         </td>

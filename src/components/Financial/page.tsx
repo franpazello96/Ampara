@@ -14,8 +14,8 @@ interface DataItem {
   tipo: string;
   doador?: string;
   documento?: string;
+  beneficiario?: string;
 }
-
 
 interface BackendTransaction {
   type: string;
@@ -27,6 +27,7 @@ interface BackendTransaction {
   timeRecurrence?: string;
   donatorName?: string;
   donatorCpf?: string;
+  beneficiaryName?: string;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -65,10 +66,9 @@ export default function Financial() {
           }
 
           const isAlimento = item.category.toLowerCase().includes("alimento");
-
           const displayQuantidade = item.quantity !== null ? `${item.quantity} ${isAlimento ? 'kg' : 'unid'}` : "";
-
           let displayValor = "";
+
           if (isAlimento && item.quantity !== null && item.amount === null) {
             displayValor = `${item.quantity} kg`;
           } else if (item.amount !== null) {
@@ -76,22 +76,22 @@ export default function Financial() {
           }
 
           return {
-              tipo: item.type,
-              valor: displayValor,
-              quantidade: displayQuantidade,
-              categoria: item.category,
-              data: formattedDate,
-              recorrencia: item.timeRecurrence?.trim() || "Não",
-              descricao: item.description || "",
-              doador: item.donatorName || "",
-              documento: item.donatorCpf || ""
-            };
+            tipo: item.type,
+            valor: displayValor,
+            quantidade: displayQuantidade,
+            categoria: item.category,
+            data: formattedDate,
+            recorrencia: item.timeRecurrence?.trim() || "Não",
+            descricao: item.description || "",
+            doador: item.donatorName || "",
+            documento: item.donatorCpf || "",
+            beneficiario: item.beneficiaryName || ""
+          };
         });
 
         setData(transformedData);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Erro desconhecido.");
-        console.error("Erro ao buscar transações:", e);
       } finally {
         setLoading(false);
       }
@@ -104,7 +104,7 @@ export default function Financial() {
     return data
       .filter(item => item.tipo === tipo)
       .filter(item => {
-        const fields = [item.categoria, item.valor, item.quantidade, item.recorrencia || '', item.descricao || ''];
+        const fields = [item.categoria, item.valor, item.quantidade, item.recorrencia || '', item.descricao || '', item.beneficiario || ''];
         const matchesSearch = fields.some(field => field.toLowerCase().includes(search.toLowerCase()));
 
         const itemDateParts = item.data.split("/");
@@ -141,7 +141,6 @@ export default function Financial() {
     <div className="flex flex-col md:flex-row w-full mt-5 overflow-x-hidden">
       <Sidebar />
       <div className="flex-1 md:ml-64 p-4 space-y-10">
-        {/* Filtros */}
         <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center mb-6 gap-2">
           <input
             type="text"
@@ -167,7 +166,6 @@ export default function Financial() {
           </div>
         </div>
 
-        {/* Entradas */}
         <div>
           <h2 className="text-lg font-semibold mb-2">Entradas</h2>
           <div className="overflow-x-auto">
@@ -205,7 +203,6 @@ export default function Financial() {
           </div>
         </div>
 
-        {/* Saídas */}
         <div>
           <h2 className="text-lg font-semibold mb-2">Saídas</h2>
           <div className="overflow-x-auto">
@@ -217,6 +214,7 @@ export default function Financial() {
                   <th className="p-3">Categoria</th>
                   <th className="p-3">Data</th>
                   <th className="p-3">Descrição</th>
+                  <th className="p-3">Beneficiário</th>
                 </tr>
               </thead>
               <tbody>
@@ -228,10 +226,11 @@ export default function Financial() {
                       <td className="p-3">{item.categoria}</td>
                       <td className="p-3">{item.data}</td>
                       <td className="p-3">{item.descricao}</td>
+                      <td className="p-3">{item.beneficiario || "-"}</td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={5} className="p-3 text-center">Nenhuma saída encontrada.</td></tr>
+                  <tr><td colSpan={6} className="p-3 text-center">Nenhuma saída encontrada.</td></tr>
                 )}
               </tbody>
             </table>

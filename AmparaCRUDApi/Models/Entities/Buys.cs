@@ -29,8 +29,10 @@ public class Buys
     [Required]
     public int Quantity { get; set; }
 
-    // RELACIONAMENTO
     [Required]
     public string DoneeCnpj { get; set; }
     public Donee Donee { get; set; }
+
+    public int? BenefitiaryId { get; set; }
+    public Benefitiary? Benefitiary { get; set; }
 }

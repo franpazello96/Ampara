@@ -28,5 +28,7 @@ namespace AmparaCRUDApi.Models
 
         [Required]
         public string DoneeCnpj { get; set; }
+
+        public int? BenefitiaryId { get; set; }
     }
 }

@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AmparaCRUDApi.Migrations
 {
-    /// <inheritdoc />
     public partial class InitialCleanMigration : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -80,7 +78,8 @@ namespace AmparaCRUDApi.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BenefitiaryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,6 +90,12 @@ namespace AmparaCRUDApi.Migrations
                         principalTable: "Donees",
                         principalColumn: "CNPJ",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Buys_Benefitiaries_BenefitiaryId",
+                        column: x => x.BenefitiaryId,
+                        principalTable: "Benefitiaries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -128,7 +133,6 @@ namespace AmparaCRUDApi.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-
             migrationBuilder.CreateIndex(
                 name: "IX_Benefitiaries_DoneeCnpj",
                 table: "Benefitiaries",
@@ -138,6 +142,11 @@ namespace AmparaCRUDApi.Migrations
                 name: "IX_Buys_DoneeCnpj",
                 table: "Buys",
                 column: "DoneeCnpj");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Buys_BenefitiaryId",
+                table: "Buys",
+                column: "BenefitiaryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Donations_DonatorCpf",
@@ -171,7 +180,6 @@ namespace AmparaCRUDApi.Migrations
             ");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(name: "Benefitiaries");

@@ -39,11 +39,13 @@ namespace AmparaCRUDApi.Controllers
                     Description = d.Description,
                     TimeRecurrence = d.TimeRecurrence,
                     Date = d.Date,
-                    DonatorCpf = d.DonatorCpfSnapshot ?? d.DonatorCpf ?? "", // usa o snapshot se disponível
-                    DonatorName = d.DonatorNameSnapshot ?? donator.Name ?? "Anônimo"
+                    DonatorCpf = d.DonatorCpfSnapshot ?? d.DonatorCpf ?? "",
+                    DonatorName = d.DonatorNameSnapshot ?? donator.Name ?? "Anônimo",
+                    BeneficiaryName = null
                 }).ToListAsync();
 
             var buys = await dbContext.Buys
+                .Include(b => b.Benefitiary)
                 .Where(b => b.DoneeCnpj == doneeCnpj)
                 .Select(b => new TransactionDTO
                 {
@@ -53,7 +55,10 @@ namespace AmparaCRUDApi.Controllers
                     Amount = b.Price,
                     Description = b.Description,
                     TimeRecurrence = null,
-                    Date = b.Date
+                    Date = b.Date,
+                    DonatorName = null,
+                    DonatorCpf = null,
+                    BeneficiaryName = b.Benefitiary != null ? b.Benefitiary.Name : null
                 })
                 .ToListAsync();
 

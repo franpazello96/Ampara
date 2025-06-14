@@ -19,12 +19,14 @@ const donationSchema = z.object({
   storeName: z.string().min(2),
   storeCnpj: z.string().regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/),
   price: z.coerce.number().min(0.01),
+  beneficiaryId: z.union([z.string(), z.number()]).optional(),
 });
 
 type DonationFormData = z.infer<typeof donationSchema>;
 
-export default function DonationPage() {
+export default function BuysPage() {
   const [doneeCnpj, setDoneeCnpj] = useState<string | null>(null);
+  const [beneficiaries, setBeneficiaries] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
     const storedCnpj = localStorage.getItem("cnpj");
@@ -34,6 +36,20 @@ export default function DonationPage() {
       toast.error("CNPJ da instituição não encontrado.");
     }
   }, []);
+
+  useEffect(() => {
+    const fetchBeneficiaries = async () => {
+      if (!doneeCnpj) return;
+      try {
+        const res = await axios.get(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${doneeCnpj}`);
+        setBeneficiaries(res.data);
+      } catch {
+        toast.error("Erro ao carregar beneficiários.");
+      }
+    };
+
+    fetchBeneficiaries();
+  }, [doneeCnpj]);
 
   const {
     register,
@@ -48,15 +64,11 @@ export default function DonationPage() {
   const watchedDonationType = watch("donationType");
 
   async function onSubmit(data: DonationFormData) {
-    if (!doneeCnpj) {
-      toast.error("CNPJ da instituição não encontrado.");
-      return;
-    }
+    if (!doneeCnpj) return toast.error("CNPJ da instituição não encontrado.");
 
     try {
       const cleanStoreCnpj = data.storeCnpj.replace(/\D/g, "");
-
-      const buyPayload = {
+      const payload = {
         date: new Date().toISOString(),
         type: data.donationType,
         storeName: data.storeName,
@@ -65,44 +77,24 @@ export default function DonationPage() {
         description: data.description,
         quantity: data.quantity,
         doneeCnpj: doneeCnpj,
+        benefitiaryId: data.beneficiaryId ? Number(data.beneficiaryId) : null,
       };
 
       const token = localStorage.getItem("token");
 
-      const response = await axios.post(
-        "https://localhost:5001/api/buys/addbuy",
-        buyPayload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      const response = await axios.post("https://localhost:5001/api/buys/addbuy", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Compra registrada com sucesso!");
         reset();
       }
     } catch (error: any) {
-      let errorMessage = "Erro desconhecido";
-      if (error.response?.data) {
-        if (typeof error.response.data === "object" && error.response.data.errors) {
-          const validationErrors = error.response.data.errors;
-          const errorMessages = Object.values(validationErrors).flat();
-          errorMessage = errorMessages.join(" ");
-        } else if (typeof error.response.data === "string") {
-          errorMessage = error.response.data;
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        }
-      } else if (error.request) {
-        errorMessage = "Não foi possível conectar à API.";
-      } else {
-        errorMessage = error.message;
-      }
-
-      toast.error("Falha ao registrar a compra: " + errorMessage);
+      toast.error("Erro ao registrar a compra.");
     }
   }
 
@@ -124,15 +116,9 @@ export default function DonationPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div>
-              <label htmlFor="donationType" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                Tipo de Doação
-              </label>
-              <select
-                id="donationType"
-                {...register("donationType")}
-                className="w-full p-2 border rounded-md mt-1 bg-transparent dark:border-gray-700"
-              >
-                <option value="">Selecione uma opção</option>
+              <label htmlFor="donationType">Tipo de Doação</label>
+              <select {...register("donationType")} className="w-full p-2 border rounded bg-transparent dark:border-gray-700">
+                <option value="">Selecione</option>
                 <option value="Alimentos">Alimentos</option>
                 <option value="Vestuário">Vestuário</option>
                 <option value="Móveis">Móveis</option>
@@ -143,74 +129,26 @@ export default function DonationPage() {
 
             {watchedDonationType && (
               <>
-                <div>
-                  <label htmlFor="quantity" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    Quantidade
-                  </label>
-                  <input
-                    id="quantity"
-                    type="number"
-                    {...register("quantity")}
-                    className="w-full p-2 border rounded-md mt-1 bg-transparent dark:border-gray-700"
-                  />
-                  {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity.message}</p>}
-                </div>
+                <input {...register("quantity")} placeholder="Quantidade" className="p-2 border rounded" />
+                <textarea {...register("description")} placeholder="Descrição" className="p-2 border rounded" />
+                <input {...register("storeName")} placeholder="Nome da Loja" className="p-2 border rounded" />
+                <input {...register("storeCnpj")} placeholder="CNPJ da Loja" className="p-2 border rounded" />
+                <input {...register("price")} type="number" step="0.01" placeholder="Preço Total" className="p-2 border rounded" />
 
-                <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    Descrição
-                  </label>
-                  <textarea
-                    id="description"
-                    {...register("description")}
-                    className="w-full p-2 border rounded-md mt-1 bg-transparent dark:border-gray-700"
-                  />
-                  {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="storeName" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    Nome da Loja
-                  </label>
-                  <input
-                    id="storeName"
-                    type="text"
-                    {...register("storeName")}
-                    className="w-full p-2 border rounded-md mt-1 bg-transparent dark:border-gray-700"
-                  />
-                  {errors.storeName && <p className="text-red-500 text-sm">{errors.storeName.message}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="storeCnpj" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    CNPJ da Loja
-                  </label>
-                  <input
-                    id="storeCnpj"
-                    type="text"
-                    {...register("storeCnpj")}
-                    className="w-full p-2 border rounded-md mt-1 bg-transparent dark:border-gray-700"
-                  />
-                  {errors.storeCnpj && <p className="text-red-500 text-sm">{errors.storeCnpj.message}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    Preço Total
-                  </label>
-                  <input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    {...register("price")}
-                    className="w-full p-2 border rounded-md mt-1 bg-transparent dark:border-gray-700"
-                  />
-                  {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
-                </div>
+                {beneficiaries.length > 0 && (
+                  <select {...register("beneficiaryId")} className="p-2 border rounded bg-transparent dark:border-gray-700">
+                    <option value="">Selecione um beneficiário</option>
+                    {beneficiaries.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </>
             )}
 
-            <div className="mt-6">
+            <div className="mt-4">
               <Button type="submit">Confirmar Doação</Button>
             </div>
           </form>
