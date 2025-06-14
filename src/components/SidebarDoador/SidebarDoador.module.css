@@ -1,107 +1,135 @@
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    width: 256px;
-    height: 100vh;
-    background-color: white;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 220px;
+  height: 100vh;
+  background-color: white;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  border-radius: 0;
+  font-size: 0.9rem;
+}
 
-  @media (prefers-color-scheme: dark) {
-    .sidebar {
-      background-color: #18181b;
-      border-right-color: #27272a;
-    }
+@media (prefers-color-scheme: dark) {
+  .sidebar {
+    background-color: #18181b;
+    border-right-color: #27272a;
   }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-    width: 100%;
-  }
-  
-  .sidebar li {
-    margin: 4px 0;
-    width: 100%;
-  }
-  
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.sidebar li {
+  margin: 10px 0;
+  width: 100%;
+}
+
+.sidebar a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+
+.sidebar a svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.sidebar a:hover {
+  background-color: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
   .sidebar a {
-    text-decoration: none;
-    color: #4b5563;
-    transition: all 0.2s;
-    width: 100%;
-    display: flex;
-    align-items: center;
+    color: #e5e7eb;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .sidebar a {
-      color: #e5e7eb;
-    }
+  .sidebar a:hover {
+    background-color: #27272a;
   }
-  
+}
+
+.sidebar a.active {
+  color: #7c3aed;
+  background-color: #f5f3ff;
+}
+
+@media (prefers-color-scheme: dark) {
   .sidebar a.active {
-    color: #7c3aed;
-    background-color: #f5f3ff;
+    color: #a78bfa;
+    background-color: #27272a;
+  }
+}
+
+/* MOBILE STYLE */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 85vw;
+    max-width: 360px;
+    transform: translateX(-100%);
+    border-top-right-radius: 1.5rem;
+    border-bottom-right-radius: 1.5rem;
+    padding: 20px;
+    font-size: 1.1rem;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .sidebar a.active {
-      color: #a78bfa;
-      background-color: #27272a;
-    }
+  .sidebar.open {
+    transform: translateX(0%);
   }
-  
-  .app-container {
-    display: flex;
+
+  .sidebar a {
+    font-size: 1.2rem;
+    padding: 14px 18px;
   }
-  
-  .main-content {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: #ECF0F1;
+
+  .sidebar a svg {
+    width: 24px;
+    height: 24px;
+    margin-right: 14px;
   }
-  
-  @media (max-width: 768px) {
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -240px;
-      width: 240px;
-      height: 100vh;
-      background-color: #2C3E50;
-      transition: left 0.3s ease;
-      z-index: 1000;
-    }
-  
-    .sidebar.open {
-      left: 0;
-    }
-  
-    .sidebar ul {
-      padding: 20px;
-    }
-  
-    .sidebar li {
-      margin: 10px 0;
-    }
-  
-    .toggle-button {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background-color: #2C3E50;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 1100;
-    }
+
+  .toggle-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #2C3E50;
+    color: white;
+    border: none;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    z-index: 1100;
   }
+}
+
+/* DESKTOP CONFIG */
+@media (min-width: 769px) {
+  .toggle-button {
+    display: none;
+  }
+
+  .sidebar {
+    transform: translateX(0%) !important;
+    border-radius: 0;
+  }
+}

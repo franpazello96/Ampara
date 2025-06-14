@@ -47,7 +47,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <div className="flex-1 ml-64 p-6 space-y-6">
+        <div className="flex-1 p-4 space-y-6 md:ml-64">
         <Dashboard />
       </div>
     </div>

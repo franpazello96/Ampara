@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { ArrowDownCircle, ArrowUpCircle, CircleDollarSignIcon } from "lucide-react";
-import Sidebar from "@/components/Sidebar/page";
 
 interface BackendTransaction {
   type: string;
@@ -57,32 +56,32 @@ export function Summary() {
     });
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4 w-4xl h-28 justify-between items-center flex-1">
-        <div className="bg-green-950 p-4 rounded-lg text-white flex-1">
-          <header className="flex justify-between items-center">
-            <span>Entradas</span>
-            <ArrowUpCircle className="text-green-500" size={32} />
-          </header>
-          <strong className="block mt-2 text-xl">{formatCurrency(entries)}</strong>
-        </div>
+    <div className="mt-4 w-full ml-0 md:ml-64 px-4 flex flex-wrap gap-4">
+      {/* Entradas */}
+      <div className="bg-green-950 p-4 rounded-lg text-white w-full sm:w-[300px] md:w-[360px] lg:w-[400px]">
+        <header className="flex justify-between items-center">
+          <span className="text-sm">Entradas</span>
+          <ArrowUpCircle className="text-green-500" size={28} />
+        </header>
+        <strong className="block mt-1 text-lg">{formatCurrency(entries)}</strong>
+      </div>
 
-        <div className="bg-red-950 p-4 rounded-lg text-white flex-1">
-          <header className="flex justify-between items-center">
-            <span>Saídas</span>
-            <ArrowDownCircle className="text-red-500" size={32} />
-          </header>
-          <strong className="block mt-2 text-xl">{formatCurrency(exits)}</strong>
-        </div>
+      {/* Saídas */}
+      <div className="bg-red-950 p-4 rounded-lg text-white w-full sm:w-[300px] md:w-[360px] lg:w-[400px]">
+        <header className="flex justify-between items-center">
+          <span className="text-sm">Saídas</span>
+          <ArrowDownCircle className="text-red-500" size={28} />
+        </header>
+        <strong className="block mt-1 text-lg">{formatCurrency(exits)}</strong>
+      </div>
 
-        <div className="bg-blue-950 p-4 rounded-lg text-white flex-1">
-          <header className="flex justify-between items-center">
-            <span>Total</span>
-            <CircleDollarSignIcon className="text-white" size={32} />
-          </header>
-          <strong className="block mt-2 text-xl">{formatCurrency(entries - exits)}</strong>
-        </div>
+      {/* Total */}
+      <div className="bg-blue-950 p-4 rounded-lg text-white w-full sm:w-[300px] md:w-[360px] lg:w-[400px]">
+        <header className="flex justify-between items-center">
+          <span className="text-sm">Total</span>
+          <CircleDollarSignIcon className="text-white" size={28} />
+        </header>
+        <strong className="block mt-1 text-lg">{formatCurrency(entries - exits)}</strong>
       </div>
     </div>
   );

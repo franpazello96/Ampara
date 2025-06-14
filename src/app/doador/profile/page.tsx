@@ -115,13 +115,13 @@ export default function EditProfile() {
     'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100';
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-zinc-900">
-      <aside className="w-64">
+    <div className="min-h-screen flex flex-col md:flex-row bg-white dark:bg-zinc-900">
+      <aside className="w-full md:w-64">
         <SidebarDoador />
       </aside>
 
-      <main className="flex-1 flex justify-center items-center p-8">
-        <div className="w-full max-w-xl rounded-xl shadow-lg bg-white dark:bg-zinc-800 p-8">
+      <main className="flex-1 flex justify-center items-center p-4 sm:p-6 md:p-10 w-full">
+        <div className="w-full max-w-xl rounded-xl shadow-lg bg-white dark:bg-zinc-800 p-6 sm:p-8">
           <div className="flex flex-col items-center mb-6">
             <ThemeToggle />
           </div>
@@ -136,7 +136,7 @@ export default function EditProfile() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              {['nome', 'email', 'telefone'].map(campo => (
+              {['nome', 'email', 'telefone'].map((campo) => (
                 <div className="space-y-2" key={campo}>
                   <label htmlFor={campo} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {campo.charAt(0).toUpperCase() + campo.slice(1)}
@@ -195,7 +195,7 @@ export default function EditProfile() {
                 )}
               </div>
 
-              <div className="flex justify-end space-x-4">
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   type="button"
                   disabled={loading}
@@ -204,6 +204,7 @@ export default function EditProfile() {
                 >
                   Cancelar
                 </button>
+
                 <button
                   type="submit"
                   disabled={loading}
@@ -211,6 +212,7 @@ export default function EditProfile() {
                 >
                   {loading ? 'Salvando...' : 'Salvar'}
                 </button>
+
                 <button
                   type="button"
                   disabled={loading}
@@ -238,7 +240,7 @@ export default function EditProfile() {
 
                                   if (!res.ok) throw new Error("Erro ao deletar conta.");
 
-                                  toast.dismiss(); // fecha o toast
+                                  toast.dismiss();
                                   toast.success("Conta excluída com sucesso!");
                                   localStorage.removeItem("token");
                                   localStorage.removeItem("cpf");
@@ -260,7 +262,7 @@ export default function EditProfile() {
                       }
                     );
                   }}
-                  className="px-6 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 ml-auto"
+                  className="px-6 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
                 >
                   Excluir Conta
                 </button>

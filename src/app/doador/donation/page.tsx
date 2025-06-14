@@ -124,101 +124,103 @@ export default function DonationPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-zinc-100 dark:bg-zinc-900">
-      <div className="w-64 bg-white dark:bg-zinc-800 p-4">
-        <SidebarDoador />
-      </div>
-      <div className="flex-1 flex flex-col items-center p-10">
-        <Image src={logo} alt="Logo" width={120} height={40} />
-        <ThemeToggle />
-        <h1 className="text-3xl font-bold mt-4 mb-6">Fazer uma Doação</h1>
+    <div className="flex flex-col md:flex-row min-h-screen bg-zinc-100 dark:bg-zinc-900">
+      <SidebarDoador />
+      <main className="flex-1 p-6 md:p-10">
+        <div className="flex flex-col items-center">
+          <Image src={logo} alt="Logo" width={120} height={40} />
+          <ThemeToggle />
+          <h1 className="text-2xl md:text-3xl font-bold mt-4 mb-6 text-center">Fazer uma Doação</h1>
 
-        <div className="w-full max-w-lg mb-6">
-          <label className="block mb-1 font-medium">Tipo de Doação</label>
-          <select
-            className="w-full p-2 rounded border"
-            value={donationType}
-            onChange={(e) => setDonationType(e.target.value)}
-          >
-            <option value="">Selecione</option>
-            <option value="Alimentos">Alimentos</option>
-            <option value="Dinheiro">Dinheiro</option>
-          </select>
-        </div>
-
-        {donationType && (
-          <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4">
+          <div className="w-full max-w-lg space-y-6">
             <div>
-              <label className="block mb-1 font-medium">Instituição</label>
+              <label className="block mb-1 font-medium">Tipo de Doação</label>
               <select
                 className="w-full p-2 rounded border"
-                value={selectedCnpj}
-                onChange={(e) => setSelectedCnpj(e.target.value)}
+                value={donationType}
+                onChange={(e) => setDonationType(e.target.value)}
               >
-                <option value="">Selecione a instituição</option>
-                {donees.map((d) => (
-                  <option key={d.cnpj} value={d.cnpj}>
-                    {d.institutionName} ({d.cnpj})
-                  </option>
-                ))}
+                <option value="">Selecione</option>
+                <option value="Alimentos">Alimentos</option>
+                <option value="Dinheiro">Dinheiro</option>
               </select>
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">
-                {donationType === "Dinheiro" ? "Valor (R$)" : "Quantidade (kg)"}
-              </label>
-              <Input
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                placeholder="Informe a quantidade"
-              />
-            </div>
+            {donationType && (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block mb-1 font-medium">Instituição</label>
+                  <select
+                    className="w-full p-2 rounded border"
+                    value={selectedCnpj}
+                    onChange={(e) => setSelectedCnpj(e.target.value)}
+                  >
+                    <option value="">Selecione a instituição</option>
+                    {donees.map((d) => (
+                      <option key={d.cnpj} value={d.cnpj}>
+                        {d.institutionName} ({d.cnpj})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Descrição</label>
-              <textarea
-                className="w-full p-2 rounded border"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: arroz, feijão, doação pontual..."
-              />
-            </div>
+                <div>
+                  <label className="block mb-1 font-medium">
+                    {donationType === "Dinheiro" ? "Valor (R$)" : "Quantidade (kg)"}
+                  </label>
+                  <Input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="Informe a quantidade"
+                  />
+                </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={recurrence}
-                onChange={(e) => setRecurrence(e.target.checked)}
-              />
-              <label className="font-medium">Doação Recorrente</label>
-            </div>
+                <div>
+                  <label className="block mb-1 font-medium">Descrição</label>
+                  <textarea
+                    className="w-full p-2 rounded border"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Ex: arroz, feijão, doação pontual..."
+                  />
+                </div>
 
-            {recurrence && (
-              <div>
-                <label className="block mb-1 font-medium">Frequência</label>
-                <select
-                  className="w-full p-2 rounded border"
-                  value={timeRecurrence}
-                  onChange={(e) => setTimeRecurrence(e.target.value)}
-                >
-                  <option value="">Selecione a frequência</option>
-                  {recurrenceOptions.map((freq) => (
-                    <option key={freq} value={freq}>
-                      {freq}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={recurrence}
+                    onChange={(e) => setRecurrence(e.target.checked)}
+                  />
+                  <label className="font-medium">Doação Recorrente</label>
+                </div>
+
+                {recurrence && (
+                  <div>
+                    <label className="block mb-1 font-medium">Frequência</label>
+                    <select
+                      className="w-full p-2 rounded border"
+                      value={timeRecurrence}
+                      onChange={(e) => setTimeRecurrence(e.target.value)}
+                    >
+                      <option value="">Selecione a frequência</option>
+                      {recurrenceOptions.map((freq) => (
+                        <option key={freq} value={freq}>
+                          {freq}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <Button type="submit" className="w-full bg-green-600 text-white py-2 rounded">
+                  Confirmar Doação
+                </Button>
+              </form>
             )}
-
-            <Button type="submit" className="w-full bg-green-600 text-white py-2 rounded">
-              Confirmar Doação
-            </Button>
-          </form>
-        )}
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
