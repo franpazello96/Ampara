@@ -79,7 +79,9 @@ namespace AmparaCRUDApi.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BenefitiaryId = table.Column<int>(type: "int", nullable: true)
+                    BenefitiaryId = table.Column<int>(type: "int", nullable: true),
+                    BenefitiaryNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BenefitiaryDocumentSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

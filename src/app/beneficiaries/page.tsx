@@ -19,7 +19,7 @@ interface Beneficiary {
 }
 
 export default function Beneficiaries() {
-  const { user } = useAuth("donee"); 
+  const { user } = useAuth("donee");
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [filtered, setFiltered] = useState<Beneficiary[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,7 +33,7 @@ export default function Beneficiaries() {
       if (!user?.cnpj) return;
       try {
         const encodedCnpj = encodeURIComponent(user.cnpj);
-const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${encodedCnpj}`);
+        const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${encodedCnpj}`);
         const data = await res.json();
         setBeneficiaries(data);
         setFiltered(data);
@@ -45,7 +45,6 @@ const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${e
     };
     fetchData();
   }, [user?.cnpj]);
-
 
   useEffect(() => {
     let result = [...beneficiaries];
@@ -80,6 +79,7 @@ const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${e
     new Date(date).toLocaleDateString("pt-BR");
 
   const getDoc = (b: Beneficiary) => b.cpf || b.cnpj || "-";
+
   const handleEdit = (b: Beneficiary) => {
     const doc = b.cpf || b.cnpj;
     if (!doc) {
@@ -89,11 +89,20 @@ const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${e
     router.push(`/beneficiaries/edit?document=${encodeURIComponent(doc)}`);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm("Deseja excluir este beneficiário?")) {
-      const updated = beneficiaries.filter(b => b.id !== id);
-      setBeneficiaries(updated);
-      setFiltered(updated);
+      try {
+        await fetch(`https://localhost:5001/api/benefitiary/${id}`, {
+          method: "DELETE"
+        });
+
+        const updated = beneficiaries.filter(b => b.id !== id);
+        setBeneficiaries(updated);
+        setFiltered(updated);
+      } catch (error) {
+        console.error("Erro ao deletar beneficiário:", error);
+        alert("Erro ao deletar beneficiário.");
+      }
     }
   };
 

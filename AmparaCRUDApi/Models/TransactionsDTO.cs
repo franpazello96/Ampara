@@ -9,5 +9,6 @@
     public string? TimeRecurrence { get; set; }
     public string? DonatorName { get; set; }
     public string? DonatorCpf { get; set; }
-    public string? BeneficiaryName { get; set; } // novo campo, opcional
+    public string? BeneficiaryName { get; set; }
+    public string? BeneficiaryDocument { get; set; }
 }

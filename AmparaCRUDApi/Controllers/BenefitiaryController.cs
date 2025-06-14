@@ -40,27 +40,18 @@ namespace AmparaCRUDApi.Controllers
         [HttpPost("signupbenefitiary")]
         public IActionResult AddBenefitiary(AddBenefitiaryDTO dto)
         {
-            // Garante que um dos dois está preenchido
             if (string.IsNullOrEmpty(dto.CPF) && string.IsNullOrEmpty(dto.CNPJ))
-            {
                 return BadRequest("Informe CPF ou CNPJ.");
-            }
 
-            // Garante que não estejam os dois preenchidos ao mesmo tempo
             if (!string.IsNullOrEmpty(dto.CPF) && !string.IsNullOrEmpty(dto.CNPJ))
-            {
                 return BadRequest("Informe apenas CPF ou apenas CNPJ, nunca os dois.");
-            }
 
-            // Verifica se já existe um registro com o mesmo CPF ou CNPJ
             bool exists = dbContext.Benefitiaries.Any(b =>
                 (!string.IsNullOrEmpty(dto.CPF) && b.CPF == dto.CPF) ||
                 (!string.IsNullOrEmpty(dto.CNPJ) && b.CNPJ == dto.CNPJ));
 
             if (exists)
-            {
                 return BadRequest("CPF ou CNPJ já cadastrado.");
-            }
 
             var entity = new Benefitiary
             {
@@ -150,7 +141,5 @@ namespace AmparaCRUDApi.Controllers
 
             return Ok(dto);
         }
-
-
     }
 }

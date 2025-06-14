@@ -1,6 +1,6 @@
 ﻿using AmparaCRUDApi.Models.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class Buys
 {
@@ -35,4 +35,7 @@ public class Buys
 
     public int? BenefitiaryId { get; set; }
     public Benefitiary? Benefitiary { get; set; }
+
+    public string? BenefitiaryNameSnapshot { get; set; }
+    public string? BenefitiaryDocumentSnapshot { get; set; }
 }

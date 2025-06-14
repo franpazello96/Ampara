@@ -24,6 +24,19 @@ namespace AmparaCRUDApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            string? nameSnapshot = null;
+            string? docSnapshot = null;
+
+            if (dto.BenefitiaryId.HasValue)
+            {
+                var benef = await dbContext.Benefitiaries.FindAsync(dto.BenefitiaryId.Value);
+                if (benef != null)
+                {
+                    nameSnapshot = benef.Name;
+                    docSnapshot = benef.CPF ?? benef.CNPJ;
+                }
+            }
+
             var buy = new Buys
             {
                 Date = dto.Date,
@@ -34,7 +47,9 @@ namespace AmparaCRUDApi.Controllers
                 Description = dto.Description,
                 Quantity = dto.Quantity,
                 DoneeCnpj = dto.DoneeCnpj,
-                BenefitiaryId = dto.BenefitiaryId
+                BenefitiaryId = dto.BenefitiaryId,
+                BenefitiaryNameSnapshot = nameSnapshot,
+                BenefitiaryDocumentSnapshot = docSnapshot
             };
 
             dbContext.Buys.Add(buy);

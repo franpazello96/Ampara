@@ -41,7 +41,8 @@ namespace AmparaCRUDApi.Controllers
                     Date = d.Date,
                     DonatorCpf = d.DonatorCpfSnapshot ?? d.DonatorCpf ?? "",
                     DonatorName = d.DonatorNameSnapshot ?? donator.Name ?? "Anônimo",
-                    BeneficiaryName = null
+                    BeneficiaryName = null,
+                    BeneficiaryDocument = null
                 }).ToListAsync();
 
             var buys = await dbContext.Buys
@@ -58,14 +59,12 @@ namespace AmparaCRUDApi.Controllers
                     Date = b.Date,
                     DonatorName = null,
                     DonatorCpf = null,
-                    BeneficiaryName = b.Benefitiary != null ? b.Benefitiary.Name : null
+                    BeneficiaryName = b.BenefitiaryNameSnapshot ?? b.Benefitiary.Name,
+                    BeneficiaryDocument = b.BenefitiaryDocumentSnapshot ?? b.Benefitiary.CPF ?? b.Benefitiary.CNPJ
                 })
                 .ToListAsync();
 
-            var all = donations
-                .Concat(buys)
-                .OrderByDescending(t => t.Date)
-                .ToList();
+            var all = donations.Concat(buys).OrderByDescending(t => t.Date).ToList();
 
             return Ok(all);
         }
