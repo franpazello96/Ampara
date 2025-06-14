@@ -6,82 +6,88 @@
 
 ## 1. Visão Geral
 
-O sistema **Ampara** tem como objetivo facilitar a arrecadação e gestão de doações financeiras e de alimentos não perecíveis para comunidades em situação de miséria e moradores de rua. A plataforma conectará doadores, ONGs e instituições beneficentes, garantindo transparência e eficiência na distribuição dos recursos.
+O sistema **Ampara** tem como objetivo facilitar a arrecadação e gestão de doações financeiras e de alimentos não perecíveis para instituições e pessoas em situação de miséria. A plataforma conectará doadores, ONGs e beneficiários, garantindo transparência e eficiência na distribuição dos recursos.
 
 ## 2. Público-alvo
 
-- ONGs e instituições de caridade
+- Instituições sem fins lucrativos
+- Beneficiários
+- Doadores
 
 ## 3. Funcionalidades
 
 ### 3.1. Usuários
-- Cadastro de doadores (Pessoa Física ou Jurídica);
+- Cadastro de doadores;
 - Cadastro de instituições;
 - Área de perfil (editar dados);
-- Histórico de doações (LOG);
-- Níveis de acesso: Administrador, ONG, Doador.
+- Histórico de doações;
+- Níveis de acesso: ONG e Doador.
 
 ### 3.2. Doações
-- Registro de doações financeiras via Pix, boleto ou cartão de crédito;
 - Cadastro e gerenciamento de doações financeiras e de alimentos;
-- Opção de doação recorrente (funcionalidade a ser discutida);
+- Opção de doação recorrente;
 - Relatórios sobre o destino das doações.
 
 ### 3.3. Transparência
 - Dashboard com gráficos e relatórios de arrecadação;
 - Relatórios financeiros;
-- Listagem de beneficiários e histórico de repasses.
+- Listagem de beneficiários.
 
 ## 4. Tecnologias Utilizadas
 
-- **Backend:** C#, .NET Core
+- **Backend:** C#, .NET Core, .ASP NET e EntityFramework
 - **Frontend:** React.js **Next.js
 - **Banco de Dados:** Microsoft SQL Server
-- **Cloud e Hospedagem:** Azure (funcionalidade a ser discutida)
 
 ## 5. Metodologias e Ferramentas de Gestão
 
-- **Metodologia Ágil:** Scrum
+- **Metodologia Ágil:** Kanban
 - **Ferramenta de Gerenciamento:** Trello (Kanban)
 - **Controle de versão:** Git/GitHub
 
 ## 6. Estrutura das Telas
 
-### 6.1. Área do Doador
-- Homepage
+### 6.1. Homepage
+- Quem somos
+- Nosso objetivo
+- Ongs Já auxiliadas
+- Onde estamos alocados
+
+### 6.2. Área do Doador
 - Tela de Cadastro/Login
 - Área de perfil do Doador
 - Tela de Doação
 - Histórico de Doações
 
-### 6.2. Área da ONG
+### 6.3. Área da ONG
 - Tela de Cadastro/Login
 - Área de perfil da ONG
-- Registro de Recebimentos
-- Listagem e relatórios
-
-### 6.3. Administração
-- Gestão de Usuários
-- Gestão de ONGs e Beneficiários
-- Monitoramento de Doações
+- Registro de eecebimentos e saídas
+- Cadastro de beneficiário
+- Edição de beneficiário
+- Dashboard de entradas, saídas e total em caixa
 
 ## 7. Conclusão
 
 O **Ampara** proporcionará um meio confiável, transparente e eficiente para conectar doadores e instituições beneficentes, garantindo que as doações cheguem a quem mais precisa. Através da tecnologia e metodologias ágeis, a plataforma será um facilitador essencial para o terceiro setor, promovendo impacto social significativo.
 
-## Instruções de instalação 
-- npm i 
-- npm run dev
-
+## Instruções de instalação Front-End
+- Executar no terminal os comandos:
+  1. npm i 
+  2. npm run dev
+  
+## Instruções de instalação Back-End
+- Instalar pacotes:
+  1. Microsoft ASP.NET MVC Core
+  2. Entity Framework Core
+  3. Entity Framework Tools
+  4. Entity Framework SqlServer
+  5. Microsoft ASP.NET Core Authentication JwtBearer (8.0.4)
+  6. System IdentityModel Tokens Jwt
+  7. BCrypt
+- Em gerenciador de pacotes NuGet, esecutar o comando:
+  1. Update-Database
 
 ## SQL Server via site
 - Microsoft SQL Server Manager
 - Microsoft SQL Server Configuration Manager
-
-##Nuget Microsoft Visual Studio
-- Microsoft ASP.NET MVC Core
-- Entity Framework Core
-- Entity Framework Tools
-- Entity Framework SqlServer
-- Microsoft ASP.NET Core Authentication JwtBearer (8.0.4)
-- System IdentityModel Tokens Jwt
