@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userType");
     toast.success("Logout realizado com sucesso!");
-    router.push("/signin");
+    router.push("/");
   };
 
   return (

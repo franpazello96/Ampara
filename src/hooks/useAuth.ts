@@ -9,6 +9,7 @@ interface TokenPayload {
   cnpj?: string;
   role: string;
   exp: number;
+  email?: string;
 }
 
 export function useAuth(requiredRole?: string) {

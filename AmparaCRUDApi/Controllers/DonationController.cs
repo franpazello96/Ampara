@@ -16,19 +16,26 @@ namespace AmparaCRUDApi.Controllers
         }
 
         [HttpPost("fooddonation")]
-        public IActionResult FoodDonation(DonationDTO DonationDTO)
+        public IActionResult FoodDonation(DonationDTO dto)
         {
-            var donationEntity = new Donation()
+            var nameSnapshot = dbContext.Donators
+                .Where(x => x.CPF == dto.DonatorCpf)
+                .Select(x => x.Name)
+                .FirstOrDefault();
+
+            var donationEntity = new Donation
             {
-                DonationType = DonationDTO.DonationType,
-                Quantity = DonationDTO.Quantity, 
-                Amount = DonationDTO.Amount,
-                Description = DonationDTO.Description,
-                Recurrence = DonationDTO.Recurrence,
-                TimeRecurrence = DonationDTO.TimeRecurrence,
-                DonatorCpf = DonationDTO.DonatorCpf,
-                DoneeCnpj = DonationDTO.DoneeCnpj,
-                Date = DonationDTO.Date
+                DonationType = dto.DonationType,
+                Quantity = dto.Quantity,
+                Amount = dto.Amount,
+                Description = dto.Description,
+                Recurrence = dto.Recurrence,
+                TimeRecurrence = dto.TimeRecurrence,
+                DonatorCpf = dto.DonatorCpf,
+                DonatorCpfSnapshot = dto.DonatorCpf,
+                DonatorNameSnapshot = nameSnapshot,
+                DoneeCnpj = dto.DoneeCnpj,
+                Date = dto.Date
             };
 
             dbContext.Donations.Add(donationEntity);
@@ -37,20 +44,26 @@ namespace AmparaCRUDApi.Controllers
         }
 
         [HttpPost("moneydonation")]
-        public IActionResult MoneyDonation(DonationDTO DonationDTO)
+        public IActionResult MoneyDonation(DonationDTO dto)
         {
-            var donationEntity = new Donation()
+            var nameSnapshot = dbContext.Donators
+                .Where(x => x.CPF == dto.DonatorCpf)
+                .Select(x => x.Name)
+                .FirstOrDefault();
+
+            var donationEntity = new Donation
             {
-                Id = DonationDTO.Id,
-                DonationType = DonationDTO.DonationType,
-                Quantity = DonationDTO.Quantity,
-                Amount = DonationDTO.Amount,
-                Description = DonationDTO.Description,
-                Recurrence = DonationDTO.Recurrence,
-                TimeRecurrence = DonationDTO.TimeRecurrence,
-                DonatorCpf = DonationDTO.DonatorCpf,
-                DoneeCnpj = DonationDTO.DoneeCnpj,
-                Date = DonationDTO.Date
+                DonationType = dto.DonationType,
+                Quantity = dto.Quantity,
+                Amount = dto.Amount,
+                Description = dto.Description,
+                Recurrence = dto.Recurrence,
+                TimeRecurrence = dto.TimeRecurrence,
+                DonatorCpf = dto.DonatorCpf,
+                DonatorCpfSnapshot = dto.DonatorCpf,
+                DonatorNameSnapshot = nameSnapshot,
+                DoneeCnpj = dto.DoneeCnpj,
+                Date = dto.Date
             };
 
             dbContext.Donations.Add(donationEntity);
@@ -62,9 +75,8 @@ namespace AmparaCRUDApi.Controllers
         public IActionResult GetByDonator(string cpf)
         {
             var donations = (from d in dbContext.Donations
-                             join i in dbContext.Donees
-                                 on d.DoneeCnpj equals i.CNPJ into di
-                             from i in di.DefaultIfEmpty() // LEFT JOIN
+                             join i in dbContext.Donees on d.DoneeCnpj equals i.CNPJ into di
+                             from i in di.DefaultIfEmpty()
                              where d.DonatorCpf == cpf
                              orderby d.Date descending
                              select new DonationWithInstitutionDTO
@@ -89,7 +101,6 @@ namespace AmparaCRUDApi.Controllers
         public IActionResult UpdateRecurringDonation(int id, [FromBody] DonationDTO dto)
         {
             var donation = dbContext.Donations.FirstOrDefault(d => d.Id == id);
-
             if (donation == null)
                 return NotFound("Doação não encontrada.");
 
@@ -100,8 +111,6 @@ namespace AmparaCRUDApi.Controllers
             donation.Quantity = dto.Quantity;
             donation.Recurrence = dto.Recurrence;
             donation.TimeRecurrence = dto.Recurrence ? dto.TimeRecurrence : null;
-
-            // Atualize o restante também, mesmo que não mude
             donation.DonationType = dto.DonationType;
             donation.Description = dto.Description;
             donation.Date = dto.Date;
@@ -109,9 +118,7 @@ namespace AmparaCRUDApi.Controllers
             donation.DoneeCnpj = dto.DoneeCnpj;
 
             dbContext.SaveChanges();
-
             return Ok(donation);
         }
-
     }
 }

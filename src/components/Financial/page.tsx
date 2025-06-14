@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar/page";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DataItem {
   valor: string;

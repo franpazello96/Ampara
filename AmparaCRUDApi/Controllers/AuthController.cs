@@ -40,24 +40,14 @@ namespace AmparaCRUDApi.Controllers
             var donator = _context.Donators.FirstOrDefault(u => u.Email.ToLower() == email);
             if (donator != null)
             {
-                Console.WriteLine($"[Login] Donator encontrado: {donator.Email}");
-                Console.WriteLine($"[Login] Senha hash no banco: {donator.Password}");
-                Console.WriteLine($"[Login] Senha recebida: {request.Password}");
-
                 var senhaCorreta = BCrypt.Net.BCrypt.Verify(request.Password, donator.Password);
-                Console.WriteLine($"[Login] Senha confere? {senhaCorreta}");
 
                 if (senhaCorreta)
                 {
                     var token = GenerateJwtTokenForDonator(donator);
                     return Ok(new { token, userType = "donator" });
                 }
-                else
-                {
-                    Console.WriteLine("[Login] Senha inválida para donator.");
-                }
             }
-
 
             var donee = _context.Donees.FirstOrDefault(u => u.Email.ToLower() == email);
             if (donee != null && BCrypt.Net.BCrypt.Verify(request.Password, donee.Password))
@@ -69,12 +59,12 @@ namespace AmparaCRUDApi.Controllers
             return Unauthorized(new { message = "Credenciais inválidas." });
         }
 
-
         private string GenerateJwtTokenForDonator(Donator donator)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, donator.Email),
+                new Claim("email", donator.Email), // ← Adicionado
                 new Claim("cpf", donator.CPF),
                 new Claim("role", "donator"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
@@ -88,6 +78,7 @@ namespace AmparaCRUDApi.Controllers
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
+                new Claim("email", donee.Email), // ← Adicionado
                 new Claim("cnpj", donee.CNPJ),
                 new Claim("role", "donee"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

@@ -18,13 +18,12 @@ public class Donation
     public string? TimeRecurrence { get; set; }
     public DateTime Date { get; set; } = DateTime.UtcNow;
 
-    // RELACIONAMENTOS
     public string? DonatorCpf { get; set; }
     public Donator? Donator { get; set; }
 
+    public string? DonatorCpfSnapshot { get; set; } 
+    public string? DonatorNameSnapshot { get; set; }
+
     public string? DoneeCnpj { get; set; }
     public Donee Donee { get; set; }
-
-    public string? DonatorNameSnapshot { get; set; } 
-
 }

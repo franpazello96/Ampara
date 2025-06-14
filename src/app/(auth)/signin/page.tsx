@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Button } from "@/components/button";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
@@ -20,48 +21,44 @@ export default function Signin() {
     try {
       const response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Erro ao fazer login.");
+        toast.error(data.message || "Erro ao fazer login.");
         return;
       }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("userType", data.userType);
 
+      const decoded: any = jwtDecode(data.token);
+      const cnpj = decoded?.cnpj;
+      const userEmail = decoded?.email;
+
+      if (cnpj) localStorage.setItem("cnpj", cnpj);
+      if (userEmail) localStorage.setItem("email", userEmail);
+
+      toast.success("Login realizado com sucesso!");
+
       if (data.userType === "donee") {
-        const decodedToken: any = jwtDecode(data.token);
-        const cnpj = decodedToken["cnpj"];
-        if (cnpj) {
-          localStorage.setItem("cnpj", cnpj);
-        }
         router.push("/dashboard");
       } else if (data.userType === "donator") {
         router.push("/doador/donation");
       }
     } catch (error) {
       console.error("Erro no login:", error);
-      alert("Erro na comunicação com o servidor.");
+      toast.error("Erro na comunicação com o servidor.");
     }
   }
 
   return (
     <div className="h-screen w-full flex">
       <div className="hidden lg:flex w-1/2 bg-zinc-100 dark:bg-zinc-800 justify-center items-center">
-        <Image
-          src={logo}
-          alt="Logo"
-          width={500}
-          height={500}
-          className="object-contain p-8 transition-all duration-1000 ease-in-out hover:transform hover:-translate-y-2 animate-fade-in"
-        />
+        <Image src={logo} alt="Logo" width={500} height={500} className="object-contain p-8" />
       </div>
 
       <div className="hidden lg:block w-[1px] h-screen bg-zinc-200 dark:bg-zinc-700" />
@@ -79,46 +76,20 @@ export default function Signin() {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-4">
-              <Input
-                type="email"
-                placeholder="E-mail"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-              <Input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
+              <Input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
 
             <div className="flex justify-center mt-8">
-              <Button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition-colors w-full"
-              >
+              <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full">
                 Entrar
               </Button>
             </div>
 
-            <div className="text-center mt-4">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Não tem uma conta?{" "}
-                <a href="/signupDoador" className="block text-blue-500 hover:underline">
-                  Cadastre-se como Doador
-                </a>
-                <a href="/signupRecebedor" className="block text-blue-500 hover:underline">
-                  Cadastre-se como ONG / Donatário
-                </a>
-              </p>
-            </div>
-            <div className="text-center mt-4">
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                <a href="/" className="hover:underline">
-                  Cancelar
-                </a>
-              </p>
+            <div className="text-center mt-4 text-sm text-zinc-600 dark:text-zinc-400 space-y-2">
+              <a href="/signupDoador" className="block text-blue-500 hover:underline">Cadastre-se como Doador</a>
+              <a href="/signupRecebedor" className="block text-blue-500 hover:underline">Cadastre-se como ONG / Donatário</a>
+              <a href="/" className="hover:underline block">Cancelar</a>
             </div>
           </form>
         </div>

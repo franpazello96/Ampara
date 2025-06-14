@@ -76,18 +76,29 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donator);
         }
 
-
-
-
         [HttpDelete("cpf/{cpf}")]
         public IActionResult DeleteDonator(string cpf)
         {
-            var donator = dbContext.Donators.FirstOrDefault(d => d.CPF == cpf);
-            if (donator == null) return NotFound();
+            var donations = dbContext.Donations.Where(d => d.DonatorCpf == cpf).ToList();
 
-            dbContext.Donators.Remove(donator);
+            foreach (var donation in donations)
+            {
+                donation.Recurrence = false;
+                donation.TimeRecurrence = null; 
+            }
+
             dbContext.SaveChanges();
-            return Ok(donator);
+
+            var donator = dbContext.Donators.Find(cpf);
+            if (donator != null)
+            {
+                dbContext.Donators.Remove(donator);
+                dbContext.SaveChanges();
+                return Ok(donator);
+            }
+
+            return NotFound("Doador já foi removido ou não encontrado.");
         }
+
     }
 }

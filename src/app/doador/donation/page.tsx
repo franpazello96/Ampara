@@ -38,15 +38,14 @@ export default function DonationPage() {
           ? response.data.$values
           : [];
 
-        if (data.length === 0) {
-          console.warn("Nenhuma instituição disponível:", response.data);
-          toast.warn("Nenhuma instituição disponível.");
-        }
-
         setDonees(data);
+
+        if (data.length === 0) {
+          toast.warn("Nenhuma instituição disponível.", { toastId: "sem-instituicoes" });
+        }
       } catch (error) {
         console.error("Erro ao buscar instituições:", error);
-        toast.error("Erro ao buscar instituições.");
+        toast.error("Erro ao buscar instituições.", { toastId: "erro-instituicoes" });
       }
     }
 
@@ -81,10 +80,9 @@ export default function DonationPage() {
       doneeCnpj: selectedCnpj
     };
 
-    const endpoint =
-      isMoney
-        ? "https://localhost:5001/api/donation/moneydonation"
-        : "https://localhost:5001/api/donation/fooddonation";
+    const endpoint = isMoney
+      ? "https://localhost:5001/api/donation/moneydonation"
+      : "https://localhost:5001/api/donation/fooddonation";
 
     try {
       const response = await axios.post(endpoint, donation, {
@@ -136,7 +134,7 @@ export default function DonationPage() {
         <h1 className="text-3xl font-bold mt-4 mb-6">Fazer uma Doação</h1>
 
         <div className="w-full max-w-lg mb-6">
-          <label>Tipo de Doação</label>
+          <label className="block mb-1 font-medium">Tipo de Doação</label>
           <select
             className="w-full p-2 rounded border"
             value={donationType}
@@ -151,7 +149,7 @@ export default function DonationPage() {
         {donationType && (
           <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4">
             <div>
-              <label>Instituição</label>
+              <label className="block mb-1 font-medium">Instituição</label>
               <select
                 className="w-full p-2 rounded border"
                 value={selectedCnpj}
@@ -167,7 +165,9 @@ export default function DonationPage() {
             </div>
 
             <div>
-              <label>{donationType === "Dinheiro" ? "Valor (R$)" : "Quantidade (kg)"}</label>
+              <label className="block mb-1 font-medium">
+                {donationType === "Dinheiro" ? "Valor (R$)" : "Quantidade (kg)"}
+              </label>
               <Input
                 type="number"
                 value={quantity}
@@ -177,7 +177,7 @@ export default function DonationPage() {
             </div>
 
             <div>
-              <label>Descrição</label>
+              <label className="block mb-1 font-medium">Descrição</label>
               <textarea
                 className="w-full p-2 rounded border"
                 value={description}
@@ -192,12 +192,12 @@ export default function DonationPage() {
                 checked={recurrence}
                 onChange={(e) => setRecurrence(e.target.checked)}
               />
-              <label>Doação Recorrente</label>
+              <label className="font-medium">Doação Recorrente</label>
             </div>
 
             {recurrence && (
               <div>
-                <label>Frequência</label>
+                <label className="block mb-1 font-medium">Frequência</label>
                 <select
                   className="w-full p-2 rounded border"
                   value={timeRecurrence}

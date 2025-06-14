@@ -1,40 +1,41 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Input } from "@/components/input";
-import { Button } from "@/components/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import Image from "next/image";
-import Link from "next/link";
-import logo from "@/assets/logo.png";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Input } from '@/components/input';
+import { Button } from '@/components/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import Image from 'next/image';
+import Link from 'next/link';
+import logo from '@/assets/logo.png';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const signupSchema = z.object({
   Name: z
     .string()
-    .min(3, "O nome deve ter pelo menos 3 caracteres.")
-    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome deve conter apenas letras."),
+    .min(3, 'O nome deve ter pelo menos 3 caracteres.')
+    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, 'O nome deve conter apenas letras.'),
 
   CPF: z
     .string()
-    .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido. Use o formato 000.000.000-00."),
+    .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido. Use o formato 000.000.000-00.'),
 
-  Email: z.string().email("Insira um e-mail válido."),
+  Email: z.string().email('Insira um e-mail válido.'),
 
   PhoneNumber: z
     .string()
-    .regex(/^\d{11}$/, "O telefone deve ter 11 números e não pode conter espaços ou caracteres especiais."),
+    .regex(/^\d{11}$/, 'O telefone deve ter 11 números (somente dígitos).'),
 
   Password: z
     .string()
-    .min(6, "A senha deve ter pelo menos 6 caracteres.")
-    .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
-    .regex(/[0-9]/, "A senha deve ter pelo menos um número.")
-    .regex(/[\W_]/, "A senha deve ter pelo menos um caractere especial."),
+    .min(6, 'A senha deve ter pelo menos 6 caracteres.')
+    .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula.')
+    .regex(/[0-9]/, 'A senha deve conter pelo menos um número.')
+    .regex(/[\W_]/, 'A senha deve conter pelo menos um caractere especial.'),
 });
 
 type SignupFormData = z.infer<typeof signupSchema>;
@@ -51,6 +52,14 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
   });
 
+  useEffect(() => {
+    if (errors.Name) toast.error(errors.Name.message);
+    if (errors.CPF) toast.error(errors.CPF.message);
+    if (errors.Email) toast.error(errors.Email.message);
+    if (errors.PhoneNumber) toast.error(errors.PhoneNumber.message);
+    if (errors.Password) toast.error(errors.Password.message);
+  }, [errors]);
+
   async function onSubmit(data: SignupFormData) {
     try {
       const addForm = {
@@ -61,30 +70,30 @@ export default function Signup() {
         Password: data.Password,
       };
 
-      const response = await axios.post("https://localhost:5001/api/donator/signupdonator", addForm, {
-        headers: { "Content-Type": "application/json" },
+      const response = await axios.post('https://localhost:5001/api/donator/signupdonator', addForm, {
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("Cadastro realizado com sucesso!");
+        toast.success('Cadastro realizado com sucesso!');
         reset();
-        router.push("/signin");
+        router.push('/signin');
       }
     } catch (error: any) {
-      let errorMessage = "Erro desconhecido";
+      let errorMessage = 'Erro desconhecido';
 
       if (error.response?.data) {
-        if (typeof error.response.data === "string") {
+        if (typeof error.response.data === 'string') {
           errorMessage = error.response.data;
-        } else if (typeof error.response.data === "object" && error.response.data.message) {
+        } else if (typeof error.response.data === 'object' && error.response.data.message) {
           errorMessage = error.response.data.message;
         } else {
           errorMessage = JSON.stringify(error.response.data);
         }
       }
 
-      toast.error("Falha ao cadastrar o usuário: " + errorMessage);
-      console.log("Erro ao cadastrar o usuário: ", errorMessage);
+      toast.error('Falha ao cadastrar o usuário: ' + errorMessage);
+      console.log('Erro ao cadastrar o usuário: ', errorMessage);
     }
   }
 
@@ -117,20 +126,30 @@ export default function Signup() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
             <div className="space-y-4">
-              <Input type="text" placeholder="Nome" {...register("Name")} />
-              {errors.Name && toast.error(errors.Name.message)}
+              <div>
+                <Input type="text" placeholder="Nome completo" {...register('Name')} />
+                {errors.Name && <p className="text-sm text-red-500">{errors.Name.message}</p>}
+              </div>
 
-              <Input type="text" placeholder="CPF (000.000.000-00)" {...register("CPF")} />
-              {errors.CPF && toast.error(errors.CPF.message)}
+              <div>
+                <Input type="text" placeholder="CPF (000.000.000-00)" {...register('CPF')} />
+                {errors.CPF && <p className="text-sm text-red-500">{errors.CPF.message}</p>}
+              </div>
 
-              <Input type="email" placeholder="E-mail" {...register("Email")} />
-              {errors.Email && toast.error(errors.Email.message)}
+              <div>
+                <Input type="email" placeholder="E-mail" {...register('Email')} />
+                {errors.Email && <p className="text-sm text-red-500">{errors.Email.message}</p>}
+              </div>
 
-              <Input type="text" placeholder="Telefone (Apenas números)" {...register("PhoneNumber")} />
-              {errors.PhoneNumber && toast.error(errors.PhoneNumber.message)}
+              <div>
+                <Input type="text" placeholder="Telefone (somente números)" {...register('PhoneNumber')} />
+                {errors.PhoneNumber && <p className="text-sm text-red-500">{errors.PhoneNumber.message}</p>}
+              </div>
 
-              <Input type="password" placeholder="Senha" {...register("Password")} />
-              {errors.Password && toast.error(errors.Password.message)}
+              <div>
+                <Input type="password" placeholder="Senha" {...register('Password')} />
+                {errors.Password && <p className="text-sm text-red-500">{errors.Password.message}</p>}
+              </div>
             </div>
 
             <div className="flex justify-center mt-8 space-x-4">
@@ -144,7 +163,7 @@ export default function Signup() {
 
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Já tem uma conta?{" "}
+                Já tem uma conta?{' '}
                 <Link href="/signin" className="text-blue-500 hover:underline">
                   Faça login
                 </Link>
@@ -153,7 +172,7 @@ export default function Signup() {
 
             <div className="text-center mt-4">
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Quero ser um{" "}
+                Quero ser um{' '}
                 <Link href="/signupRecebedor" className="text-blue-500 hover:underline">
                   Beneficiário
                 </Link>

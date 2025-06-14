@@ -108,6 +108,7 @@ namespace AmparaCRUDApi.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DonatorCpf = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DonatorCpfSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DonatorNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -126,6 +127,7 @@ namespace AmparaCRUDApi.Migrations
                         principalColumn: "CNPJ",
                         onDelete: ReferentialAction.Restrict);
                 });
+
 
             migrationBuilder.CreateIndex(
                 name: "IX_Benefitiaries_DoneeCnpj",
