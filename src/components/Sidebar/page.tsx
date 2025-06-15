@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { RiBarChartFill } from 'react-icons/ri';
 import { BiTransfer } from 'react-icons/bi';
 import { HiUsers, HiOutlineUserGroup, HiOutlineShoppingBag } from 'react-icons/hi';
 import { IoAccessibilityOutline, IoLogOutOutline } from 'react-icons/io5';
+import { HiOutlineUser } from 'react-icons/hi2';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
 
@@ -66,6 +67,7 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem("userType");
     localStorage.removeItem("email");
+    localStorage.removeItem("cnpj");
     toast.success("Logout realizado com sucesso!");
     router.push('/');
   };
@@ -113,6 +115,11 @@ const Sidebar: React.FC = () => {
             <li>
               <Link href="/signupBenefitiary" className="flex items-center px-4 py-2 rounded-lg text-white hover:bg-zinc-700">
                 <IoAccessibilityOutline className="w-5 h-5 mr-3" /> Cadastro de Beneficiários
+              </Link>
+            </li>
+            <li>
+              <Link href="/profile" className="flex items-center px-4 py-2 rounded-lg text-white hover:bg-zinc-700">
+                <HiOutlineUser className="w-5 h-5 mr-3" /> Editar Perfil
               </Link>
             </li>
           </ul>

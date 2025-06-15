@@ -12,8 +12,8 @@
         public DateTime Date { get; set; }
         public string DonatorCpf { get; set; }
         public string DoneeCnpj { get; set; }
-        public string? DoneeName { get; set; } // Aqui vem o nome da instituição
+
+        public string? DoneeName { get; set; } // Nome atual da instituição (se existir)
+        public string? DoneeNameSnapshot { get; set; } // Nome fixado no momento da doação ✅
     }
-
-
 }

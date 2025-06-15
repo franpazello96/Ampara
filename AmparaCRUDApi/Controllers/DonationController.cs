@@ -2,6 +2,7 @@
 using AmparaCRUDApi.Models;
 using AmparaCRUDApi.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace AmparaCRUDApi.Controllers
 {
@@ -10,6 +11,7 @@ namespace AmparaCRUDApi.Controllers
     public class DonationController : Controller
     {
         private readonly ApplicationDbContext dbContext;
+
         public DonationController(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -21,6 +23,11 @@ namespace AmparaCRUDApi.Controllers
             var nameSnapshot = dbContext.Donators
                 .Where(x => x.CPF == dto.DonatorCpf)
                 .Select(x => x.Name)
+                .FirstOrDefault();
+
+            var institutionSnapshot = dbContext.Donees
+                .Where(x => x.CNPJ == dto.DoneeCnpj)
+                .Select(x => x.InstitutionName)
                 .FirstOrDefault();
 
             var donationEntity = new Donation
@@ -35,6 +42,7 @@ namespace AmparaCRUDApi.Controllers
                 DonatorCpfSnapshot = dto.DonatorCpf,
                 DonatorNameSnapshot = nameSnapshot,
                 DoneeCnpj = dto.DoneeCnpj,
+                DoneeNameSnapshot = institutionSnapshot,
                 Date = dto.Date
             };
 
@@ -51,6 +59,11 @@ namespace AmparaCRUDApi.Controllers
                 .Select(x => x.Name)
                 .FirstOrDefault();
 
+            var institutionSnapshot = dbContext.Donees
+                .Where(x => x.CNPJ == dto.DoneeCnpj)
+                .Select(x => x.InstitutionName)
+                .FirstOrDefault();
+
             var donationEntity = new Donation
             {
                 DonationType = dto.DonationType,
@@ -63,6 +76,7 @@ namespace AmparaCRUDApi.Controllers
                 DonatorCpfSnapshot = dto.DonatorCpf,
                 DonatorNameSnapshot = nameSnapshot,
                 DoneeCnpj = dto.DoneeCnpj,
+                DoneeNameSnapshot = institutionSnapshot,
                 Date = dto.Date
             };
 
@@ -91,7 +105,8 @@ namespace AmparaCRUDApi.Controllers
                                  Date = d.Date,
                                  DonatorCpf = d.DonatorCpf,
                                  DoneeCnpj = d.DoneeCnpj,
-                                 DoneeName = i != null ? i.InstitutionName : null
+                                 DoneeName = i != null ? i.InstitutionName : null,
+                                 DoneeNameSnapshot = d.DoneeNameSnapshot // ✅ incluído aqui
                              }).ToList();
 
             return Ok(donations);

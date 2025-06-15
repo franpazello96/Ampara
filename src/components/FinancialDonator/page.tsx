@@ -14,7 +14,7 @@ interface Donation {
   date: string;
   recurrence: boolean;
   timeRecurrence?: string;
-  doneeName?: string;
+  doneeNameSnapshot?: string;
   doneeCnpj?: string;
 }
 
@@ -201,7 +201,7 @@ export default function FinancialDonator() {
             <tbody>
               {paginated
                 .filter(d =>
-                  [d.donationType ?? "", d.description ?? "", d.doneeName ?? ""]
+                  [d.donationType ?? "", d.description ?? "", d.doneeNameSnapshot ?? ""]
                     .some(f => f.toLowerCase().includes(search.toLowerCase()))
                 )
                 .map((d, i) => (
@@ -211,7 +211,7 @@ export default function FinancialDonator() {
                     <td className="p-2">{d.donationType}</td>
                     <td className="p-2">{formatDate(d.date)}</td>
                     <td className="p-2">{d.description ?? "-"}</td>
-                    <td className="p-2">{d.doneeName ?? "-"}</td>
+                    <td className="p-2">{d.doneeNameSnapshot ?? "-"}</td>
                   </tr>
                 ))}
             </tbody>
@@ -286,7 +286,7 @@ export default function FinancialDonator() {
                       </select>
                     </td>
                     <td className="p-2">{d.description ?? "-"}</td>
-                    <td className="p-2">{d.doneeName ?? "-"}</td>
+                    <td className="p-2">{d.doneeNameSnapshot ?? "-"}</td>
                     <td className="p-2">
                       <button
                         onClick={() => handleEditRecurrence(d.id, { recurrence: false })}
