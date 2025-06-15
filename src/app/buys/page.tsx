@@ -11,8 +11,6 @@ import Image from "next/image";
 import logo from "@/assets/logo.png";
 import Sidebar from "@/components/Sidebar/page";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth"; // 👈 Certifique-se que esse hook existe
 
 const donationSchema = z.object({
   donationType: z.string().min(1),
@@ -27,16 +25,8 @@ const donationSchema = z.object({
 type DonationFormData = z.infer<typeof donationSchema>;
 
 export default function BuysPage() {
-  const router = useRouter();
-  const { isAuthenticated, user } = useAuth("donee"); 
   const [doneeCnpj, setDoneeCnpj] = useState<string | null>(null);
   const [beneficiaries, setBeneficiaries] = useState<{ id: number; name: string }[]>([]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/signin"); 
-    }
-  }, [isAuthenticated, router]);
 
   useEffect(() => {
     const storedCnpj = localStorage.getItem("cnpj");
@@ -107,8 +97,6 @@ export default function BuysPage() {
       toast.error("Erro ao registrar a compra.");
     }
   }
-
-  if (!isAuthenticated) return null; // Evita mostrar a tela durante o redirecionamento
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">

@@ -5,8 +5,6 @@ import Sidebar from "@/components/Sidebar/page";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { jwtDecode } from 'jwt-decode';
-import { toast } from 'react-toastify';
 
 interface Donator {
   id: number;
@@ -25,49 +23,12 @@ export default function Donators() {
   const [donators, setDonators] = useState<Donator[]>([]);
   const [filteredDonators, setFilteredDonators] = useState<Donator[]>([]);
   const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const toastId = "auth-check-toast";
-
-    if (!token) {
-      if (!toast.isActive(toastId)) {
-        toast.warn("Você precisa estar logado para acessar esta página.", { toastId });
-      }
-      router.push("/signin");
-      return;
-    }
-
-    try {
-      const decoded: any = jwtDecode(token);
-      const currentTime = Date.now();
-      if (decoded.exp * 1000 < currentTime) {
-        localStorage.removeItem("token");
-        if (!toast.isActive(toastId)) {
-          toast.warn("Sessão expirada. Faça login novamente.", { toastId });
-        }
-        router.push("/signin");
-        return;
-      }
-
-      setAuthChecked(true);
-    } catch {
-      localStorage.removeItem("token");
-      if (!toast.isActive(toastId)) {
-        toast.error("Token inválido. Faça login novamente.", { toastId });
-      }
-      router.push("/signin");
-    }
-  }, [router]);
-
-  useEffect(() => {
-    if (!authChecked) return;
-
     const fetchDonators = async () => {
       try {
         const response = await fetch('https://localhost:5001/api/Donator');
@@ -82,7 +43,7 @@ export default function Donators() {
     };
 
     fetchDonators();
-  }, [authChecked]);
+  }, []);
 
   useEffect(() => {
     const filterDonators = () => {
@@ -130,8 +91,6 @@ export default function Donators() {
       setFilteredDonators(updated);
     }
   };
-
-  if (!authChecked) return null; 
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">

@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Beneficiary {
   id: number;
@@ -29,22 +31,17 @@ export default function Beneficiaries() {
   const router = useRouter();
 
   useEffect(() => {
-    if (user === null) {
-      router.push("/signin");
-    }
-  }, [user]);
-
-  useEffect(() => {
     const fetchData = async () => {
       if (!user?.cnpj) return;
       try {
         const encodedCnpj = encodeURIComponent(user.cnpj);
         const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${encodedCnpj}`);
+        if (!res.ok) throw new Error("404");
         const data = await res.json();
         setBeneficiaries(data);
         setFiltered(data);
       } catch (err) {
-        console.error("Erro ao buscar beneficiários:", err);
+        toast.error("Erro ao buscar beneficiários.");
       } finally {
         setLoading(false);
       }
@@ -89,30 +86,52 @@ export default function Beneficiaries() {
   const handleEdit = (b: Beneficiary) => {
     const doc = b.cpf || b.cnpj;
     if (!doc) {
-      alert("Documento não encontrado.");
+      toast.warn("Documento não encontrado.");
       return;
     }
     router.push(`/beneficiaries/edit?document=${encodeURIComponent(doc)}`);
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Deseja excluir este beneficiário?")) {
-      try {
-        await fetch(`https://localhost:5001/api/benefitiary/${id}`, {
-          method: "DELETE"
-        });
-
-        const updated = beneficiaries.filter(b => b.id !== id);
-        setBeneficiaries(updated);
-        setFiltered(updated);
-      } catch (error) {
-        console.error("Erro ao deletar beneficiário:", error);
-        alert("Erro ao deletar beneficiário.");
-      }
-    }
+    toast.info(
+      ({ closeToast }) => (
+        <div className="space-y-2">
+          <p>Deseja excluir este beneficiário?</p>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(`https://localhost:5001/api/benefitiary/${id}`, {
+                    method: "DELETE",
+                  });
+                  if (!res.ok) throw new Error("Erro ao deletar beneficiário.");
+                  const updated = beneficiaries.filter(b => b.id !== id);
+                  setBeneficiaries(updated);
+                  setFiltered(updated);
+                  toast.success("Beneficiário excluído com sucesso!");
+                } catch (err) {
+                  console.error(err);
+                  toast.error("Erro ao deletar beneficiário.");
+                } finally {
+                  closeToast?.();
+                }
+              }}
+              className="px-3 py-1 bg-red-600 text-white rounded"
+            >
+              Confirmar
+            </button>
+            <button
+              onClick={() => closeToast?.()}
+              className="px-3 py-1 bg-gray-300 dark:bg-zinc-700 text-black dark:text-white rounded"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ),
+      { autoClose: false }
+    );
   };
-
-  if (!user) return null; 
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">

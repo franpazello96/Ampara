@@ -6,9 +6,17 @@ import Image from "next/image";
 import SidebarDoador from "@/components/SidebarDoador/page";
 import FinancialDonator from "@/components/FinancialDonator/page";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 export default function Report() {
   const { isAuthenticated, user } = useAuth("donator");
+
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      toast.warn("Você precisa estar logado para acessar esta página.");
+    }
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) return null;
 
@@ -18,16 +26,16 @@ export default function Report() {
         <SidebarDoador />
       </aside>
 
-      <div className="max-w-7xl mx-auto w-full space-y-12">
-        <div className="flex flex-col items-center">
-          <Image src={logo} alt="Logo" width={120} height={40} className="mb-4" />
-          <ThemeToggle />
-          <h1 className="text-3xl font-bold mt-4 text-center">Relatório de Doações</h1>
-        </div>
+        <div className="max-w-7xl mx-auto w-full space-y-12">
+          <div className="flex flex-col items-center">
+            <Image src={logo} alt="Logo" width={120} height={40} className="mb-4" />
+            <ThemeToggle />
+            <h1 className="text-3xl font-bold mt-4 text-center">Relatório de Doações</h1>
+          </div>
 
-        {/* Corpo do relatório */}
-        <FinancialDonator />
-      </div>
+          {/* Corpo do relatório */}
+          <FinancialDonator />
+        </div>
     </div>
   );
 }
