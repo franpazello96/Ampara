@@ -31,6 +31,12 @@ export default function Beneficiaries() {
   const router = useRouter();
 
   useEffect(() => {
+    if (user === null) {
+      router.push("/signin");
+    }
+  }, [user]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (!user?.cnpj) return;
       try {
@@ -132,6 +138,8 @@ export default function Beneficiaries() {
       { autoClose: false }
     );
   };
+
+  if (!user) return null; 
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">

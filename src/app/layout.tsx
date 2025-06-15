@@ -16,10 +16,8 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className="bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-200
         text-zinc-900 min-h-screen flex">
-        <main className="w-full mx-auto px-5 py-8">
           {children}
           <Toaster />
-        </main>
       </body>
     </html>
   );

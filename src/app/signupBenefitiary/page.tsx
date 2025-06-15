@@ -11,8 +11,11 @@ import Image from "next/image";
 import logo from "@/assets/logo.png";
 import Sidebar from "@/components/Sidebar/page";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
 
-// Validações
+// Validação com Zod
 const schema = z
   .object({
     personType: z.enum(["Física", "Jurídica"]),
@@ -49,6 +52,43 @@ type FormData = z.infer<typeof schema>;
 
 export default function SignUpBeneficiaryPage() {
   const { user } = useAuth("donee");
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const toastId = "auth-check-toast";
+
+    const showToastOnce = (type: "warn" | "error", message: string) => {
+      if (!toast.isActive(toastId)) {
+        toast[type](message, { toastId });
+      }
+    };
+
+    if (!token) {
+      showToastOnce("warn", "Você precisa estar logado para acessar esta página.");
+      router.replace("/signin"); // ✅ impede múltiplos push
+      return;
+    }
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const currentTime = Date.now();
+
+      if (decoded.exp * 1000 < currentTime) {
+        localStorage.removeItem("token");
+        showToastOnce("warn", "Sessão expirada. Faça login novamente.");
+        router.replace("/signin");
+        return;
+      }
+
+      setAuthChecked(true);
+    } catch {
+      localStorage.removeItem("token");
+      showToastOnce("error", "Token inválido. Faça login novamente.");
+      router.replace("/signin");
+    }
+  }, [router]);
 
   const {
     register,
@@ -76,7 +116,7 @@ export default function SignUpBeneficiaryPage() {
     };
 
     try {
-      const response = await axios.post("https://localhost:5001/api/benefitiary/signupbenefitiary", payload);
+      await axios.post("https://localhost:5001/api/benefitiary/signupbenefitiary", payload);
       toast.success("Beneficiário cadastrado com sucesso!");
       reset();
     } catch (error: any) {
@@ -84,6 +124,8 @@ export default function SignUpBeneficiaryPage() {
       toast.error("Erro ao cadastrar beneficiário.");
     }
   };
+
+  if (!authChecked) return null; // 🔒 garante que nada aparece antes da verificação
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -101,8 +143,6 @@ export default function SignUpBeneficiaryPage() {
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-
-          {/* Tipo de Pessoa */}
           <div>
             <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Tipo de Pessoa</label>
             <select
@@ -116,10 +156,8 @@ export default function SignUpBeneficiaryPage() {
             {errors.personType && <p className="text-red-500 text-sm">{errors.personType.message}</p>}
           </div>
 
-          {/* Renderizar somente após seleção */}
           {personType && (
             <>
-              {/* Nome */}
               <div>
                 <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Nome</label>
                 <input
@@ -131,7 +169,6 @@ export default function SignUpBeneficiaryPage() {
                 {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               </div>
 
-              {/* CPF ou CNPJ */}
               {personType === "Física" && (
                 <div>
                   <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">CPF</label>
@@ -158,7 +195,6 @@ export default function SignUpBeneficiaryPage() {
                 </div>
               )}
 
-              {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">E-mail</label>
                 <input
@@ -170,7 +206,6 @@ export default function SignUpBeneficiaryPage() {
                 {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
               </div>
 
-              {/* Telefone */}
               <div>
                 <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Telefone</label>
                 <input

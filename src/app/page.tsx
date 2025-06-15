@@ -5,9 +5,6 @@ import logo from "@/assets/logo.png";
 import donationsImg from "@/assets/8.png";
 import QuemSomosImg from "@/assets/1.png";
 import QuemSomosImg2 from "@/assets/6.png";
-import impactImg from "@/assets/impact.jpg";
-import missionImg from "@/assets/mission.jpg";
-import networkImg from "@/assets/network.jpg";
 import CountUp from 'react-countup';
 import { Button } from "@/components/button";
 import Link from "next/link";
@@ -185,12 +182,8 @@ export default function Home() {
           )}
         </div>
       </header>
-
-      {/* Espaçador para compensar o header fixo */}
-      <div className="h-20" />
-
       <section className="text-center py-20 px-6 md:px-20 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg shadow-lg">
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-6 pt-5">
           Bem-vindo ao Nosso Projeto
         </h1>
         <p className="text-lg md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
