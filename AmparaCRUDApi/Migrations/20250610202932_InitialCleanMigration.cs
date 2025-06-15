@@ -114,9 +114,10 @@ namespace AmparaCRUDApi.Migrations
                     TimeRecurrence = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DonatorCpf = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DonatorCpfSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DonatorNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DonatorNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DoneeNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -135,30 +136,11 @@ namespace AmparaCRUDApi.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Benefitiaries_DoneeCnpj",
-                table: "Benefitiaries",
-                column: "DoneeCnpj");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Buys_DoneeCnpj",
-                table: "Buys",
-                column: "DoneeCnpj");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Buys_BenefitiaryId",
-                table: "Buys",
-                column: "BenefitiaryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Donations_DonatorCpf",
-                table: "Donations",
-                column: "DonatorCpf");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Donations_DoneeCnpj",
-                table: "Donations",
-                column: "DoneeCnpj");
+            migrationBuilder.CreateIndex(name: "IX_Benefitiaries_DoneeCnpj", table: "Benefitiaries", column: "DoneeCnpj");
+            migrationBuilder.CreateIndex(name: "IX_Buys_DoneeCnpj", table: "Buys", column: "DoneeCnpj");
+            migrationBuilder.CreateIndex(name: "IX_Buys_BenefitiaryId", table: "Buys", column: "BenefitiaryId");
+            migrationBuilder.CreateIndex(name: "IX_Donations_DonatorCpf", table: "Donations", column: "DonatorCpf");
+            migrationBuilder.CreateIndex(name: "IX_Donations_DoneeCnpj", table: "Donations", column: "DoneeCnpj");
 
             migrationBuilder.Sql(@"
                 CREATE VIEW vw_DailyDonationTotals AS
