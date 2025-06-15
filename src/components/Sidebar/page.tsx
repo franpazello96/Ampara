@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
@@ -11,20 +11,56 @@ import { BiTransfer } from 'react-icons/bi';
 import { HiUsers, HiOutlineUserGroup, HiOutlineShoppingBag } from 'react-icons/hi';
 import { IoAccessibilityOutline, IoLogOutOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState("Email não disponível");
+  const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
+  const toastShownRef = useRef(false); // Evita toast duplicado
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const toastId = "sidebar-auth-toast";
+
+    const showToastOnce = (message: string) => {
+      if (!toast.isActive(toastId)) {
+        toast.warn(message, { toastId });
+      }
+    };
+
+    if (!token) {
+      showToastOnce("Você precisa estar logado para acessar esta página.");
+      router.replace("/signin");
+      return;
+    }
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const now = Date.now();
+
+      if (decoded.exp * 1000 < now) {
+        localStorage.removeItem("token");
+        showToastOnce("Sessão expirada. Faça login novamente.");
+        router.replace("/signin");
+        return;
+      }
+
+      setAuthChecked(true);
+    } catch {
+      localStorage.removeItem("token");
+      showToastOnce("Token inválido. Faça login novamente.");
+      router.replace("/signin");
+    }
+  }, [router]);
 
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
     if (savedEmail) setEmail(savedEmail);
   }, []);
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleSidebar = () => setIsOpen(!isOpen);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -33,6 +69,8 @@ const Sidebar: React.FC = () => {
     toast.success("Logout realizado com sucesso!");
     router.push('/');
   };
+
+  if (!authChecked) return null; // 🔒 Evita carregar layout sem autenticação
 
   return (
     <>

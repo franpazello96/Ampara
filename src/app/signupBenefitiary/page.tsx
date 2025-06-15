@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,7 +12,6 @@ import logo from "@/assets/logo.png";
 import Sidebar from "@/components/Sidebar/page";
 import { useAuth } from "@/hooks/useAuth";
 
-// Validações
 const schema = z
   .object({
     personType: z.enum(["Física", "Jurídica"]),
@@ -76,7 +75,7 @@ export default function SignUpBeneficiaryPage() {
     };
 
     try {
-      const response = await axios.post("https://localhost:5001/api/benefitiary/signupbenefitiary", payload);
+      await axios.post("https://localhost:5001/api/benefitiary/signupbenefitiary", payload);
       toast.success("Beneficiário cadastrado com sucesso!");
       reset();
     } catch (error: any) {
@@ -101,8 +100,6 @@ export default function SignUpBeneficiaryPage() {
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-
-          {/* Tipo de Pessoa */}
           <div>
             <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Tipo de Pessoa</label>
             <select
@@ -116,10 +113,8 @@ export default function SignUpBeneficiaryPage() {
             {errors.personType && <p className="text-red-500 text-sm">{errors.personType.message}</p>}
           </div>
 
-          {/* Renderizar somente após seleção */}
           {personType && (
             <>
-              {/* Nome */}
               <div>
                 <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Nome</label>
                 <input
@@ -131,7 +126,6 @@ export default function SignUpBeneficiaryPage() {
                 {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
               </div>
 
-              {/* CPF ou CNPJ */}
               {personType === "Física" && (
                 <div>
                   <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">CPF</label>
@@ -158,7 +152,6 @@ export default function SignUpBeneficiaryPage() {
                 </div>
               )}
 
-              {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">E-mail</label>
                 <input
@@ -170,7 +163,6 @@ export default function SignUpBeneficiaryPage() {
                 {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
               </div>
 
-              {/* Telefone */}
               <div>
                 <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Telefone</label>
                 <input
