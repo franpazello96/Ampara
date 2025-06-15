@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Sidebar from "@/components/Sidebar/page";
@@ -40,7 +40,7 @@ export default function Beneficiaries() {
         const data = await res.json();
         setBeneficiaries(data);
         setFiltered(data);
-      } catch (err) {
+      } catch {
         toast.error("Erro ao buscar beneficiários.");
       } finally {
         setLoading(false);
@@ -55,7 +55,7 @@ export default function Beneficiaries() {
     if (searchTerm) {
       result = result.filter(b =>
         b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        b.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        b.email?.toLowerCase().includes(searchTerm) ||
         b.phoneNumber?.includes(searchTerm) ||
         (b.cpf && b.cpf.includes(searchTerm)) ||
         (b.cnpj && b.cnpj.includes(searchTerm))
@@ -93,138 +93,131 @@ export default function Beneficiaries() {
   };
 
   const handleDelete = async (id: number) => {
-    toast.info(
-      ({ closeToast }) => (
-        <div className="space-y-2">
-          <p>Deseja excluir este beneficiário?</p>
-          <div className="flex gap-2">
-            <button
-              onClick={async () => {
-                try {
-                  const res = await fetch(`https://localhost:5001/api/benefitiary/${id}`, {
-                    method: "DELETE",
-                  });
-                  if (!res.ok) throw new Error("Erro ao deletar beneficiário.");
-                  const updated = beneficiaries.filter(b => b.id !== id);
-                  setBeneficiaries(updated);
-                  setFiltered(updated);
-                  toast.success("Beneficiário excluído com sucesso!");
-                } catch (err) {
-                  console.error(err);
-                  toast.error("Erro ao deletar beneficiário.");
-                } finally {
-                  closeToast?.();
-                }
-              }}
-              className="px-3 py-1 bg-red-600 text-white rounded"
-            >
-              Confirmar
-            </button>
-            <button
-              onClick={() => closeToast?.()}
-              className="px-3 py-1 bg-gray-300 dark:bg-zinc-700 text-black dark:text-white rounded"
-            >
-              Cancelar
-            </button>
-          </div>
+    toast.info(({ closeToast }) => (
+      <div className="space-y-2">
+        <p>Deseja excluir este beneficiário?</p>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch(`https://localhost:5001/api/benefitiary/${id}`, {
+                  method: "DELETE",
+                });
+                if (!res.ok) throw new Error();
+                const updated = beneficiaries.filter(b => b.id !== id);
+                setBeneficiaries(updated);
+                setFiltered(updated);
+                toast.success("Beneficiário excluído com sucesso!");
+              } catch {
+                toast.error("Erro ao deletar beneficiário.");
+              } finally {
+                closeToast?.();
+              }
+            }}
+            className="px-3 py-1 bg-red-600 text-white rounded"
+          >
+            Confirmar
+          </button>
+          <button
+            onClick={() => closeToast?.()}
+            className="px-3 py-1 bg-gray-300 dark:bg-zinc-700 text-black dark:text-white rounded"
+          >
+            Cancelar
+          </button>
         </div>
-      ),
-      { autoClose: false }
-    );
+      </div>
+    ), { autoClose: false });
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">
       <Sidebar />
-      <div className="flex flex-col ml-64">
-        <div className="p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-              Lista de Beneficiários
-            </h1>
-            <ThemeToggle />
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-6">
-            <input
-              type="text"
-              placeholder="Buscar por nome, e-mail, telefone..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border rounded-lg dark:bg-zinc-800 dark:text-white"
-            />
-            <input
-              type="date"
-              value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              className="px-4 py-2 border rounded-lg dark:bg-zinc-800 dark:text-white"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              className="px-4 py-2 border rounded-lg dark:bg-zinc-800 dark:text-white"
-            />
-          </div>
-
-          <button
-            onClick={() => router.push("/signupBenefitiary")}
-            className="mb-6 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-          >
-            Adicionar Beneficiário
-          </button>
-
-          {loading ? (
-            <div className="flex justify-center py-10">
-              <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full" />
-            </div>
-          ) : (
-            <div className="overflow-auto rounded-lg shadow-lg bg-white dark:bg-zinc-800">
-              <table className="min-w-full table-auto">
-                <thead className="bg-gray-100 dark:bg-zinc-700">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Nome</th>
-                    <th className="px-4 py-3 text-left">Data de Cadastro</th>
-                    <th className="px-4 py-3 text-left">Contato</th>
-                    <th className="px-4 py-3 text-left">Documento</th>
-                    <th className="px-4 py-3 text-left">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y dark:divide-zinc-700">
-                  {filtered.map(b => (
-                    <tr key={b.id} className="hover:bg-gray-50 dark:hover:bg-zinc-700">
-                      <td className="px-4 py-3">{b.name}</td>
-                      <td className="px-4 py-3">{formatDate(b.createdAt)}</td>
-                      <td className="px-4 py-3">
-                        {formatPhone(b.phoneNumber)}<br />
-                        {b.email}
-                      </td>
-                      <td className="px-4 py-3">{getDoc(b)}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex space-x-3">
-                          <button onClick={() => handleEdit(b)}>
-                            <FaEdit className="text-indigo-600 dark:text-indigo-300" />
-                          </button>
-                          <button onClick={() => handleDelete(b.id)}>
-                            <FaTrash className="text-red-600 dark:text-red-400" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {filtered.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="text-center py-6 text-gray-500 dark:text-gray-400">
-                        Nenhum beneficiário encontrado.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+      <main className="flex flex-col p-4 sm:p-6 md:ml-64">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">
+            Lista de Beneficiários
+          </h1>
+          <ThemeToggle />
         </div>
-      </div>
+
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Buscar por nome, e-mail, telefone..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="px-4 py-2 border rounded-lg w-full dark:bg-zinc-800 dark:text-white"
+          />
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="px-4 py-2 border rounded-lg w-full md:w-auto dark:bg-zinc-800 dark:text-white"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="px-4 py-2 border rounded-lg w-full md:w-auto dark:bg-zinc-800 dark:text-white"
+          />
+        </div>
+
+        <button
+          onClick={() => router.push("/signupBenefitiary")}
+          className="mb-6 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 w-full sm:w-auto"
+        >
+          Adicionar Beneficiário
+        </button>
+
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full" />
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-lg shadow-lg bg-white dark:bg-zinc-800">
+            <table className="min-w-full table-auto text-sm">
+              <thead className="bg-gray-100 dark:bg-zinc-700">
+                <tr>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">Nome</th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">Data de Cadastro</th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">Contato</th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">Documento</th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y dark:divide-zinc-700">
+                {filtered.map(b => (
+                  <tr key={b.id} className="hover:bg-gray-50 dark:hover:bg-zinc-700">
+                    <td className="px-4 py-3">{b.name}</td>
+                    <td className="px-4 py-3">{formatDate(b.createdAt)}</td>
+                    <td className="px-4 py-3">
+                      {formatPhone(b.phoneNumber)}<br />{b.email}
+                    </td>
+                    <td className="px-4 py-3">{getDoc(b)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex space-x-3">
+                        <button onClick={() => handleEdit(b)}>
+                          <FaEdit className="text-indigo-600 dark:text-indigo-300" />
+                        </button>
+                        <button onClick={() => handleDelete(b.id)}>
+                          <FaTrash className="text-red-600 dark:text-red-400" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                      Nenhum beneficiário encontrado.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

@@ -120,5 +120,28 @@ namespace AmparaCRUDApi.Controllers
             dbContext.SaveChanges();
             return Ok(donation);
         }
+
+        [HttpGet("recurring/bydonee")]
+        public IActionResult GetRecurringDonationsByDonee([FromQuery] string cnpj)
+        {
+            if (string.IsNullOrEmpty(cnpj))
+                return BadRequest("CNPJ não informado.");
+
+            var recurring = dbContext.Donations
+                .Where(d => d.Recurrence == true && d.DoneeCnpj == cnpj)
+                .Select(d => new
+                {
+                    DonatorName = d.DonatorNameSnapshot,
+                    DonatorCpf = d.DonatorCpfSnapshot,
+                    Frequency = d.TimeRecurrence,
+                    DonationType = d.DonationType,
+                    Amount = d.DonationType == "Dinheiro" ? d.Amount : null,
+                    QuantityKg = d.DonationType == "Alimentos" ? d.Quantity : null
+                })
+                .ToList();
+
+            return Ok(recurring);
+        }
+
     }
 }
