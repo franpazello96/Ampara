@@ -24,41 +24,70 @@ namespace AmparaCRUDApi.Controllers
         public async Task<IActionResult> AddBuy([FromBody] AddBuysDTO dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            string? nameSnapshot = null;
-            string? docSnapshot = null;
-
-            if (dto.BenefitiaryId.HasValue)
-            {
-                var benef = await dbContext.Benefitiaries.FindAsync(dto.BenefitiaryId.Value);
-                if (benef != null)
+                return BadRequest(new
                 {
-                    nameSnapshot = benef.Name;
-                    docSnapshot = benef.CPF ?? benef.CNPJ;
-                }
-            }
+                    Message = "Erro de validação nos dados enviados.",
+                    Errors = ModelState.Where(e => e.Value.Errors.Count > 0)
+                                       .Select(e => new
+                                       {
+                                           Field = e.Key,
+                                           Errors = e.Value.Errors.Select(er => er.ErrorMessage)
+                                       })
+                });
 
-            var buy = new Buys
+            try
             {
-                Date = dto.Date,
-                Type = dto.Type,
-                StoreName = dto.StoreName,
-                CNPJ = dto.CNPJ,
-                Price = dto.Price,
-                Description = dto.Description,
-                Quantity = dto.Quantity,
-                DoneeCnpj = dto.DoneeCnpj,
-                BenefitiaryId = dto.BenefitiaryId,
-                BenefitiaryNameSnapshot = nameSnapshot,
-                BenefitiaryDocumentSnapshot = docSnapshot
-            };
+                string? nameSnapshot = null;
+                string? docSnapshot = null;
 
-            dbContext.Buys.Add(buy);
-            await dbContext.SaveChangesAsync();
+                if (dto.BenefitiaryId.HasValue)
+                {
+                    var benef = await dbContext.Benefitiaries.FindAsync(dto.BenefitiaryId.Value);
+                    if (benef != null)
+                    {
+                        nameSnapshot = benef.Name;
+                        docSnapshot = benef.CPF ?? benef.CNPJ;
+                    }
+                }
 
-            return CreatedAtAction(nameof(GetBuyById), new { id = buy.Id }, dto);
+                var buy = new Buys
+                {
+                    Date = dto.Date,
+                    Type = dto.Type,
+                    StoreName = dto.StoreName,
+                    CNPJ = dto.CNPJ,
+                    Price = dto.Price,
+                    Description = dto.Description,
+                    Quantity = dto.Quantity,
+                    DoneeCnpj = dto.DoneeCnpj,
+                    BenefitiaryId = dto.BenefitiaryId,
+                    BenefitiaryNameSnapshot = nameSnapshot,
+                    BenefitiaryDocumentSnapshot = docSnapshot
+                };
+
+                dbContext.Buys.Add(buy);
+                await dbContext.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetBuyById), new { id = buy.Id }, dto);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return StatusCode(400, new
+                {
+                    Message = "Erro de integridade referencial. Verifique se o CNPJ ou Beneficiário informado existe.",
+                    Details = ex.InnerException?.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "Erro interno ao registrar a compra.",
+                    Details = ex.Message
+                });
+            }
         }
+
 
         [Authorize(Roles = "donee")]
         [HttpGet("{id}")]

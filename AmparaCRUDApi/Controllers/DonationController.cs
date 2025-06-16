@@ -3,6 +3,7 @@ using AmparaCRUDApi.Models;
 using AmparaCRUDApi.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace AmparaCRUDApi.Controllers
@@ -22,71 +23,113 @@ namespace AmparaCRUDApi.Controllers
         [HttpPost("fooddonation")]
         public IActionResult FoodDonation(DonationDTO dto)
         {
-            var nameSnapshot = dbContext.Donators
-                .Where(x => x.CPF == dto.DonatorCpf)
-                .Select(x => x.Name)
-                .FirstOrDefault();
-
-            var institutionSnapshot = dbContext.Donees
-                .Where(x => x.CNPJ == dto.DoneeCnpj)
-                .Select(x => x.InstitutionName)
-                .FirstOrDefault();
-
-            var donationEntity = new Donation
+            try
             {
-                DonationType = dto.DonationType,
-                Quantity = dto.Quantity,
-                Amount = dto.Amount,
-                Description = dto.Description,
-                Recurrence = dto.Recurrence,
-                TimeRecurrence = dto.TimeRecurrence,
-                DonatorCpf = dto.DonatorCpf,
-                DonatorCpfSnapshot = dto.DonatorCpf,
-                DonatorNameSnapshot = nameSnapshot,
-                DoneeCnpj = dto.DoneeCnpj,
-                DoneeNameSnapshot = institutionSnapshot,
-                Date = dto.Date
-            };
+                var nameSnapshot = dbContext.Donators
+                    .Where(x => x.CPF == dto.DonatorCpf)
+                    .Select(x => x.Name)
+                    .FirstOrDefault();
 
-            dbContext.Donations.Add(donationEntity);
-            dbContext.SaveChanges();
-            return Ok(donationEntity);
+                var institutionSnapshot = dbContext.Donees
+                    .Where(x => x.CNPJ == dto.DoneeCnpj)
+                    .Select(x => x.InstitutionName)
+                    .FirstOrDefault();
+
+                var donationEntity = new Donation
+                {
+                    DonationType = dto.DonationType,
+                    Quantity = dto.Quantity,
+                    Amount = dto.Amount,
+                    Description = dto.Description,
+                    Recurrence = dto.Recurrence,
+                    TimeRecurrence = dto.TimeRecurrence,
+                    DonatorCpf = dto.DonatorCpf,
+                    DonatorCpfSnapshot = dto.DonatorCpf,
+                    DonatorNameSnapshot = nameSnapshot,
+                    DoneeCnpj = dto.DoneeCnpj,
+                    DoneeNameSnapshot = institutionSnapshot,
+                    Date = dto.Date
+                };
+
+                dbContext.Donations.Add(donationEntity);
+                dbContext.SaveChanges();
+
+                return Ok(donationEntity);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return StatusCode(400, new
+                {
+                    Message = "CPF ou CNPJ informado não existe. Verifique os dados e tente novamente.",
+                    Error = ex.InnerException?.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "Erro inesperado ao registrar doação.",
+                    Error = ex.Message
+                });
+            }
         }
+
 
         [Authorize(Roles = "donator")]
         [HttpPost("moneydonation")]
         public IActionResult MoneyDonation(DonationDTO dto)
         {
-            var nameSnapshot = dbContext.Donators
-                .Where(x => x.CPF == dto.DonatorCpf)
-                .Select(x => x.Name)
-                .FirstOrDefault();
-
-            var institutionSnapshot = dbContext.Donees
-                .Where(x => x.CNPJ == dto.DoneeCnpj)
-                .Select(x => x.InstitutionName)
-                .FirstOrDefault();
-
-            var donationEntity = new Donation
+            try
             {
-                DonationType = dto.DonationType,
-                Quantity = dto.Quantity,
-                Amount = dto.Amount,
-                Description = dto.Description,
-                Recurrence = dto.Recurrence,
-                TimeRecurrence = dto.TimeRecurrence,
-                DonatorCpf = dto.DonatorCpf,
-                DonatorCpfSnapshot = dto.DonatorCpf,
-                DonatorNameSnapshot = nameSnapshot,
-                DoneeCnpj = dto.DoneeCnpj,
-                DoneeNameSnapshot = institutionSnapshot,
-                Date = dto.Date
-            };
+                var nameSnapshot = dbContext.Donators
+                    .Where(x => x.CPF == dto.DonatorCpf)
+                    .Select(x => x.Name)
+                    .FirstOrDefault();
 
-            dbContext.Donations.Add(donationEntity);
-            dbContext.SaveChanges();
-            return Ok(donationEntity);
+                var institutionSnapshot = dbContext.Donees
+                    .Where(x => x.CNPJ == dto.DoneeCnpj)
+                    .Select(x => x.InstitutionName)
+                    .FirstOrDefault();
+
+                var donationEntity = new Donation
+                {
+                    DonationType = dto.DonationType,
+                    Quantity = dto.Quantity,
+                    Amount = dto.Amount,
+                    Description = dto.Description,
+                    Recurrence = dto.Recurrence,
+                    TimeRecurrence = dto.TimeRecurrence,
+                    DonatorCpf = dto.DonatorCpf,
+                    DonatorCpfSnapshot = dto.DonatorCpf,
+                    DonatorNameSnapshot = nameSnapshot,
+                    DoneeCnpj = dto.DoneeCnpj,
+                    DoneeNameSnapshot = institutionSnapshot,
+                    Date = dto.Date
+                };
+
+                dbContext.Donations.Add(donationEntity);
+                dbContext.SaveChanges();
+
+                return Ok(donationEntity);
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return StatusCode(400, new
+                {
+                    Message = "CPF ou CNPJ informado não existe. Verifique os dados e tente novamente.",
+                    Error = ex.InnerException?.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "Erro inesperado ao registrar doação.",
+                    Error = ex.Message
+                });
+            }
         }
+
 
         [Authorize(Roles = "donator,donee")]
         [HttpGet("bydonator/{cpf}")]
