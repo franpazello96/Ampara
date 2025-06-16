@@ -52,7 +52,7 @@ namespace AmparaCRUDApi.Migrations
                     CNPJ = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: true) 
                 },
                 constraints: table =>
                 {
@@ -62,7 +62,7 @@ namespace AmparaCRUDApi.Migrations
                         column: x => x.DoneeCnpj,
                         principalTable: "Donees",
                         principalColumn: "CNPJ",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull); 
                 });
 
             migrationBuilder.CreateTable(
@@ -78,7 +78,7 @@ namespace AmparaCRUDApi.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DoneeCnpj = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     BenefitiaryId = table.Column<int>(type: "int", nullable: true),
                     BenefitiaryNameSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BenefitiaryDocumentSnapshot = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -91,7 +91,7 @@ namespace AmparaCRUDApi.Migrations
                         column: x => x.DoneeCnpj,
                         principalTable: "Donees",
                         principalColumn: "CNPJ",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Buys_Benefitiaries_BenefitiaryId",
                         column: x => x.BenefitiaryId,

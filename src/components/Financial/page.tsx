@@ -51,7 +51,11 @@ export default function Financial() {
         const cnpj = localStorage.getItem("cnpj");
         if (!cnpj) throw new Error("CNPJ não encontrado no localStorage");
 
-        const response = await fetch(`https://localhost:5001/api/transactions/getalltransactions?doneeCnpj=${cnpj}`);
+        const response = await fetch(`https://localhost:5001/api/transactions/getalltransactions?doneeCnpj=${cnpj}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
         const backendData: BackendTransaction[] = await response.json();

@@ -38,17 +38,13 @@ export default function BuysPage() {
   }, []);
 
   useEffect(() => {
-    const fetchBeneficiaries = async () => {
-      if (!doneeCnpj) return;
-      try {
-        const res = await axios.get(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${doneeCnpj}`);
-        setBeneficiaries(res.data);
-      } catch {
-        toast.error("Erro ao carregar beneficiários.");
-      }
-    };
-
-    fetchBeneficiaries();
+    if (!doneeCnpj) return;
+    axios
+      .get(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${doneeCnpj}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then(res => setBeneficiaries(res.data))
+      .catch(() => toast.error("Erro ao carregar beneficiários."));
   }, [doneeCnpj]);
 
   const {
@@ -67,12 +63,11 @@ export default function BuysPage() {
     if (!doneeCnpj) return toast.error("CNPJ da instituição não encontrado.");
 
     try {
-      const cleanStoreCnpj = data.storeCnpj.replace(/\D/g, "");
       const payload = {
         date: new Date().toISOString(),
         type: data.donationType,
         storeName: data.storeName,
-        cnpj: cleanStoreCnpj,
+        cnpj: data.storeCnpj.replace(/\D/g, ""),
         price: data.price,
         description: data.description,
         quantity: data.quantity,
@@ -80,12 +75,10 @@ export default function BuysPage() {
         benefitiaryId: data.beneficiaryId ? Number(data.beneficiaryId) : null,
       };
 
-      const token = localStorage.getItem("token");
-
       const response = await axios.post("https://localhost:5001/api/buys/addbuy", payload, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -99,91 +92,113 @@ export default function BuysPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar />
-      <main className="flex flex-1 flex-col px-4 py-10 sm:px-6 md:px-10 lg:px-16 md:ml-64">
-        <div className="w-full max-w-3xl mx-auto p-6 sm:p-8 border dark:border-gray-700 rounded-xl shadow-lg bg-white dark:bg-black">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-            <Image src={logo} alt="Logo" width={108.5} height={30} className="hidden sm:block" />
+      <div className="flex-1 max-w-3xl mx-auto my-10 p-6 sm:p-8 border dark:border-gray-700 rounded-xl shadow-lg bg-white dark:bg-black">
+        <div className="flex justify-between items-center mb-8">
+          <Image src={logo} alt="Logo" width={108.5} height={30} className="hidden sm:block" />
+          <div className="flex-1 flex justify-center sm:justify-end">
             <ThemeToggle />
           </div>
+        </div>
 
-          <h1 className="text-2xl sm:text-3xl font-semibold text-center text-zinc-800 dark:text-zinc-100 mb-8">
-            Cadastro de compras para doações
-          </h1>
+        <h1 className="text-3xl font-medium md:text-4xl text-center text-zinc-800 dark:text-zinc-100 mb-8">
+          Cadastro de Compra
+        </h1>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="donationType">Tipo de Doação</label>
-              <select
-                {...register("donationType")}
-                className="w-full p-2 border rounded bg-transparent dark:border-gray-700 dark:text-white"
-              >
-                <option value="">Selecione</option>
-                <option value="Alimentos">Alimentos</option>
-                <option value="Vestuário">Vestuário</option>
-                <option value="Móveis">Móveis</option>
-                <option value="Outros">Outros</option>
-              </select>
-              {errors.donationType && (
-                <p className="text-red-500 text-sm">{errors.donationType.message}</p>
-              )}
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Tipo de Doação</label>
+            <select
+              {...register("donationType")}
+              className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+            >
+              <option value="">Selecione</option>
+              <option value="Alimentos">Alimentos</option>
+              <option value="Vestuário">Vestuário</option>
+              <option value="Móveis">Móveis</option>
+              <option value="Outros">Outros</option>
+            </select>
+            {errors.donationType && <p className="text-red-500 text-sm">{errors.donationType.message}</p>}
+          </div>
 
-            {watchedDonationType && (
-              <>
+          {watchedDonationType && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Quantidade</label>
                 <input
+                  type="number"
                   {...register("quantity")}
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
                   placeholder="Quantidade"
-                  className="w-full p-2 border rounded dark:bg-zinc-800 dark:text-white"
                 />
+                {errors.quantity && <p className="text-red-500 text-sm">{errors.quantity.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Descrição</label>
                 <textarea
                   {...register("description")}
-                  placeholder="Descrição"
-                  className="w-full p-2 border rounded dark:bg-zinc-800 dark:text-white"
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                  placeholder="Descrição da compra"
                 />
+                {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Nome da Loja</label>
                 <input
                   {...register("storeName")}
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
                   placeholder="Nome da Loja"
-                  className="w-full p-2 border rounded dark:bg-zinc-800 dark:text-white"
                 />
+                {errors.storeName && <p className="text-red-500 text-sm">{errors.storeName.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">CNPJ da Loja</label>
                 <input
                   {...register("storeCnpj")}
-                  placeholder="CNPJ da Loja"
-                  className="w-full p-2 border rounded dark:bg-zinc-800 dark:text-white"
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
+                  placeholder="00.000.000/0000-00"
                 />
+                {errors.storeCnpj && <p className="text-red-500 text-sm">{errors.storeCnpj.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Preço Total</label>
                 <input
-                  {...register("price")}
                   type="number"
                   step="0.01"
+                  {...register("price")}
+                  className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
                   placeholder="Preço Total"
-                  className="w-full p-2 border rounded dark:bg-zinc-800 dark:text-white"
                 />
+                {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
+              </div>
 
-                {beneficiaries.length > 0 && (
+              {beneficiaries.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100">Beneficiário</label>
                   <select
                     {...register("beneficiaryId")}
-                    className="w-full p-2 border rounded bg-transparent dark:border-gray-700 dark:text-white"
+                    className="w-full p-2 border rounded-md bg-transparent dark:border-gray-700"
                   >
                     <option value="">Selecione um beneficiário</option>
                     {beneficiaries.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                      </option>
+                      <option key={b.id} value={b.id}>{b.name}</option>
                     ))}
                   </select>
-                )}
-              </>
-            )}
+                </div>
+              )}
 
-            <div className="mt-4">
-              <Button type="submit" className="w-full sm:w-auto">
-                Confirmar Doação
-              </Button>
-            </div>
-          </form>
-        </div>
-      </main>
+              <div className="mt-6">
+                <Button type="submit">Confirmar Compra</Button>
+              </div>
+            </>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

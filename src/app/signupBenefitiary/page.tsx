@@ -75,7 +75,15 @@ export default function SignUpBeneficiaryPage() {
     };
 
     try {
-      await axios.post("https://localhost:5001/api/benefitiary/signupbenefitiary", payload);
+      await axios.post(
+        "https://localhost:5001/api/benefitiary/signupbenefitiary",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
       toast.success("Beneficiário cadastrado com sucesso!");
       reset();
     } catch (error: any) {

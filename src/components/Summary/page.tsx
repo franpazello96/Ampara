@@ -22,7 +22,14 @@ export function Summary() {
         const cnpj = localStorage.getItem("cnpj");
         if (!cnpj) return;
 
-        const response = await fetch(`https://localhost:5001/api/transactions/getalltransactions?doneeCnpj=${encodeURIComponent(cnpj)}`);
+        const response = await fetch(
+          `https://localhost:5001/api/transactions/getalltransactions?doneeCnpj=${encodeURIComponent(cnpj)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          }
+        );
         if (!response.ok) throw new Error("Erro ao buscar dados");
 
         const data: BackendTransaction[] = await response.json();

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,11 @@ export default function Profile() {
     }
     setCnpj(savedCnpj);
 
-    fetch(`https://localhost:5001/api/donee/getbycnpj?cnpj=${encodeURIComponent(savedCnpj)}`)
+    fetch(`https://localhost:5001/api/donee/getbycnpj?cnpj=${encodeURIComponent(savedCnpj)}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    })
       .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();
@@ -59,7 +63,10 @@ export default function Profile() {
 
       const res = await fetch(`https://localhost:5001/api/donee/cnpj?cnpj=${encodeURIComponent(cnpj)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify(bodyData),
       });
 
@@ -72,24 +79,53 @@ export default function Profile() {
   };
 
   const handleDelete = async () => {
-    const confirm = window.confirm("Tem certeza que deseja excluir sua conta?");
-    if (!confirm) return;
+    const confirmToast = toast.info(
+      <div className="flex flex-col">
+        <span>Tem certeza que deseja excluir sua conta?</span>
+        <div className="flex justify-end gap-2 mt-3">
+          <button
+            onClick={async () => {
+              toast.dismiss(confirmToast);
 
-    try {
-      const res = await fetch(`https://localhost:5001/api/donee/cnpj?cnpj=${encodeURIComponent(cnpj)}`, {
-        method: "DELETE",
-      });
+              try {
+                const res = await fetch(`https://localhost:5001/api/donee/cnpj?cnpj=${encodeURIComponent(cnpj)}`, {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                  },
+                });
 
-      if (!res.ok) throw new Error();
+                if (!res.ok) throw new Error();
 
-      localStorage.clear();
-      toast.success("Conta excluída com sucesso!");
-      setTimeout(() => {
-        router.push("/signin");
-      }, 1000);
-    } catch {
-      toast.error("Erro ao excluir conta.");
-    }
+                localStorage.clear();
+                toast.success("Conta excluída com sucesso!");
+                setTimeout(() => {
+                  router.push("/signin");
+                }, 1000);
+              } catch {
+                toast.error("Erro ao excluir conta.");
+              }
+            }}
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Sim
+          </button>
+          <button
+            onClick={() => toast.dismiss(confirmToast)}
+            className="px-3 py-1 text-sm border rounded"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: false,
+        closeOnClick: false,
+        closeButton: false,
+        draggable: false,
+      }
+    );
   };
 
   return (

@@ -40,14 +40,14 @@ namespace AmparaCRUDApi.Data
                 .HasOne(b => b.Donee)
                 .WithMany(o => o.Purchases)
                 .HasForeignKey(b => b.DoneeCnpj)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull); // ← ALTERADO
 
             // RELACIONAMENTO Benefitiary → Donee
             modelBuilder.Entity<Benefitiary>()
                 .HasOne(b => b.Donee)
                 .WithMany(o => o.Benefitiaries)
                 .HasForeignKey(b => b.DoneeCnpj)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull); // ← ALTERADO
 
             // VIEW vw_DailyDonationTotals
             modelBuilder.Entity<DailyDonationTotals>()

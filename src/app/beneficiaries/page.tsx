@@ -35,7 +35,11 @@ export default function Beneficiaries() {
       if (!user?.cnpj) return;
       try {
         const encodedCnpj = encodeURIComponent(user.cnpj);
-        const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${encodedCnpj}`);
+        const res = await fetch(`https://localhost:5001/api/benefitiary/bydonee?cnpj=${encodedCnpj}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         if (!res.ok) throw new Error("404");
         const data = await res.json();
         setBeneficiaries(data);
@@ -102,6 +106,9 @@ export default function Beneficiaries() {
               try {
                 const res = await fetch(`https://localhost:5001/api/benefitiary/${id}`, {
                   method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                  }
                 });
                 if (!res.ok) throw new Error();
                 const updated = beneficiaries.filter(b => b.id !== id);

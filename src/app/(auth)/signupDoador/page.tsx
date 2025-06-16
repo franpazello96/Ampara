@@ -14,25 +14,31 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-const signupSchema = z.object({
-  Name: z
-    .string()
-    .min(3, 'O nome deve ter pelo menos 3 caracteres.')
-    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, 'O nome deve conter apenas letras.'),
-  CPF: z
-    .string()
-    .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido. Use o formato 000.000.000-00.'),
-  Email: z.string().email('Insira um e-mail válido.'),
-  PhoneNumber: z
-    .string()
-    .regex(/^\d{11}$/, 'O telefone deve ter 11 números (somente dígitos).'),
-  Password: z
-    .string()
-    .min(6, 'A senha deve ter pelo menos 6 caracteres.')
-    .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula.')
-    .regex(/[0-9]/, 'A senha deve conter pelo menos um número.')
-    .regex(/[\W_]/, 'A senha deve conter pelo menos um caractere especial.'),
-});
+const signupSchema = z
+  .object({
+    Name: z
+      .string()
+      .min(3, 'O nome deve ter pelo menos 3 caracteres.')
+      .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, 'O nome deve conter apenas letras.'),
+    CPF: z
+      .string()
+      .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido. Use o formato 000.000.000-00.'),
+    Email: z.string().email('Insira um e-mail válido.'),
+    PhoneNumber: z
+      .string()
+      .regex(/^\d{11}$/, 'O telefone deve ter 11 números (somente dígitos).'),
+    Password: z
+      .string()
+      .min(6, 'A senha deve ter pelo menos 6 caracteres.')
+      .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula.')
+      .regex(/[0-9]/, 'A senha deve conter pelo menos um número.')
+      .regex(/[\W_]/, 'A senha deve conter pelo menos um caractere especial.'),
+    ConfirmPassword: z.string(),
+  })
+  .refine((data) => data.Password === data.ConfirmPassword, {
+    message: 'As senhas não coincidem.',
+    path: ['ConfirmPassword'],
+  });
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
@@ -54,6 +60,7 @@ export default function Signup() {
     if (errors.Email) toast.error(errors.Email.message);
     if (errors.PhoneNumber) toast.error(errors.PhoneNumber.message);
     if (errors.Password) toast.error(errors.Password.message);
+    if (errors.ConfirmPassword) toast.error(errors.ConfirmPassword.message);
   }, [errors]);
 
   async function onSubmit(data: SignupFormData) {
@@ -124,27 +131,26 @@ export default function Signup() {
             <div className="space-y-4">
               <div>
                 <Input type="text" placeholder="Nome completo" {...register('Name')} />
-                {errors.Name && <p className="text-sm text-red-500">{errors.Name.message}</p>}
               </div>
 
               <div>
                 <Input type="text" placeholder="CPF (000.000.000-00)" {...register('CPF')} />
-                {errors.CPF && <p className="text-sm text-red-500">{errors.CPF.message}</p>}
               </div>
 
               <div>
                 <Input type="email" placeholder="E-mail" {...register('Email')} />
-                {errors.Email && <p className="text-sm text-red-500">{errors.Email.message}</p>}
               </div>
 
               <div>
                 <Input type="text" placeholder="Telefone (somente números)" {...register('PhoneNumber')} />
-                {errors.PhoneNumber && <p className="text-sm text-red-500">{errors.PhoneNumber.message}</p>}
               </div>
 
               <div>
                 <Input type="password" placeholder="Senha" {...register('Password')} />
-                {errors.Password && <p className="text-sm text-red-500">{errors.Password.message}</p>}
+              </div>
+
+              <div>
+                <Input type="password" placeholder="Confirmar senha" {...register('ConfirmPassword')} />
               </div>
             </div>
 
@@ -170,7 +176,7 @@ export default function Signup() {
               <p className="text-sm text-zinc-600 dark:text-zinc-400">
                 Quero ser um{' '}
                 <Link href="/signupRecebedor" className="text-blue-500 hover:underline">
-                  Beneficiário
+                  Donatário
                 </Link>
               </p>
             </div>

@@ -45,11 +45,21 @@ export default function Dashboard() {
           return
         }
 
-        const [resReceita, resDespesa] = await Promise.all([
-          fetch(`https://localhost:5001/api/dashboard/reciveddonation?doneeCnpj=${encodeURIComponent(doneeCnpj)}`),
-          fetch(`https://localhost:5001/api/dashboard/expenses?doneeCnpj=${encodeURIComponent(doneeCnpj)}`),
-        ])
+        const token = localStorage.getItem("token");
 
+        const [resReceita, resDespesa] = await Promise.all([
+          fetch(`https://localhost:5001/api/dashboard/reciveddonation?doneeCnpj=${encodeURIComponent(doneeCnpj)}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }),
+          fetch(`https://localhost:5001/api/dashboard/expenses?doneeCnpj=${encodeURIComponent(doneeCnpj)}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+        ]);
+        
         if (!resReceita.ok || !resDespesa.ok) throw new Error("Erro ao buscar dados")
 
         const receitas = await resReceita.json()

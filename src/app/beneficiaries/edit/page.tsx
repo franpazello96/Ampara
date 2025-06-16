@@ -27,7 +27,11 @@ export default function EditBeneficiary() {
 
     const fetchBeneficiary = async () => {
       try {
-        const res = await fetch(`https://localhost:5001/api/benefitiary/bydocument?document=${encodeURIComponent(document)}`);
+        const res = await fetch(`https://localhost:5001/api/benefitiary/bydocument?document=${encodeURIComponent(document)}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         if (!res.ok) throw new Error();
         const data = await res.json();
         setFormData({
@@ -76,7 +80,7 @@ export default function EditBeneficiary() {
     ), { autoClose: false });
   };
 
-  const salvarAlteracoes = async () => {
+    const salvarAlteracoes = async () => {
     setSaving(true);
     try {
       const payload = {
@@ -93,7 +97,10 @@ export default function EditBeneficiary() {
 
       const res = await fetch(url, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify(payload)
       });
 
@@ -106,6 +113,7 @@ export default function EditBeneficiary() {
       setSaving(false);
     }
   };
+
 
   const inputBase =
     'w-full px-4 py-2.5 rounded-lg border bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100';

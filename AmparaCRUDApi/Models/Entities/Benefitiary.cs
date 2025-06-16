@@ -13,9 +13,8 @@ public class Benefitiary
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
 
-    [Required]
-    public string DoneeCnpj { get; set; }
-    public Donee Donee { get; set; }
+    public string? DoneeCnpj { get; set; }
+    public Donee? Donee { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

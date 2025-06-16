@@ -28,7 +28,11 @@ export default function RecurringDonations() {
       if (!user?.cnpj) return;
       try {
         const encodedCnpj = encodeURIComponent(user.cnpj);
-        const res = await fetch(`https://localhost:5001/api/donation/recurring/bydonee?cnpj=${encodedCnpj}`);
+        const res = await fetch(`https://localhost:5001/api/donation/recurring/bydonee?cnpj=${encodedCnpj}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         if (!res.ok) throw new Error("Erro ao buscar doações.");
         const data = await res.json();
         setDonations(data);

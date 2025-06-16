@@ -12,34 +12,42 @@ import logo from "@/assets/logo.png";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const signupSchema = z.object({
-  Nome_instituicao: z.string()
-    .min(3, "O nome da instituição deve ter pelo menos 3 caracteres.")
-    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome da instituição deve conter apenas letras."),
+const signupSchema = z
+  .object({
+    Nome_instituicao: z.string()
+      .min(3, "O nome da instituição deve ter pelo menos 3 caracteres.")
+      .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome da instituição deve conter apenas letras."),
 
-  Tipo_instituicao: z.string()
-    .min(3, "O tipo de instituição deve ter pelo menos 3 caracteres.")
-    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O tipo de instituição deve conter apenas letras."),
+    Tipo_instituicao: z.string()
+      .min(3, "O tipo de instituição deve ter pelo menos 3 caracteres.")
+      .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O tipo de instituição deve conter apenas letras."),
 
-  CNPJ: z.string()
-    .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido. Use o formato 00.000.000/0000-00."),
+    CNPJ: z.string()
+      .regex(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, "CNPJ inválido. Use o formato 00.000.000/0000-00."),
 
-  Email: z.string().email("Insira um e-mail válido."),
+    Email: z.string().email("Insira um e-mail válido."),
 
-  Telefone: z.string()
-    .regex(/^\d{11}$/, "O telefone deve ter 11 números e não pode conter espaços ou caracteres especiais."),
+    Telefone: z.string()
+      .regex(/^\d{11}$/, "O telefone deve ter 11 números e não pode conter espaços ou caracteres especiais."),
 
-  Nome_representante: z.string()
-    .min(3, "O nome do representante deve ter pelo menos 3 caracteres.")
-    .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome do representante deve conter apenas letras."),
+    Nome_representante: z.string()
+      .min(3, "O nome do representante deve ter pelo menos 3 caracteres.")
+      .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome do representante deve conter apenas letras."),
 
-  Senha: z.string()
-    .min(6, "A senha deve ter pelo menos 6 caracteres.")
-    .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
-    .regex(/[0-9]/, "A senha deve ter pelo menos um número.")
-    .regex(/[\W_]/, "A senha deve ter pelo menos um caractere especial."),
-});
+    Senha: z.string()
+      .min(6, "A senha deve ter pelo menos 6 caracteres.")
+      .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
+      .regex(/[0-9]/, "A senha deve ter pelo menos um número.")
+      .regex(/[\W_]/, "A senha deve ter pelo menos um caractere especial."),
+
+    ConfirmarSenha: z.string(),
+  })
+  .refine((data) => data.Senha === data.ConfirmarSenha, {
+    message: "As senhas não coincidem.",
+    path: ["ConfirmarSenha"],
+  });
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
@@ -54,6 +62,10 @@ export default function SignupRecebedor() {
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
+
+  useEffect(() => {
+    if (errors.ConfirmarSenha) toast.error(errors.ConfirmarSenha.message);
+  }, [errors.ConfirmarSenha]);
 
   async function onSubmit(data: SignupFormData) {
     try {
@@ -70,8 +82,6 @@ export default function SignupRecebedor() {
       const response = await axios.post("https://localhost:5001/api/donee/signupdonee", addForm, {
         headers: { "Content-Type": "application/json" },
       });
-
-      console.log("Dados enviados:", data);
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Cadastro realizado com sucesso!");
@@ -155,6 +165,11 @@ export default function SignupRecebedor() {
             <Input type="password" placeholder="Senha" {...register("Senha")} />
             {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
 
+            <Input type="password" placeholder="Confirmar senha" {...register("ConfirmarSenha")} />
+            {errors.ConfirmarSenha && (
+              <p className="text-red-500 text-sm">{errors.ConfirmarSenha.message}</p>
+            )}
+
             <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 mt-4">
               Cadastrar
             </Button>
@@ -167,10 +182,7 @@ export default function SignupRecebedor() {
             </p>
 
             <div className="text-center mt-2">
-              <Link
-                href="/"
-                className="inline-block text-sm text-red-500 hover:underline"
-              >
+              <Link href="/" className="inline-block text-sm text-red-500 hover:underline">
                 Cancelar
               </Link>
             </div>
