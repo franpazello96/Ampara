@@ -23,6 +23,17 @@ export default function Home() {
   const [showDropdown, setShowDropdown] = useState(false);
   const carouselRef = useRef<Carousel | null>(null);
   const [hasStartedCounting, setHasStartedCounting] = useState(false);
+  const carouselSectionRef = useRef<HTMLElement | null>(null);
+
+const handleGoToSection = (index: number) => {
+  if (carouselSectionRef.current) {
+    carouselSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  if (carouselRef.current) {
+    carouselRef.current.moveTo(index);
+  }
+};
+
   const { ref: statsRef, inView } = useInView({
     threshold: 0.5,
     triggerOnce: true
@@ -78,28 +89,18 @@ export default function Home() {
 
             <nav className="hidden md:flex items-center gap-8 text-lg font-medium text-zinc-900 dark:text-zinc-100">
               <div className="flex items-center gap-6">
-                <Link
-                  href="#quem-somos"
-                  onClick={() => handleCarouselChange(0)}
-                  className="hover:text-violet-600 transition-all"
-                >
+                <a onClick={() => handleGoToSection(0)} className="hover:text-violet-600 transition-all cursor-pointer">
                   Quem Somos
-                </Link>
-                <Link
-                  href="#objetivo"
-                  onClick={() => handleCarouselChange(1)}
-                  className="hover:text-violet-600 transition-all"
-                >
-                  Nosso Objetivo
-                </Link>
-                <Link
-                  href="#ongs"
-                  onClick={() => handleCarouselChange(2)}
-                  className="hover:text-violet-600 transition-all"
-                >
-                  ONG's Parceiras
-                </Link>
-              </div>
+                </a>
+
+                <a onClick={() => handleGoToSection(1)} className="hover:text-violet-600 transition-all cursor-pointer">
+                    Nosso Objetivo
+                  </a>
+
+                  <a onClick={() => handleGoToSection(2)} className="hover:text-violet-600 transition-all cursor-pointer">
+                    ONG's Parceiras
+                  </a>
+</div>
 
             <div className="relative">
               <button
@@ -139,27 +140,17 @@ export default function Home() {
           {showDropdown && (
             <div className="md:hidden py-4 bg-white dark:bg-zinc-800 border-t border-zinc-200 dark:border-zinc-700">
               <div className="flex flex-col space-y-4 text-base font-medium">
-                <Link
-                  href="#quem-somos"
-                  onClick={() => handleCarouselChange(0)}
-                  className="px-4 py-2 hover:text-violet-600 transition-all"
-                >
+                <a onClick={() => handleGoToSection(0)} className="px-4 py-2 hover:text-violet-600 transition-all cursor-pointer">
                   Quem Somos
-                </Link>
-                <Link
-                  href="#objetivo"
-                  onClick={() => handleCarouselChange(1)}
-                  className="px-4 py-2 hover:text-violet-600 transition-all"
-                >
+                </a>
+                <a onClick={() => handleGoToSection(1)} className="px-4 py-2 hover:text-violet-600 transition-all cursor-pointer">
                   Nosso Objetivo
-                </Link>
-                <Link
-                  href="#ongs"
-                  onClick={() => handleCarouselChange(2)}
-                  className="px-4 py-2 hover:text-violet-600 transition-all"
-                >
+                </a>
+
+                <a onClick={() => handleGoToSection(2)} className="px-4 py-2 hover:text-violet-600 transition-all cursor-pointer">
                   ONG's Parceiras
-                </Link>
+                </a>
+
                 <div className="px-4 py-2 space-y-3">
                   <Link href="/signupDoador" className="block">
                     <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2.5 rounded-lg shadow-lg transition-all font-semibold">
@@ -178,7 +169,6 @@ export default function Home() {
                   </Link>
                 </div>
                 <div className="px-4 py-2">
-                  <ThemeToggle />
                 </div>
               </div>
             </div>
@@ -205,9 +195,10 @@ export default function Home() {
       </section>
 
       <section
-        id="quem-somos"
+        ref={carouselSectionRef}
         className="w-full bg-zinc-100 dark:bg-zinc-800 text-purple-800 dark:text-white"
-      >
+        >
+
         <div className="text-center py-12">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
             Descubra Mais Sobre Nosso Impacto
@@ -383,19 +374,19 @@ export default function Home() {
             <h3 className="text-2xl font-bold mb-4">Links Rápidos</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#quem-somos" className="text-zinc-300 hover:text-white transition-colors">
+                <a onClick={() => handleGoToSection(0)} className="text-zinc-300 hover:text-white transition-colors cursor-pointer">
                   Quem Somos
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="#objetivo" className="text-zinc-300 hover:text-white transition-colors">
-                  Nosso Objetivo
-                </Link>
+                <a onClick={() => handleGoToSection(1)} className="text-zinc-300 hover:text-white transition-colors cursor-pointer">
+                   Nosso Objetivo
+              </a>
               </li>
               <li>
-                <Link href="#ongs" className="text-zinc-300 hover:text-white transition-colors">
-                  ONG's Parceiras
-                </Link>
+                <a onClick={() => handleGoToSection(2)} className="text-zinc-300 hover:text-white transition-colors cursor-pointer">
+                   ONG's Parceiras
+                </a>
               </li>
             </ul>
           </div>

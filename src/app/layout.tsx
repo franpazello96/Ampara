@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import { Toaster } from "../components/Toaster";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { ThemeProvider } from "../components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "Ampara",
@@ -9,17 +11,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
-      <body className="bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-200
-        text-zinc-900 min-h-screen flex">
-        <main className="w-full mx-auto px-5 py-8">
-          {children}
-          <Toaster />
-        </main>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className="bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-200 min-h-screen w-full">
+        <ThemeProvider>
+          <ThemeToggle />
+          <main className="w-full min-h-screen">
+            {children}
+            <Toaster />
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
