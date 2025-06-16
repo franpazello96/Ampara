@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -79,31 +79,30 @@ export default function SignupRecebedor() {
         router.push("/signin");
       }
     } catch (error: any) {
-        let errorMessage = "Erro desconhecido";
+      let errorMessage = "Erro desconhecido";
 
-        if (error.response?.data) {
-          if (typeof error.response.data === "string") {
-            errorMessage = error.response.data;
-          } else if (typeof error.response.data === "object" && error.response.data.message) {
-            errorMessage = error.response.data.message;
-          } else {
-            errorMessage = JSON.stringify(error.response.data);
-          }
-        }
-
-        if (
-          errorMessage.includes("E-mail já cadastrado") ||
-          errorMessage.includes("Telefone já cadastrado") ||
-          errorMessage.includes("CNPJ já cadastrado")
-        ) {
-          toast.warn(errorMessage);
+      if (error.response?.data) {
+        if (typeof error.response.data === "string") {
+          errorMessage = error.response.data;
+        } else if (typeof error.response.data === "object" && error.response.data.message) {
+          errorMessage = error.response.data.message;
         } else {
-          toast.error("Falha ao cadastrar o usuário: " + errorMessage);
+          errorMessage = JSON.stringify(error.response.data);
         }
-
-        console.log("Erro ao cadastrar o usuário:", errorMessage);
       }
 
+      if (
+        errorMessage.includes("E-mail já cadastrado") ||
+        errorMessage.includes("Telefone já cadastrado") ||
+        errorMessage.includes("CNPJ já cadastrado")
+      ) {
+        toast.warn(errorMessage);
+      } else {
+        toast.error("Falha ao cadastrar o usuário: " + errorMessage);
+      }
+
+      console.log("Erro ao cadastrar o usuário:", errorMessage);
+    }
   }
 
   return (
@@ -166,6 +165,15 @@ export default function SignupRecebedor() {
                 Faça login
               </Link>
             </p>
+
+            <div className="text-center mt-2">
+              <Link
+                href="/"
+                className="inline-block text-sm text-red-500 hover:underline"
+              >
+                Cancelar
+              </Link>
+            </div>
           </form>
         </div>
       </div>

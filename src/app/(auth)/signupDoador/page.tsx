@@ -19,17 +19,13 @@ const signupSchema = z.object({
     .string()
     .min(3, 'O nome deve ter pelo menos 3 caracteres.')
     .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, 'O nome deve conter apenas letras.'),
-
   CPF: z
     .string()
     .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido. Use o formato 000.000.000-00.'),
-
   Email: z.string().email('Insira um e-mail válido.'),
-
   PhoneNumber: z
     .string()
     .regex(/^\d{11}$/, 'O telefone deve ter 11 números (somente dígitos).'),
-
   Password: z
     .string()
     .min(6, 'A senha deve ter pelo menos 6 caracteres.')
@@ -177,6 +173,15 @@ export default function Signup() {
                   Beneficiário
                 </Link>
               </p>
+            </div>
+
+            <div className="text-center mt-4">
+              <Link
+                href="/"
+                className="inline-block text-sm text-red-500 hover:underline mt-2"
+              >
+                Cancelar
+              </Link>
             </div>
           </form>
         </div>
