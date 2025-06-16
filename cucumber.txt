@@ -1,0 +1,79 @@
+Funcionalidade: Cadastro de doador
+
+  Cenário: Doador se cadastra com sucesso
+    Dado que estou na tela de cadastro de doador
+    Quando preencho o CPF, nome, e-mail, telefone e senha
+    E clico em "Cadastrar"
+    Então devo ver uma mensagem "Cadastro realizado com sucesso"
+    E meus dados devem estar salvos no sistema
+
+  Cenário: Cadastro falha por CPF duplicado
+    Dado que estou na tela de cadastro de doador
+    E já existe um doador com o mesmo CPF
+    Quando preencho os dados e clico em "Cadastrar"
+    Então devo ver uma mensagem de erro "CPF já cadastrado"
+
+
+
+
+Funcionalidade: Login de usuários
+
+  Cenário: Login válido de um doador
+    Dado que sou um doador cadastrado
+    Quando acesso a tela de login
+    E informo meu e-mail e senha corretos
+    Então devo ser redirecionado para o painel do doador
+
+  Cenário: Tentativa de login com senha incorreta
+    Dado que sou um doador cadastrado
+    Quando acesso a tela de login
+    E informo meu e-mail e uma senha incorreta
+    Então devo ver uma mensagem "Senha inválida"
+
+
+
+
+Funcionalidade: Realizar doação em dinheiro
+
+  Cenário: Doador realiza uma doação com sucesso
+    Dado que estou logado como doador
+    E acesso a página de doação monetária
+    Quando preencho o valor, descrição e seleciono a ONG
+    E clico em "Confirmar doação"
+    Então a doação deve ser registrada no histórico
+    E o sistema deve exibir "Doação realizada com sucesso"
+
+
+
+
+
+Funcionalidade: Visualizar histórico de doações
+
+  Cenário: Doador visualiza suas doações anteriores
+    Dado que estou logado como doador
+    Quando acesso a seção "Minhas Doações"
+    Então devo ver uma lista com as doações realizadas
+    E cada doação deve exibir tipo, valor, data e nome da instituição
+
+
+
+Funcionalidade: Acompanhamento financeiro da ONG
+
+  Cenário: ONG acessa painel de transações
+    Dado que estou logado como uma ONG
+    Quando acesso a aba "Transações"
+    Então devo ver uma lista de entradas e saídas
+    E cada transação deve exibir data, tipo, valor e descrição
+
+  Cenário: ONG visualiza gráfico de doações diárias
+    Dado que estou logado como uma ONG
+    Quando acesso a aba "Painel"
+    Então devo ver um gráfico com as doações recebidas por dia
+
+
+
+
+
+
+
+
