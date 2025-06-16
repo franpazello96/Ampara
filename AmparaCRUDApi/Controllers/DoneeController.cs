@@ -81,7 +81,7 @@ namespace AmparaCRUDApi.Controllers
             dbContext.Donees.Add(doneeEntity);
             dbContext.SaveChanges();
 
-            return Ok("Donee successfully created.");
+            return Ok("Donatário criado com sucesso.");
         }
 
         [Authorize(Roles = "donee")]
@@ -128,7 +128,7 @@ namespace AmparaCRUDApi.Controllers
             dbContext.Donees.Remove(donee);
             dbContext.SaveChanges();
 
-            return Ok("Donee deletado com sucesso.");
+            return Ok("Donatário deletado com sucesso.");
         }
     }
 }

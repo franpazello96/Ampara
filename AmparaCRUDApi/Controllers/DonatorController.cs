@@ -35,7 +35,7 @@ namespace AmparaCRUDApi.Controllers
         public IActionResult AddDonator([FromBody] AddDonatorDTO addDonatorDTO)
         {
             if (dbContext.Donators.Any(d => d.CPF == addDonatorDTO.CPF))
-                return BadRequest("CPF already registered");
+                return BadRequest("CPF já registrado");
 
             var donatorEntity = new Donator()
             {
@@ -49,7 +49,7 @@ namespace AmparaCRUDApi.Controllers
             dbContext.Donators.Add(donatorEntity);
             dbContext.SaveChanges();
 
-            return Ok("Donator successfully created.");
+            return Ok("Doador criado com sucesso.");
         }
 
         [Authorize(Roles = "donator")]
