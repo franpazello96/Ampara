@@ -12,7 +12,6 @@ public class Donee
     public required string RepresentativeName { get; set; }
     public required string Password { get; set; }
 
-    // RELAÇÃO REVERSA
     public ICollection<Donation> DonationsReceived { get; set; }
     public ICollection<Buys> Purchases { get; set; }
     public ICollection<Benefitiary> Benefitiaries { get; set; }

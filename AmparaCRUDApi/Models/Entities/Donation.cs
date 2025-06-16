@@ -27,5 +27,5 @@ public class Donation
     public string? DoneeCnpj { get; set; }
     public Donee Donee { get; set; }
 
-    public string? DoneeNameSnapshot { get; set; } // ✅ Nova propriedade adicionada
+    public string? DoneeNameSnapshot { get; set; } 
 }

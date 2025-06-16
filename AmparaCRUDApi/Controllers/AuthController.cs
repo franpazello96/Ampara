@@ -78,7 +78,7 @@ namespace AmparaCRUDApi.Controllers
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, donee.Email),
-                new Claim("email", donee.Email), // ← Adicionado
+                new Claim("email", donee.Email),
                 new Claim("cnpj", donee.CNPJ),
                 new Claim("role", "donee"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

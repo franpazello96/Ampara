@@ -153,7 +153,7 @@ namespace AmparaCRUDApi.Controllers
                                  DonatorCpf = d.DonatorCpf,
                                  DoneeCnpj = d.DoneeCnpj,
                                  DoneeName = i != null ? i.InstitutionName : null,
-                                 DoneeNameSnapshot = d.DoneeNameSnapshot // ✅ incluído aqui
+                                 DoneeNameSnapshot = d.DoneeNameSnapshot 
                              }).ToList();
 
             return Ok(donations);
