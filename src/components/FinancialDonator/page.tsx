@@ -31,8 +31,14 @@ export default function FinancialDonator() {
   useEffect(() => {
     async function fetchDonations() {
       try {
-        const response = await fetch(`https://localhost:5001/api/donation/bydonator/${user?.cpf}`);
+        const response = await fetch(`https://localhost:5001/api/donation/bydonator/${user?.cpf}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+
         if (!response.ok) throw new Error("Erro ao buscar doações.");
+
         const data = await response.json();
         setDonations(data);
       } catch (error) {
@@ -112,11 +118,12 @@ export default function FinancialDonator() {
                       method: "PUT",
                       headers: {
                         "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                       },
                       body: JSON.stringify(payload),
                     }
                   );
-
+                  
                   if (!response.ok) throw new Error();
 
                   toast.success("Doação atualizada com sucesso!");

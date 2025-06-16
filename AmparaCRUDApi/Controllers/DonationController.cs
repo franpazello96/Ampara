@@ -1,6 +1,7 @@
 ﻿using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
 using AmparaCRUDApi.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -17,6 +18,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donator")]
         [HttpPost("fooddonation")]
         public IActionResult FoodDonation(DonationDTO dto)
         {
@@ -51,6 +53,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donationEntity);
         }
 
+        [Authorize(Roles = "donator")]
         [HttpPost("moneydonation")]
         public IActionResult MoneyDonation(DonationDTO dto)
         {
@@ -85,6 +88,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donationEntity);
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet("bydonator/{cpf}")]
         public IActionResult GetByDonator(string cpf)
         {
@@ -112,6 +116,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donations);
         }
 
+        [Authorize(Roles = "donator")]
         [HttpPut("update/{id}")]
         public IActionResult UpdateRecurringDonation(int id, [FromBody] DonationDTO dto)
         {
@@ -136,6 +141,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donation);
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet("recurring/bydonee")]
         public IActionResult GetRecurringDonationsByDonee([FromQuery] string cnpj)
         {

@@ -1,6 +1,7 @@
 ﻿using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
 using AmparaCRUDApi.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPost("addbuy")]
         public async Task<IActionResult> AddBuy([FromBody] AddBuysDTO dto)
         {
@@ -58,6 +60,7 @@ namespace AmparaCRUDApi.Controllers
             return CreatedAtAction(nameof(GetBuyById), new { id = buy.Id }, dto);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBuyById(int id)
         {

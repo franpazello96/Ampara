@@ -3,6 +3,7 @@ using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AmparaCRUDApi.Controllers
 {
@@ -17,6 +18,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet]
         public IActionResult GetAllDonees()
         {
@@ -27,6 +29,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donees);
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet("getbycnpj")]
         public IActionResult GetDoneeByCnpj([FromQuery] CnpjRequestModel model)
         {
@@ -81,6 +84,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok("Donee successfully created.");
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPut("cnpj")]
         public IActionResult UpdateDoneeByCnpj([FromQuery] CnpjRequestModel model, [FromBody] UpdateDoneeDTO dto)
         {
@@ -104,6 +108,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok("Donee atualizado com sucesso.");
         }
 
+        [Authorize(Roles = "donee")]
         [HttpDelete("cnpj")]
         public IActionResult DeleteDoneeByCnpj([FromQuery] CnpjRequestModel model)
         {

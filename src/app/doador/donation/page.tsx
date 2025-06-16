@@ -30,8 +30,12 @@ export default function DonationPage() {
   useEffect(() => {
     async function fetchInstitutions() {
       try {
-        const response = await axios.get("https://localhost:5001/api/donee");
-
+        const response = await axios.get("https://localhost:5001/api/donee", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        
         const data = Array.isArray(response.data)
           ? response.data
           : Array.isArray(response.data?.$values)

@@ -27,7 +27,12 @@ export default function EditProfile() {
     if (isAuthenticated && cpf) {
       async function fetchProfile() {
         try {
-          const response = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`);
+          const response = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          });
+
           if (!response.ok) throw new Error('Erro ao buscar perfil.');
 
           const data = await response.json();
@@ -90,7 +95,8 @@ export default function EditProfile() {
       const response = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify(payload)
       });
@@ -235,7 +241,10 @@ export default function EditProfile() {
 
                                 try {
                                   const res = await fetch(`https://localhost:5001/api/donator/cpf/${cpf}`, {
-                                    method: 'DELETE'
+                                    method: 'DELETE',
+                                    headers: {
+                                      Authorization: `Bearer ${localStorage.getItem("token")}`
+                                    }
                                   });
 
                                   if (!res.ok) throw new Error("Erro ao deletar conta.");

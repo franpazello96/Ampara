@@ -15,6 +15,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet]
         public IActionResult GetAllDonators()
         {
@@ -22,6 +23,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(allDonators);
         }
 
+        [Authorize(Roles = "donator,donee")]
         [HttpGet("cpf/{cpf}")]
         public IActionResult GetDonatorByCpf(string cpf)
         {
@@ -50,6 +52,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok("Donator successfully created.");
         }
 
+        [Authorize(Roles = "donator")]
         [HttpPut("cpf/{cpf}")]
         public IActionResult UpdateDonator(string cpf, [FromBody] UpdateDonatorDTO dto)
         {
@@ -76,6 +79,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(donator);
         }
 
+        [Authorize(Roles = "donator")]
         [HttpDelete("cpf/{cpf}")]
         public IActionResult DeleteDonator(string cpf)
         {

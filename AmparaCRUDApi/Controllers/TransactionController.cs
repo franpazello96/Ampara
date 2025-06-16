@@ -1,5 +1,6 @@
 ﻿using AmparaCRUDApi.Data;
 using AmparaCRUDApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("getalltransactions")]
         public async Task<IActionResult> GetAllTransactions([FromQuery] string doneeCnpj)
         {

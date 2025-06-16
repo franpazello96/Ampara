@@ -3,6 +3,7 @@ using AmparaCRUDApi.Data;
 using System.Linq;
 using AmparaCRUDApi.Models.Entities;
 using AmparaCRUDApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AmparaCRUDApi.Controllers
 {
@@ -15,7 +16,8 @@ namespace AmparaCRUDApi.Controllers
         {
             this.dbContext = dbContext;
         }
-
+        
+        [Authorize(Roles = "donee")]
         [HttpGet("bydonee")]
         public ActionResult<List<BenefitiaryDTO>> GetByDonee([FromQuery] CnpjRequestModel cnpjModel)
         {
@@ -37,6 +39,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(beneficiaries);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPost("signupbenefitiary")]
         public IActionResult AddBenefitiary(AddBenefitiaryDTO dto)
         {
@@ -70,6 +73,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(entity);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPut("cpf/{cpf}")]
         public IActionResult UpdateByCpf(string cpf, [FromBody] UpdateBenefitiaryDTO dto)
         {
@@ -84,6 +88,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(existing);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpPut("cnpj")]
         public IActionResult UpdateByCnpj([FromQuery] CnpjRequestModel model, [FromBody] UpdateBenefitiaryDTO dto)
         {
@@ -101,6 +106,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(existing);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpDelete("{id}")]
         public IActionResult DeleteBenefitiary(int id)
         {
@@ -114,6 +120,7 @@ namespace AmparaCRUDApi.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("bydocument")]
         public IActionResult GetByDocument([FromQuery] string document)
         {

@@ -1,4 +1,5 @@
 ﻿using AmparaCRUDApi.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace AmparaCRUDApi.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("reciveddonation")]
         public IActionResult GetAllDailyTotals([FromQuery] string doneeCnpj)
         {
@@ -27,6 +29,7 @@ namespace AmparaCRUDApi.Controllers
             return Ok(totals);
         }
 
+        [Authorize(Roles = "donee")]
         [HttpGet("expenses")]
         public async Task<IActionResult> GetExpenses([FromQuery] string doneeCnpj)
         {
