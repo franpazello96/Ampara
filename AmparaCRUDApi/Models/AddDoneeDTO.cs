@@ -17,6 +17,8 @@ namespace AmparaCRUDApi.Models
         [Required]
         public string RepresentativeName { get; set; }
         [Required]
+
+        public string FavoriteColor { get; set; }
         public string Password { get; set; }
     }
 }

@@ -47,7 +47,8 @@ namespace AmparaCRUDApi.Controllers
                 donee.InstitutionType,
                 donee.Email,
                 donee.PhoneNumber,
-                donee.RepresentativeName
+                donee.RepresentativeName,
+                donee.FavoriteColor
             });
         }
 
@@ -75,6 +76,7 @@ namespace AmparaCRUDApi.Controllers
                 Email = addDoneeDTO.Email,
                 PhoneNumber = addDoneeDTO.PhoneNumber,
                 RepresentativeName = addDoneeDTO.RepresentativeName,
+                FavoriteColor = addDoneeDTO.FavoriteColor,
                 Password = BCrypt.Net.BCrypt.HashPassword(addDoneeDTO.Password),
             };
 

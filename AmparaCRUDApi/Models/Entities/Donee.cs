@@ -11,6 +11,8 @@ public class Donee
     public required string PhoneNumber { get; set; }
     public required string RepresentativeName { get; set; }
     public required string Password { get; set; }
+    public required string? FavoriteColor { get; set; }
+
 
     public ICollection<Donation> DonationsReceived { get; set; }
     public ICollection<Buys> Purchases { get; set; }

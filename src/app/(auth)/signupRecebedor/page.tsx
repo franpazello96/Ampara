@@ -36,6 +36,7 @@ const signupSchema = z
       .min(3, "O nome do representante deve ter pelo menos 3 caracteres.")
       .regex(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/, "O nome do representante deve conter apenas letras."),
 
+    CorFavorita: z.string(),
     Senha: z.string()
       .min(6, "A senha deve ter pelo menos 6 caracteres.")
       .regex(/[A-Z]/, "A senha deve ter pelo menos uma letra maiúscula.")
@@ -76,6 +77,7 @@ export default function SignupRecebedor() {
         Email: data.Email,
         PhoneNumber: data.Telefone,
         RepresentativeName: data.Nome_representante,
+        FavoriteColor: data.CorFavorita,
         Password: data.Senha,
       };
 
@@ -161,6 +163,8 @@ export default function SignupRecebedor() {
             {errors.Nome_representante && (
               <p className="text-red-500 text-sm">{errors.Nome_representante.message}</p>
             )}
+            
+            <Input type="text" placeholder="Cor Favorita" {...register("CorFavorita")} />
 
             <Input type="password" placeholder="Senha" {...register("Senha")} />
             {errors.Senha && <p className="text-red-500 text-sm">{errors.Senha.message}</p>}
