@@ -27,7 +27,8 @@ const signupSchema = z
     PhoneNumber: z
       .string()
       .regex(/^\d{11}$/, 'O telefone deve ter 11 números (somente dígitos).'),
-    Password: z
+      SocialName: z.string().nullable().or(z.literal('')),
+      Password: z
       .string()
       .min(6, 'A senha deve ter pelo menos 6 caracteres.')
       .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula.')
@@ -61,6 +62,7 @@ export default function Signup() {
     if (errors.PhoneNumber) toast.error(errors.PhoneNumber.message);
     if (errors.Password) toast.error(errors.Password.message);
     if (errors.ConfirmPassword) toast.error(errors.ConfirmPassword.message);
+    if (errors.SocialName) toast.error(errors.SocialName.message);
   }, [errors]);
 
   async function onSubmit(data: SignupFormData) {
@@ -70,6 +72,7 @@ export default function Signup() {
         Name: data.Name,
         Email: data.Email,
         PhoneNumber: data.PhoneNumber,
+        SocialName: data.SocialName,
         Password: data.Password,
       };
 
@@ -143,6 +146,10 @@ export default function Signup() {
 
               <div>
                 <Input type="text" placeholder="Telefone (somente números)" {...register('PhoneNumber')} />
+              </div>
+
+              <div>
+                <Input type="text" placeholder="Nome social (opcional)" {...register('SocialName')} />
               </div>
 
               <div>

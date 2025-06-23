@@ -16,6 +16,8 @@ namespace AmparaCRUDApi.Models
         [Required]
         public string PhoneNumber { get; set; }
 
+        public string SocialName { get; set; }
+
         [Required]
         public string Password { get; set; }
     }

@@ -43,6 +43,7 @@ namespace AmparaCRUDApi.Controllers
                 Name = addDonatorDTO.Name,
                 Email = addDonatorDTO.Email,
                 PhoneNumber = addDonatorDTO.PhoneNumber,
+                SocialName = addDonatorDTO.SocialName,
                 Password = BCrypt.Net.BCrypt.HashPassword(addDonatorDTO.Password)
             };
 
@@ -66,6 +67,7 @@ namespace AmparaCRUDApi.Controllers
             donator.Name = dto.Name;
             donator.Email = dto.Email;
             donator.PhoneNumber = dto.PhoneNumber;
+            donator.SocialName = dto.SocialName;
 
             if (!string.IsNullOrEmpty(dto.NewPassword))
             {

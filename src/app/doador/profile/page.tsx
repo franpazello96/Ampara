@@ -14,6 +14,7 @@ export default function EditProfile() {
     nome: '',
     email: '',
     telefone: '',
+    nomeSocial: '',
     senhaAtual: '',
     novaSenha: '',
     confirmarSenha: ''
@@ -40,7 +41,8 @@ export default function EditProfile() {
             ...prev,
             nome: data.name,
             email: data.email,
-            telefone: data.phoneNumber
+            telefone: data.phoneNumber,
+            nomeSocial: data.socialName || ''
           }));
         } catch (err) {
           toast.error('Erro ao carregar perfil.');
@@ -87,6 +89,7 @@ export default function EditProfile() {
         name: formData.nome,
         email: formData.email,
         phoneNumber: formData.telefone,
+        socialName: formData.nomeSocial,
         currentPassword: formData.senhaAtual,
         newPassword: formData.novaSenha || null,
         confirmPassword: formData.confirmarSenha || null
@@ -157,6 +160,19 @@ export default function EditProfile() {
                   />
                 </div>
               ))}
+
+              <div className="space-y-2">
+                <label htmlFor="socialName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Nome Social
+                </label>
+                <input
+                  id="nomeSocial"
+                  type="text"
+                  className={`${inputBase} border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500`}
+                  value={formData.nomeSocial}
+                  onChange={(e) => setFormData({ ...formData, nomeSocial: e.target.value })}
+                />
+              </div>
 
               <div className="space-y-2">
                 <label htmlFor="senhaAtual" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
